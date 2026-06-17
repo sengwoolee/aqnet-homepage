@@ -7,7 +7,6 @@ const stripTrack = document.querySelector("[data-strip]");
 const progressBar = document.querySelector("[data-progress]");
 const heroEl = document.querySelector(".hero");
 const heroConsole = document.querySelector(".hero-console-stack");
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -32,7 +31,7 @@ let heroHeight = heroEl ? heroEl.offsetHeight : 1;
 let scrollTicking = false;
 
 const parallaxAllowed = () =>
-  !prefersReducedMotion && window.matchMedia("(pointer:fine)").matches && window.innerWidth > 1024;
+  window.matchMedia("(pointer:fine)").matches && window.innerWidth > 1024;
 
 function onScrollFrame() {
   const y = window.scrollY;
@@ -197,11 +196,6 @@ if (counters.length) {
       const cell = el.closest("article");
       if (cell) cell.classList.add("counted");
     };
-    if (prefersReducedMotion) {
-      el.textContent = `${target}${suffix}`;
-      done();
-      return;
-    }
     const duration = 1100;
     const start = performance.now();
     const step = (now) => {
@@ -246,7 +240,7 @@ const drawChartBars = (bars) => {
 };
 
 if (revealItems.length) {
-  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+  if (!("IntersectionObserver" in window)) {
     revealItems.forEach((el) => el.classList.add("is-visible"));
     const bars = document.querySelector("[data-bars]");
     if (bars) bars.classList.add("drawn");

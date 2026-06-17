@@ -2312,46 +2312,8 @@ body.menu-open .site-header {
   transition-delay: calc(var(--i, 0) * var(--stagger-step));
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .chart-bars[data-bars]:not(.drawn) span {
-    transform: none;
-  }
-
-  /* 시그니처/앰비언트 모션은 모션 줄이기와 무관하게 항상 동작 (요청) */
-  .strip-track {
-    animation-duration: 32s !important;
-    animation-iteration-count: infinite !important;
-  }
-
-  .loop-rail {
-    animation-duration: 2.5s !important;
-    animation-iteration-count: infinite !important;
-  }
-
-  .live-badge i {
-    animation-duration: 1.8s !important;
-    animation-iteration-count: infinite !important;
-  }
-
-  .hero-scrollcue span {
-    animation-duration: 1.8s !important;
-    animation-iteration-count: infinite !important;
-  }
-}
+/* 모션 정책: 요청에 따라 모든 애니메이션/인터랙션을 OS '모션 줄이기' 설정과
+   무관하게 항상 재생합니다. (prefers-reduced-motion 비활성화 블록 제거) */
 
 /* =========================================================
    RESPONSIVE
