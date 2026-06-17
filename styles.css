@@ -2330,6 +2330,12 @@ body.menu-open .site-header {
   .chart-bars[data-bars]:not(.drawn) span {
     transform: none;
   }
+
+  /* 채널띠는 모션 줄이기와 무관하게 항상 흐르도록 (요청) */
+  .strip-track {
+    animation-duration: 32s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* =========================================================

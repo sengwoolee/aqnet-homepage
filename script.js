@@ -460,7 +460,7 @@ if (canvas && canvas.getContext) {
   }
 
   function startLoop() {
-    if (running || prefersReducedMotion) return;
+    if (running) return;
     running = true;
     animationFrame = requestAnimationFrame(drawScene);
   }
@@ -471,13 +471,8 @@ if (canvas && canvas.getContext) {
     animationFrame = null;
   }
 
-  function renderStatic() {
-    running = false;
-    drawScene();
-  }
-
-  // 포인터 잔물결 — 좌표만 저장(그리지 않음)
-  if (!prefersReducedMotion && heroEl) {
+  // 포인터 잔물결 — 좌표만 저장(그리지 않음). 모션 설정과 무관하게 항상 동작.
+  if (heroEl) {
     heroEl.addEventListener(
       "pointermove",
       (event) => {
@@ -498,7 +493,7 @@ if (canvas && canvas.getContext) {
 
   // 가시성 정지 — 화면 밖 / 탭 비활성 시 루프 중단
   let heroVisible = true;
-  if (!prefersReducedMotion && "IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window) {
     const visObserver = new IntersectionObserver(
       (entries) => {
         heroVisible = entries[0].isIntersecting;
@@ -525,11 +520,7 @@ if (canvas && canvas.getContext) {
   );
 
   resizeCanvas();
-  if (prefersReducedMotion) {
-    renderStatic();
-  } else {
-    startLoop();
-  }
+  startLoop();
 
   let resizeTimer;
   window.addEventListener("resize", () => {
@@ -537,9 +528,7 @@ if (canvas && canvas.getContext) {
     resizeTimer = window.setTimeout(() => {
       heroHeight = heroEl ? heroEl.offsetHeight : 1;
       resizeCanvas();
-      if (prefersReducedMotion) {
-        renderStatic();
-      } else if (heroVisible && !document.hidden) {
+      if (heroVisible && !document.hidden) {
         stopLoop();
         startLoop();
       }
