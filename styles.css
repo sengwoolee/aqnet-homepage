@@ -994,12 +994,28 @@ body.menu-open .site-header {
   opacity: 0.5;
 }
 
-.about-statement p {
+.statement-body {
   position: relative;
+  z-index: 1;
+}
+
+.statement-lead {
   margin: 0;
-  font-size: clamp(20px, 2.6vw, 30px);
-  line-height: 1.55;
-  font-weight: 800;
+  font-size: clamp(20px, 2.3vw, 27px);
+  line-height: 1.5;
+  font-weight: 850;
+  color: var(--white);
+  word-break: keep-all;
+}
+
+.statement-sub {
+  margin: 22px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-1);
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.7;
+  font-weight: 600;
+  color: var(--text-d-2);
   word-break: keep-all;
 }
 
