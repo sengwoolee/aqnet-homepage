@@ -1009,9 +1009,7 @@ body.menu-open .site-header {
 }
 
 .statement-sub {
-  margin: 22px 0 0;
-  padding-top: 22px;
-  border-top: 1px solid var(--border-1);
+  margin: 18px 0 0;
   font-size: clamp(15px, 1.5vw, 17px);
   line-height: 1.7;
   font-weight: 600;
@@ -1019,18 +1017,47 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
-.proof-points {
+/* 주장(메인+서브) ↔ 근거(역량 태그) 위계 — 가로줄 대체 */
+.proof {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  z-index: 1;
   margin-top: 36px;
 }
 
-.proof-points span {
+.proof-label {
   display: inline-flex;
-  min-height: 38px;
   align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--text-d-3);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.proof-label::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+
+.proof-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.proof-points li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
   padding: 0 14px;
   border-radius: var(--r-pill);
   border: 1px solid var(--border-2);
@@ -1038,6 +1065,15 @@ body.menu-open .site-header {
   color: var(--text-d-2);
   font-size: 13px;
   font-weight: 750;
+}
+
+.proof-points li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  opacity: 0.8;
 }
 
 /* Timeline */
