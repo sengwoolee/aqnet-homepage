@@ -994,17 +994,6 @@ body.menu-open .site-header {
   opacity: 0.5;
 }
 
-.brand-watermark {
-  position: absolute;
-  top: -14px;
-  right: -10px;
-  width: 150px;
-  height: 150px;
-  color: var(--cyan);
-  opacity: 0.12;
-  pointer-events: none;
-}
-
 .about-statement p {
   position: relative;
   margin: 0;
@@ -1045,14 +1034,15 @@ body.menu-open .site-header {
   gap: 6px;
 }
 
-.timeline::before {
+/* 노드 중심끼리만 연결 — 마지막 노드 아래로 선이 삐져나오지 않게 */
+.t-step:not(:last-child)::before {
   content: "";
   position: absolute;
   left: 23px;
-  top: 24px;
-  bottom: 24px;
+  top: 40px;
+  bottom: -46px;
   width: 2px;
-  background: linear-gradient(var(--border-l2), var(--border-l3), var(--border-l2));
+  background: linear-gradient(var(--border-l3), var(--border-l2));
 }
 
 .t-step {
