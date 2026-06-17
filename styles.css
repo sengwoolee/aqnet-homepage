@@ -1294,20 +1294,21 @@ body.menu-open .site-header {
 }
 
 .service-card li {
-  position: relative;
-  padding-left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-l-1);
   font-size: 15px;
+  line-height: 1.45;
   font-weight: 650;
 }
 
 .service-card li::before {
   content: "";
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 8px;
-  height: 8px;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-top: -2px;
   border-left: 1.75px solid var(--blue);
   border-bottom: 1.75px solid var(--blue);
   transform: rotate(-45deg);
