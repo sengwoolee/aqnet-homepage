@@ -2331,9 +2331,24 @@ body.menu-open .site-header {
     transform: none;
   }
 
-  /* 채널띠는 모션 줄이기와 무관하게 항상 흐르도록 (요청) */
+  /* 시그니처/앰비언트 모션은 모션 줄이기와 무관하게 항상 동작 (요청) */
   .strip-track {
     animation-duration: 32s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .loop-rail {
+    animation-duration: 2.5s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .live-badge i {
+    animation-duration: 1.8s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .hero-scrollcue span {
+    animation-duration: 1.8s !important;
     animation-iteration-count: infinite !important;
   }
 }

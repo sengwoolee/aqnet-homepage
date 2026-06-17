@@ -268,9 +268,9 @@ if (revealItems.length) {
   }
 }
 
-/* AQ Growth OS — 운영 루프 순환 + 콘솔 패널 동기화 */
+/* AQ Growth OS — 운영 루프 순환 + 콘솔 패널 동기화 (모션 설정과 무관하게 항상 동작) */
 const loop = document.querySelector("[data-loop]");
-if (loop && !prefersReducedMotion) {
+if (loop) {
   const nodes = Array.from(loop.querySelectorAll(".loop-node"));
   const panels = Array.from(document.querySelectorAll(".panel-grid div"));
   let active = 0;
