@@ -1800,10 +1800,6 @@ body.menu-open .site-header {
     box-shadow var(--dur) ease;
 }
 
-.logo-tile:nth-child(7n) {
-  background: var(--surface-l1);
-}
-
 .logo-tile img {
   display: block;
   width: 100%;
@@ -2352,10 +2348,6 @@ body.menu-open .site-header {
 
   .logo-wall {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  .logo-tile:nth-child(7n) {
-    background: var(--surface-l0);
   }
 
   .snapshot-inner {
