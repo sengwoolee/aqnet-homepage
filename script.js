@@ -172,11 +172,15 @@ if (contactForm) {
     }
 
     const formData = new FormData(contactForm);
+    const company = formData.get("company");
     const name = formData.get("name");
+    const phone = formData.get("phone");
     const email = formData.get("email");
     const message = formData.get("message");
-    const subject = encodeURIComponent(`[AQNET 문의] ${name}`);
-    const body = encodeURIComponent(`이름/회사명: ${name}\n이메일: ${email}\n\n문의 내용:\n${message}`);
+    const subject = encodeURIComponent(`[AQNET 문의] ${company} / ${name}`);
+    const body = encodeURIComponent(
+      `회사명: ${company}\n담당자명: ${name}\n연락처: ${phone}\n이메일: ${email}\n\n문의 내용:\n${message}`,
+    );
 
     window.location.href = `mailto:contact@aqnet.co.kr?subject=${subject}&body=${body}`;
     if (formNote) formNote.textContent = "메일 앱에서 문의 내용을 확인해주세요.";

@@ -103,7 +103,7 @@
               </h1>
               <p class="hero-sub">
                 AQNET은 광고 운영, 데이터, CRM, 커머스를 하나의 성장 시스템으로 연결하고
-                AI 기반 의사결정으로 반복 가능한 성과 구조를 만드는 <span class="nowrap">마케팅 기술 컴퍼니입니다.</span>
+                <span class="nowrap">AI 기반</span> 의사결정으로 반복 가능한 성과 구조를 만드는 <span class="nowrap">마케팅 기술 컴퍼니입니다.</span>
               </p>
               <div class="hero-actions" aria-label="주요 이동">
                 <a class="button button-primary" href="#solution">AQ Growth OS 보기</a>
@@ -287,7 +287,7 @@
               </span>
               <span class="svc-index">02</span>
               <h3>AI Marketing Solution</h3>
-              <p>반복 운영을 줄이고 캠페인 의사결정 속도를 높이는 AI 기반 운영 환경을 구축합니다.</p>
+              <p>반복 운영을 줄이고 캠페인 의사결정 속도를 높이는 <span class="nowrap">AI 기반</span> 운영 환경을 구축합니다.</p>
               <ul>
                 <li>자동 리포팅과 이상 신호 감지</li>
                 <li>소재/예산 조정 우선순위 추천</li>
@@ -305,7 +305,7 @@
               <ul>
                 <li>캠페인 구조 진단</li>
                 <li>예산 배분과 입찰 운영</li>
-                <li>ROAS, CPA, LTV 기준 최적화</li>
+                <li><span class="nowrap">ROAS, CPA, LTV</span> 기준 최적화</li>
               </ul>
             </article>
 
@@ -602,7 +602,7 @@
             </article>
             <article>
               <span class="i-tag tag-ai">AI Ops</span>
-              <strong>AI 자동화가 먼저 바꿔야 할 마케팅 운영 업무</strong>
+              <strong><span class="nowrap">AI 자동화가</span> 먼저 바꿔야 할 마케팅 운영 업무</strong>
               <em>2026.06</em>
               <i class="i-arrow" aria-hidden="true">→</i>
             </article>
@@ -624,14 +624,26 @@
           </div>
 
           <form class="contact-form" data-contact-form novalidate>
-            <label>
-              <span>이름 / 회사명</span>
-              <input name="name" type="text" autocomplete="name" required />
-            </label>
-            <label>
-              <span>이메일</span>
-              <input name="email" type="email" autocomplete="email" required />
-            </label>
+            <div class="form-row">
+              <label>
+                <span>회사명</span>
+                <input name="company" type="text" autocomplete="organization" required />
+              </label>
+              <label>
+                <span>담당자명</span>
+                <input name="name" type="text" autocomplete="name" required />
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <span>연락처</span>
+                <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+              </label>
+              <label>
+                <span>이메일</span>
+                <input name="email" type="email" autocomplete="email" required />
+              </label>
+            </div>
             <label>
               <span>문의 내용</span>
               <textarea name="message" rows="5" required></textarea>
@@ -647,11 +659,71 @@
       </main>
 
       <footer class="site-footer">
-        <a class="brand" href="#home" aria-label="AQNET 홈">
-          <img class="brand-logo" src="assets/logos/aqnet-logo-horizontal-dark.png" alt="AQNET" width="156" height="46" />
-        </a>
-        <p>Data &amp; Tech Marketing Company</p>
-        <span>© 2026 AQNET. All rights reserved.</span>
+        <div class="footer-top">
+          <div class="footer-brand">
+            <a class="brand" href="#home" aria-label="AQNET 홈">
+              <img class="brand-logo" src="assets/logos/aqnet-logo-horizontal-dark.png" alt="AQNET" width="168" height="44" />
+            </a>
+            <p class="footer-tagline">데이터·AI로 마케팅 성장을 운영하는 <span class="nowrap">기술 컴퍼니</span></p>
+            <a class="footer-cta" href="#contact">프로젝트 문의하기 <span aria-hidden="true">→</span></a>
+          </div>
+
+          <nav class="footer-col" aria-label="사이트맵">
+            <p class="footer-h">Sitemap</p>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#service">Service</a></li>
+              <li><a href="#solution">Solution</a></li>
+              <li><a href="#works">Works</a></li>
+              <li><a href="#insight">Insight</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+
+          <div class="footer-col">
+            <p class="footer-h">Contact</p>
+            <ul class="footer-contact">
+              <li><span>E</span><a href="mailto:contact@aqnet.co.kr">contact@aqnet.co.kr</a></li>
+              <li><span>T</span><a href="tel:+820200000000">02-0000-0000</a></li>
+              <li><span>A</span>서울특별시 ○○구 ○○로 00, 0층</li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <p class="footer-h">Follow</p>
+            <ul class="footer-social">
+              <li>
+                <a href="#" aria-label="AQNET LinkedIn" target="_blank" rel="noopener noreferrer">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.65h.05c.53-.95 1.83-1.95 3.76-1.95C20.4 8.7 22 10.55 22 14v7h-4v-6.2c0-1.48-.03-3.38-2.06-3.38-2.06 0-2.38 1.6-2.38 3.27V21H9V9Z"/></svg>
+                </a>
+              </li>
+              <li>
+                <a href="#" aria-label="AQNET Instagram" target="_blank" rel="noopener noreferrer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" /></svg>
+                </a>
+              </li>
+              <li>
+                <a href="#" aria-label="AQNET Blog" target="_blank" rel="noopener noreferrer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11a8 8 0 0 1 8 8" /><path d="M5 5a14 14 0 0 1 14 14" /><circle cx="5.5" cy="18.5" r="1.4" fill="currentColor" stroke="none" /></svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p class="footer-legal">
+            (주)에이큐넷 &nbsp;·&nbsp; 대표 ○○○ &nbsp;·&nbsp; 사업자등록번호 000-00-00000 &nbsp;·&nbsp; 서울특별시 ○○구 ○○로 00, 0층
+          </p>
+          <div class="footer-meta">
+            <span class="footer-copy">© 2026 AQNET. All rights reserved.</span>
+            <span class="footer-policy">
+              <a href="#">개인정보처리방침</a>
+              <a href="#">이용약관</a>
+            </span>
+          </div>
+        </div>
       </footer>
     </div>
 
