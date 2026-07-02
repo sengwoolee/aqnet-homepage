@@ -1710,8 +1710,8 @@ body.menu-open .site-header {
 
 .solution-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 0.88fr) minmax(420px, 1.12fr);
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -1740,6 +1740,41 @@ body.menu-open .site-header {
   to {
     background-position-y: 16px;
   }
+}
+
+/* 진행 커서 도트 — active 노드 아이콘 중심을 따라 이동 */
+.loop-cursor {
+  position: absolute;
+  left: 40px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: var(--glow-cyan);
+  z-index: 2;
+  transform: translateY(calc(var(--cy, 40px) - 6px));
+  transition: transform var(--dur-slow) var(--ease-emphasized);
+  pointer-events: none;
+}
+
+/* Learn → Collect 리턴 패스 — 우측 점선 곡선, Learn 단계에서 점등 */
+.loop-return {
+  position: absolute;
+  right: -14px;
+  top: 32px;
+  bottom: 32px;
+  width: 14px;
+  border: 2px dashed rgba(46, 211, 255, 0.22);
+  border-left: none;
+  border-radius: 0 14px 14px 0;
+  transition: border-color var(--dur) ease;
+  pointer-events: none;
+}
+
+.growth-loop.returning .loop-return {
+  border-color: rgba(46, 211, 255, 0.55);
 }
 
 .loop-node {
@@ -1812,6 +1847,7 @@ body.menu-open .site-header {
 .loop-node.active {
   background: var(--surface-3);
   border-color: var(--border-3);
+  transform: translateX(4px);
 }
 
 .loop-node.active .loop-ic {
@@ -1825,11 +1861,10 @@ body.menu-open .site-header {
   color: var(--cyan);
 }
 
-/* Console panel */
+/* Console panel — 제품 목업(통합 대시보드 v1.0 프리뷰 + 대화형 레포트 티저) */
 .solution-panel {
   position: relative;
-  min-height: 520px;
-  padding: clamp(24px, 4vw, 36px);
+  padding: clamp(20px, 3vw, 28px);
   border-radius: var(--r-lg);
   color: var(--white);
   background: var(--surface-1);
@@ -1837,7 +1872,9 @@ body.menu-open .site-header {
   box-shadow: var(--e-dark-1);
   display: flex;
   flex-direction: column;
+  gap: 16px;
   overflow: hidden;
+  transition: border-color var(--dur) ease;
 }
 
 .solution-panel.bg-grid {
@@ -1845,74 +1882,69 @@ body.menu-open .site-header {
   background-size: 52px 52px;
 }
 
-.panel-topline {
+.solution-panel.learning {
+  border-color: var(--border-3);
+}
+
+/* 존1 — 브라우저 크롬바 */
+.panel-chrome {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-}
-
-.panel-topline span {
-  color: var(--text-d-3);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.chart-wrap {
-  flex: 1;
-  margin: 36px 0;
-}
-
-.chart-bars {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(20px, 1fr));
-  gap: 12px;
-  align-items: end;
-  height: 100%;
-  min-height: 230px;
-  padding: 20px;
-  border: 1px solid var(--border-1);
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.04);
-  background-image: repeating-linear-gradient(
-    180deg,
-    var(--border-1) 0 1px,
-    transparent 1px 25%
-  );
-}
-
-.chart-bars span {
-  position: relative;
-  display: block;
-  height: var(--h);
-  min-height: 28px;
-  border-radius: 6px 6px 0 0;
-  background: var(--grad-bar);
-  box-shadow: 0 0 18px rgba(46, 211, 255, 0.18);
-  transform-origin: bottom;
-  transition: transform var(--dur-slow) var(--ease-out);
-}
-
-.chart-bars span:nth-child(even) {
-  background: linear-gradient(180deg, var(--signal), var(--blue));
-}
-
-.chart-bars[data-bars]:not(.drawn) span {
-  transform: scaleY(0);
-}
-
-.panel-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-1);
 }
 
-.panel-grid div {
-  position: relative;
-  min-height: 90px;
-  padding: 16px;
+.chrome-dots {
+  display: inline-flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.chrome-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.chrome-url {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: var(--r-xs);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-1);
+  font-size: 12px;
+  color: var(--text-d-3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.preview-badge {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border: 1px solid var(--border-3);
+  border-radius: var(--r-pill);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* 존2 — KPI 4셀 */
+.panel-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.panel-kpis > div {
+  padding: 12px;
   border: 1px solid var(--border-1);
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.04);
@@ -1921,23 +1953,201 @@ body.menu-open .site-header {
     background var(--dur) ease;
 }
 
-.panel-grid div.lit {
+.panel-kpis.lit > div {
   border-color: var(--border-3);
   background: rgba(46, 211, 255, 0.08);
 }
 
-.panel-grid span {
+.panel-kpis span {
   display: block;
-  color: var(--text-d-3);
-  font-size: 13px;
+  font-size: 10.5px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-d-2);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.panel-grid strong {
+.panel-kpis strong {
   display: block;
-  margin-top: 12px;
-  font-size: 22px;
-  font-weight: 820;
+  margin-top: 6px;
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 800;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.panel-kpis em {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+/* 존3 — 채널 ROAS 가로 바 */
+.panel-channels {
+  padding: 14px 16px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.04);
+  transition:
+    border-color var(--dur) ease,
+    background var(--dur) ease;
+}
+
+.panel-channels.lit {
+  border-color: var(--border-3);
+  background: rgba(46, 211, 255, 0.08);
+}
+
+.panel-cap {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-d-2);
+}
+
+.ch-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 48px;
+  gap: 10px;
+  align-items: center;
+}
+
+.ch-row + .ch-row {
+  margin-top: 10px;
+}
+
+.ch-row b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-d-2);
+}
+
+.ch-row strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--white);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ch-track {
+  display: block;
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.ch-fill {
+  display: block;
+  width: var(--h, 60%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  box-shadow: 0 0 14px rgba(46, 211, 255, 0.18);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.panel-channels.drawn .ch-fill {
+  transform: scaleX(1);
+}
+
+/* 존4 — 대화형 레포트 티저 */
+.panel-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel-chat .panel-cap {
+  margin-bottom: 2px;
+}
+
+.chat-q,
+.chat-a {
+  margin: 0;
+  max-width: 88%;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: keep-all;
+  transition:
+    border-color var(--dur) ease,
+    outline-color var(--dur) ease;
+}
+
+.chat-q {
+  align-self: flex-end;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--grad-action);
+  color: var(--white);
+  outline: 1px solid transparent;
+}
+
+.chat-q.lit {
+  outline-color: var(--cyan);
+}
+
+.chat-a {
+  align-self: flex-start;
+  border-radius: 14px 14px 14px 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text-d-2);
+}
+
+.chat-a.lit {
+  border-color: var(--border-3);
+  background: rgba(46, 211, 255, 0.08);
+}
+
+/* 존5 — 상태 라인 · 캡션 · 데모 CTA */
+.panel-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: auto;
+}
+
+.console-status {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-d-3);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur) ease;
+}
+
+.console-status.lit {
+  color: var(--cyan);
+}
+
+.demo-link {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.demo-link:hover,
+.demo-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.panel-foot .console-note {
+  flex-basis: 100%;
+  margin-top: 0;
 }
 
 /* =========================================================
@@ -2861,6 +3071,11 @@ body.menu-open .site-header {
     grid-template-columns: 1fr;
   }
 
+  /* 1열 스택에서는 리턴 패스(우측 돌출) 숨김 */
+  .loop-return {
+    display: none;
+  }
+
   .hero-inner {
     align-items: start;
     padding-top: calc(var(--header-height) + 48px);
@@ -2957,9 +3172,21 @@ body.menu-open .site-header {
   .service-grid,
   .work-grid,
   .framework-grid,
-  .mp-grid,
-  .panel-grid {
+  .mp-grid {
     grid-template-columns: 1fr;
+  }
+
+  .panel-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .solution-panel {
+    padding: 18px;
+  }
+
+  .chat-q,
+  .chat-a {
+    max-width: 100%;
   }
 
   /* 지표 4종은 2×2로 유지 — '대시보드감' 보존 */
@@ -3014,10 +3241,6 @@ body.menu-open .site-header {
   .logo-tile img {
     max-width: 104px;
     height: 42px;
-  }
-
-  .solution-panel {
-    min-height: 440px;
   }
 
   .insight-list article {

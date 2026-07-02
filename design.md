@@ -304,3 +304,24 @@ v2까지가 구조·카피·접근성 정비였다면, v3는 시각적 디자인
 
 ### 검토 후 보류(클라이언트 데이터 필요)
 - Works 운영 기간·ROAS 표기, Snapshot 외부 지표 교체, 개인정보처리방침 페이지, 서버리스 폼 — SDD 백로그 참조.
+
+## 14. v7 — AQ Growth OS 섹션 리디자인 (제품이 있는 운영체계)
+
+3관점(기획·디자인·개발) 검토 결론에 따라, 추상 루프 도식 + 장식용 차트였던 콘솔을 **실제 SaaS 제품 목업**으로 격상했습니다 (회사소개서의 제품 서사와 메시지 일치).
+
+### 기획
+- 리드에 "이 운영 루프는 통합 대시보드 v1.0과 대화형 레포트 v2.0으로 제품화됩니다" 추가.
+- **LIVE 뱃지 폐기 → `v1.0 PREVIEW`** (실서비스 미출시 상태와 표기 일치), 콘솔에 "예시 화면입니다" 캡션.
+- 콘솔 푸터에 인라인 CTA "대시보드 데모 안내 받기 →"(#contact). CTA 밴드와 중복 없음.
+
+### 디자인 — 콘솔 5존
+크롬바(도트3+URL 필+PREVIEW) / KPI 4셀(₩84.2M·12.4M·3,284·ROAS 427% 카운트업) / 채널 ROAS 가로바 4종(스케일: 최대 560% 기준, 좌→우 드로우온) / 대화형 레포트 티저(질문·답변 버블) / 상태 라인+캡션+데모 CTA. 루프에는 **진행 커서 도트**(active 아이콘 중심 추적)와 **Learn→Collect 리턴 패스**(우측 점선, Learn 시 점등), active 노드 translateX(4px).
+
+### 개발
+- 5노드↔4셀 `index % 4` 동기화 논리 오류 해소 → `data-sync` 0~4 1:1 매핑(KPI→채널바→질문→답변→상태라인, Learn 시 패널 `.learning`+`returning`).
+- 상태 라인은 WAAPI 페이드(레이아웃 읽기 없음), 커서 위치는 load/resize에서만 offsetTop 캐시.
+- 기존 drawChartBars·[data-bars] 리빌 후킹 재사용(`.ch-fill` 대상), active 노드 `aria-current="step"`, 채널 차트 role="img"+수치 aria-label, 상태 라인 aria-hidden.
+- 모바일: ≤1024 리턴 패스 숨김, ≤720 KPI 2×2·패딩 축소·min-height 해제.
+
+### 클라이언트 확인 대기
+- 콘솔 크롬바 URL: `app.aqnet.io` 도메인 확정 시 "AQ Growth OS · Dashboard" → "app.aqnet.io/dashboard" 교체. PREVIEW 문구 컨펌.

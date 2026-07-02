@@ -55,7 +55,7 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 | 5 | About (`#about`) | 라이트 | **Why AQNET?** 다크 박스(AQ=Adaptability Quotient 정의 + "광고는 계속 변합니다…" + Capabilities 태그) + 운영 원칙 타임라인(진단→실행→자동화→학습) |
 | 6 | **AQ Framework** (`#framework`) | 다크 | "Every Growth Starts with Adaptability." + **C·O·R·E 4카드**(고스트 이니셜): Control(광고 데이터·CRM·퍼널·KPI) / Ownership(ROAS·매출·LTV) / Reach(Media·Creative·Automation·Global) / Endurance(AI·System·Learning·Optimization). ※내비 메뉴에는 미포함 |
 | 7 | Service (`#service`) | 라이트 | 6카드(아이콘+체크리스트): Data Analytics / **AI Marketing Solution(FLAGSHIP 다크 강조)** / Performance / Creative&Contents / CRM·Funnel / Commerce. 하단 **Media Products** 4카드: 검색광고 / 디스플레이·배너 / SNS·영상 / 오픈마켓·쇼핑 |
-| 8 | Solution (`#solution`) | 다크 | **AQ Growth OS** — 운영 루프 5노드(Collect→Analyze→Decide→Execute→Learn, 3초 자동 순환+콘솔 동기화) + 콘솔 패널(막대차트 stagger) |
+| 8 | Solution (`#solution`) | 다크 | **AQ Growth OS** — 루프 5노드(3초 순환+스크롤 스크럽, 진행 커서 도트, Learn→Collect 리턴 패스) + **제품 목업 콘솔**(크롬바·v1.0 PREVIEW·KPI 4셀·채널 ROAS 바·대화형 레포트 티저·STEP 상태라인·데모 CTA). 노드↔존 `data-sync` 1:1 점등. 수치는 소개서 확정 예시값+"예시 화면" 캡션 |
 | 9 | Works (`#works`) | 다크 | 카테고리 필터 탭(All/Commerce/Health/Marketplace) + 사례 5카드(월 예산·광고 매출) + 측정기준 주석 |
 | 10 | Client Network (`#reference`) | 라이트 | 로고월 70종(7열, lazy load, 기본 grayscale→hover 원색, priority 18종은 옅은 컬러 유지) |
 | 11 | Insight (`#insight`) | 라이트 | 아티클 리스트 3건(카테고리 pill, hover 액센트) — 현재 프리뷰형(링크 없음) |
@@ -140,7 +140,9 @@ acaa01e Service 체크 아이콘 수직 정렬
 
 ### 클라이언트(김관호 대표) 소스 대기 항목
 - [ ] Works 사례별 운영 기간(→ 기간·ROAS 표기 보강), Snapshot 외부 지표(업력·누적 집행액 등)
-- [ ] 회사소개서 13p 확장용: 연혁·팀 구성, 온보딩 절차·기간, 리포트 샘플/주기 (§SDD v6 검토 결론)
+- [ ] 회사소개서 확장용: 온보딩 절차·기간 (연혁·팀·리포팅은 1차 PDF 소스로 해소됨)
+- [ ] `app.aqnet.io` 도메인 표기 확정(솔루션 콘솔 크롬바 URL + 소개서 목업) 및 v1.0 PREVIEW 뱃지 문구 컨펌
+- [ ] 공식 이메일 확정: contact@aqnet.co.kr(홈페이지) vs hello@aqnet.io(1차 PDF)
 
 ### 실데이터 채우기 (placeholder 교체 필요)
 - [ ] footer: 사업자등록번호(`000-00-00000`), 주소(`서울특별시 ○○구…`), 전화(`02-0000-0000`)

@@ -370,8 +370,10 @@ document.querySelectorAll("[data-stagger]").forEach((group) => {
 });
 
 const drawChartBars = (bars) => {
-  Array.from(bars.children).forEach((bar, i) => {
-    bar.style.transitionDelay = `${i * 60}ms`;
+  const fills = bars.querySelectorAll(".ch-fill");
+  const targets = fills.length ? Array.from(fills) : Array.from(bars.children);
+  targets.forEach((el, i) => {
+    el.style.transitionDelay = `${i * 60}ms`;
   });
   bars.classList.add("drawn");
 };
@@ -403,14 +405,43 @@ if (revealItems.length) {
 const loop = document.querySelector("[data-loop]");
 if (loop) {
   const nodes = Array.from(loop.querySelectorAll(".loop-node"));
-  const panels = Array.from(document.querySelectorAll(".panel-grid div"));
+  const syncEls = Array.from(document.querySelectorAll("[data-sync]"));
+  const panel = document.querySelector(".solution-panel");
+  const statusEl = document.querySelector(".console-status");
+  const STATUS = [
+    "STEP 01 · Collect — 12개 소스 수집 중",
+    "STEP 02 · Analyze — 채널 기여도 재계산",
+    "STEP 03 · Decide — 예산 재배분 우선순위 산출",
+    "STEP 04 · Execute — 캠페인 액션 반영 중",
+    "STEP 05 · Learn — 다음 가설로 학습 반영",
+  ];
+  let nodeTops = [];
   let active = 0;
   let timer;
 
+  const measureNodes = () => {
+    // 아이콘 중심 = 노드 offsetTop + padding 16 + 아이콘 절반 24
+    nodeTops = nodes.map((n) => n.offsetTop + 40);
+  };
+
   const setActive = (index) => {
-    nodes.forEach((n, i) => n.classList.toggle("active", i === index));
-    if (panels.length) {
-      panels.forEach((p, i) => p.classList.toggle("lit", i === index % panels.length));
+    nodes.forEach((n, i) => {
+      n.classList.toggle("active", i === index);
+      if (i === index) {
+        n.setAttribute("aria-current", "step");
+      } else {
+        n.removeAttribute("aria-current");
+      }
+    });
+    syncEls.forEach((el) => el.classList.toggle("lit", el.dataset.sync === String(index)));
+    loop.classList.toggle("returning", index === nodes.length - 1);
+    if (panel) panel.classList.toggle("learning", index === nodes.length - 1);
+    if (nodeTops.length) loop.style.setProperty("--cy", `${nodeTops[index]}px`);
+    if (statusEl) {
+      statusEl.textContent = STATUS[index] || "";
+      if (statusEl.animate) {
+        statusEl.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 240, easing: "ease-out" });
+      }
     }
   };
 
@@ -433,8 +464,10 @@ if (loop) {
       solTop = solutionSection.offsetTop;
       solHeight = solutionSection.offsetHeight;
     }
+    measureNodes();
   };
   measureSolution();
+  setActive(0); // 커서 초기 위치 + 상태 라인 초기화
   let solTimer;
   window.addEventListener("resize", () => {
     window.clearTimeout(solTimer);

@@ -459,7 +459,8 @@
             <h2>AQ Growth OS</h2>
             <p>
               광고, CRM, 커머스, 콘텐츠 데이터를 연결해 다음 액션을 결정하고<br />실행 결과를 다시 학습하는
-              AQNET의 성장 운영 프레임입니다.
+              AQNET의 성장 운영 프레임입니다. 이 운영 루프는 <span class="nowrap">통합 대시보드 v1.0</span>과
+              <span class="nowrap">대화형 레포트 v2.0</span>으로 제품화됩니다.
             </p>
           </div>
 
@@ -496,29 +497,59 @@
                 <div class="loop-body"><span class="loop-no">05</span><strong>Learn</strong><p>실행 결과를 다음 성장 가설로 재구성</p></div>
               </li>
               <span class="loop-rail" aria-hidden="true"></span>
+              <span class="loop-cursor" aria-hidden="true"></span>
+              <span class="loop-return" aria-hidden="true"></span>
             </ol>
 
-            <div class="solution-panel bg-grid">
-              <div class="panel-topline">
-                <span>AQ Growth OS Console</span>
-                <strong class="live-badge"><i aria-hidden="true"></i>LIVE</strong>
+            <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 제품 예시 화면">
+              <div class="panel-chrome" aria-hidden="true">
+                <span class="chrome-dots"><i></i><i></i><i></i></span>
+                <span class="chrome-url">AQ Growth OS · Dashboard</span>
+                <span class="preview-badge">v1.0 PREVIEW</span>
               </div>
-              <div class="chart-wrap">
-                <div class="chart-bars" role="img" aria-label="성장 운영 데이터 흐름을 표현한 그래픽" data-bars>
-                  <span style="--h: 46%"></span>
-                  <span style="--h: 62%"></span>
-                  <span style="--h: 38%"></span>
-                  <span style="--h: 78%"></span>
-                  <span style="--h: 58%"></span>
-                  <span style="--h: 86%"></span>
-                  <span style="--h: 70%"></span>
+
+              <div class="panel-kpis" data-sync="0">
+                <div>
+                  <span>Total Spend</span>
+                  <strong>₩84.2M</strong>
+                  <em>+12.4%</em>
+                </div>
+                <div>
+                  <span>Impressions</span>
+                  <strong>12.4M</strong>
+                  <em>+8.1%</em>
+                </div>
+                <div>
+                  <span>Conversions</span>
+                  <strong>3,284</strong>
+                  <em>+21.6%</em>
+                </div>
+                <div>
+                  <span>Avg. ROAS</span>
+                  <strong data-count="427" data-suffix="%">0</strong>
+                  <em>+0.34x</em>
                 </div>
               </div>
-              <div class="panel-grid">
-                <div data-panel="0"><span>Data Layer</span><strong>Unified</strong></div>
-                <div data-panel="1"><span>Insight</span><strong>Mapped</strong></div>
-                <div data-panel="2"><span>Next Action</span><strong>Priority</strong></div>
-                <div data-panel="3"><span>Growth Loop</span><strong>Learning</strong></div>
+
+              <div class="panel-channels" data-sync="1" data-bars role="img"
+                aria-label="채널별 ROAS 예시: 카카오 412%, 네이버 388%, 메타 506%, 구글 441%">
+                <span class="panel-cap">CHANNEL ROAS</span>
+                <div class="ch-row"><b>Kakao</b><span class="ch-track"><span class="ch-fill" style="--h: 74%"></span></span><strong>412%</strong></div>
+                <div class="ch-row"><b>Naver</b><span class="ch-track"><span class="ch-fill" style="--h: 69%"></span></span><strong>388%</strong></div>
+                <div class="ch-row"><b>Meta</b><span class="ch-track"><span class="ch-fill hot" style="--h: 90%"></span></span><strong>506%</strong></div>
+                <div class="ch-row"><b>Google</b><span class="ch-track"><span class="ch-fill" style="--h: 79%"></span></span><strong>441%</strong></div>
+              </div>
+
+              <div class="panel-chat">
+                <span class="panel-cap">CONVERSATIONAL REPORT · v2.0</span>
+                <p class="chat-q" data-sync="2">지난 7일 ROAS 상위 캠페인 3개 보여줘</p>
+                <p class="chat-a" data-sync="3">Meta 리타게팅 612%가 가장 높았습니다. 예산 +20% 적용 시 전환 +14~18% 예상됩니다.</p>
+              </div>
+
+              <div class="panel-foot">
+                <span class="console-status" data-sync="4" aria-hidden="true">STEP 01 · Collect — 12개 소스 수집 중</span>
+                <a class="demo-link" href="#contact">대시보드 데모 안내 받기 →</a>
+                <span class="console-note">* 예시 화면입니다 (Illustrative)</span>
               </div>
             </div>
           </div>
