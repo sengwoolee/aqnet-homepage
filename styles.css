@@ -456,6 +456,11 @@ body.menu-open .site-header {
    ========================================================= */
 .hero {
   position: relative;
+  color: var(--white);
+}
+
+.hero-stage {
+  position: relative;
   min-height: 82vh; /* svh 미지원 폴백 */
   min-height: 82svh;
   isolation: isolate;
@@ -473,7 +478,6 @@ body.menu-open .site-header {
     78px 78px,
     78px 78px,
     auto;
-  color: var(--white);
 }
 
 .hero-canvas,
@@ -519,7 +523,7 @@ body.menu-open .site-header {
   max-width: 880px;
   font-size: clamp(34px, 5.4vw, 72px);
   line-height: 1.05;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: -0.015em;
   word-break: keep-all;
 }
@@ -552,7 +556,7 @@ body.menu-open .site-header {
   padding: 0 22px;
   border-radius: var(--r-sm);
   border: 1px solid transparent;
-  font-weight: 850;
+  font-weight: 800;
   cursor: pointer;
   transition:
     transform var(--dur) var(--ease-out),
@@ -601,7 +605,6 @@ body.menu-open .site-header {
 .hero-console-stack {
   position: relative;
   min-height: 300px;
-  transform: translate3d(0, calc(var(--hp, 0) * 1px), 0);
 }
 
 .console-card {
@@ -636,7 +639,7 @@ body.menu-open .site-header {
 
 .console-title {
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 800;
   letter-spacing: 0.12em;
   color: var(--text-d-3);
 }
@@ -651,7 +654,7 @@ body.menu-open .site-header {
   background: rgba(46, 211, 255, 0.12);
   color: var(--cyan);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.06em;
 }
 
@@ -728,7 +731,7 @@ body.menu-open .site-header {
   display: block;
   margin-top: 10px;
   color: var(--text-d-4);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.04em;
 }
 
@@ -742,7 +745,7 @@ body.menu-open .site-header {
   text-align: right;
   color: var(--white);
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
@@ -792,6 +795,140 @@ body.menu-open .site-header {
   height: 26px;
   background: linear-gradient(var(--cyan), transparent);
   animation: scrollCue 1.8s ease-in-out infinite;
+}
+
+/* Solution 브리지 — 콘솔 하단 캡션+미니 CTA */
+.hero-bridge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 2px 0;
+  font-size: 13px;
+  color: var(--text-d-3);
+  word-break: keep-all;
+}
+
+.hero-bridge a {
+  color: var(--cyan);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hero-bridge a:hover,
+.hero-bridge a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* 로드 인트로 — 요소 단위 캐스케이드 (backwards: 종료 후 스크럽 스타일로 복귀) */
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-copy .eyebrow {
+  animation: heroIn 640ms var(--ease-emphasized) 60ms backwards;
+}
+
+.hero-title {
+  animation: heroIn 700ms var(--ease-emphasized) 160ms backwards;
+}
+
+.hero-sub {
+  animation: heroIn 640ms var(--ease-emphasized) 340ms backwards;
+}
+
+.hero-actions {
+  animation: heroIn 640ms var(--ease-emphasized) 480ms backwards;
+}
+
+.hero-console-stack {
+  animation: heroIn 760ms var(--ease-emphasized) 620ms backwards;
+}
+
+/* 데스크탑 핀 스크럽 — 히어로 200svh 트랙 + sticky 무대 (카피 침강 → 콘솔 센터-스테이지) */
+@media (min-width: 1025px) {
+  .hero {
+    height: 200vh;
+    height: 200svh;
+    --hero-drift: -56px;
+  }
+
+  .hero-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hero-copy {
+    transform: translate3d(0, calc(var(--hs, 0) * var(--hero-drift)), 0)
+      scale(calc(1 - var(--hs, 0) * 0.04));
+    opacity: calc(1 - var(--hs, 0) * 0.9);
+  }
+
+  .hero-console-stack {
+    transform: translate3d(
+        calc(var(--hc, 0) * var(--console-dx, -300px)),
+        calc(var(--hc, 0) * -20px),
+        0
+      )
+      scale(calc(1 + var(--hc, 0) * 0.14));
+    will-change: transform;
+  }
+
+  .console-back {
+    opacity: calc(0.45 - var(--hc, 0) * 0.45);
+    transform: translate(calc(16px + var(--hc, 0) * 18px), calc(18px + var(--hc, 0) * 22px));
+  }
+
+  /* 스케일 중 backdrop-filter 재래스터화 비용 제거 */
+  .console-card {
+    backdrop-filter: none;
+    background: linear-gradient(180deg, rgba(18, 30, 54, 0.92), rgba(14, 23, 41, 0.88));
+  }
+
+  .hero.scrubbed .spark-line {
+    animation: none;
+    stroke-dashoffset: calc(1 - var(--hsp, 0));
+  }
+
+  .hero.scrubbed .spark-area {
+    animation: none;
+    opacity: var(--hsp, 0);
+  }
+
+  .hero.scrubbed .console-kpis li:nth-child(1) {
+    opacity: calc(0.35 + var(--hk0, 1) * 0.65);
+    transform: translateY(calc(8px - var(--hk0, 1) * 8px));
+  }
+
+  .hero.scrubbed .console-kpis li:nth-child(2) {
+    opacity: calc(0.35 + var(--hk1, 1) * 0.65);
+    transform: translateY(calc(8px - var(--hk1, 1) * 8px));
+  }
+
+  .hero.scrubbed .console-kpis li:nth-child(3) {
+    opacity: calc(0.35 + var(--hk2, 1) * 0.65);
+    transform: translateY(calc(8px - var(--hk2, 1) * 8px));
+  }
+
+  .hero-bridge {
+    opacity: var(--hbr, 0);
+    transform: translateY(calc(12px - var(--hbr, 0) * 12px));
+  }
+
+  .hero-scrollcue {
+    opacity: calc(1 - var(--hcue, 0));
+  }
 }
 
 @keyframes scrollCue {
@@ -858,7 +995,7 @@ body.menu-open .site-header {
   border-radius: var(--r-pill);
   color: var(--text-d-2);
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -935,6 +1072,7 @@ body.menu-open .site-header {
   display: block;
   margin-top: 14px;
   color: var(--text-d-3);
+  font-size: 15px;
   font-weight: 700;
   word-break: keep-all;
 }
@@ -979,7 +1117,7 @@ body.menu-open .site-header {
   color: var(--text-l-1);
   font-size: clamp(32px, 5vw, 60px);
   line-height: 1.08;
-  font-weight: 920;
+  font-weight: 900;
   letter-spacing: -0.01em;
   word-break: keep-all;
 }
@@ -1051,7 +1189,7 @@ body.menu-open .site-header {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   color: var(--cyan);
   font-size: 12px;
   font-weight: 800;
@@ -1069,33 +1207,36 @@ body.menu-open .site-header {
 
 .statement-lead {
   margin: 0;
-  font-size: clamp(20px, 2.3vw, 27px);
-  line-height: 1.4;
-  font-weight: 850;
+  font-size: clamp(21px, 2.4vw, 28px);
+  line-height: 1.38;
+  font-weight: 800;
   color: var(--white);
   word-break: keep-all;
 }
 
 .why-lines {
-  margin: 18px 0 0;
+  margin: 20px 0 0;
   color: var(--text-d-3);
-  font-size: clamp(14px, 1.4vw, 15px);
+  font-size: 15px;
   line-height: 1.7;
   word-break: keep-all;
 }
 
+/* 클로징 선언 — 말미 배치 + 시안 인용 바 (리드와 성격 분리) */
 .why-close {
-  margin: 4px 0 0;
+  margin: 24px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--cyan);
   color: var(--white);
-  font-size: clamp(16px, 1.7vw, 19px);
+  font-size: 17px;
   line-height: 1.55;
   font-weight: 800;
   word-break: keep-all;
 }
 
 .statement-sub {
-  margin: 18px 0 0;
-  font-size: clamp(14px, 1.4vw, 15px);
+  margin: 12px 0 0;
+  font-size: 15px;
   line-height: 1.7;
   font-weight: 600;
   color: var(--text-d-2);
@@ -1106,7 +1247,7 @@ body.menu-open .site-header {
 .proof {
   position: relative;
   z-index: 1;
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 .proof-label {
@@ -1149,7 +1290,7 @@ body.menu-open .site-header {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-d-2);
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .proof-points li::before {
@@ -1166,20 +1307,25 @@ body.menu-open .site-header {
   position: relative;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: clamp(22px, 2.6vw, 30px);
   display: grid;
-  gap: 6px;
+  gap: 12px;
+  align-content: center;
+  background: var(--surface-l1);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-1);
 }
 
 /* 노드 중심끼리만 연결 — 마지막 노드 아래로 선이 삐져나오지 않게 */
 .t-step:not(:last-child)::before {
   content: "";
   position: absolute;
-  left: 23px;
-  top: 40px;
-  bottom: -46px;
+  left: 35px; /* padding-left 12 + 노드 중심 23 */
+  top: 38px; /* padding-top 14 + 24 */
+  bottom: -50px; /* -(gap 12 + 다음 padding-top 14 + 24) */
   width: 2px;
-  background: linear-gradient(var(--border-l3), var(--border-l2));
+  background: linear-gradient(180deg, rgba(34, 118, 255, 0.38), rgba(46, 211, 255, 0.2));
 }
 
 .t-step {
@@ -1188,7 +1334,13 @@ body.menu-open .site-header {
   grid-template-columns: 48px minmax(0, 1fr);
   gap: 18px;
   align-items: start;
-  padding: 16px 18px 16px 0;
+  padding: 14px 12px;
+  border-radius: var(--r-md);
+  transition: background var(--dur) ease;
+}
+
+.t-step:hover {
+  background: var(--surface-l0);
 }
 
 .t-node {
@@ -1199,13 +1351,19 @@ body.menu-open .site-header {
   width: 48px;
   height: 48px;
   border-radius: var(--r-pill);
-  background: var(--surface-l0);
-  border: 1px solid var(--border-l2);
-  color: var(--blue);
+  background: var(--navy);
+  border: 1px solid rgba(122, 183, 255, 0.25);
+  color: var(--white);
   font-size: 13px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
-  box-shadow: var(--e-1);
+  box-shadow:
+    0 1px 0 var(--hairline-top) inset,
+    0 8px 18px rgba(10, 16, 32, 0.28);
+  transition:
+    background var(--dur) ease,
+    border-color var(--dur) ease,
+    box-shadow var(--dur) ease;
 }
 
 .t-step:hover .t-node {
@@ -1216,15 +1374,15 @@ body.menu-open .site-header {
 }
 
 .t-body h3 {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--text-l-1);
   font-size: clamp(20px, 2.4vw, 24px);
   line-height: 1.2;
-  font-weight: 820;
+  font-weight: 800;
 }
 
 .t-body p {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--text-l-2);
   line-height: 1.7;
   word-break: keep-all;
@@ -1297,7 +1455,7 @@ body.menu-open .site-header {
   right: 16px;
   font-size: 92px;
   line-height: 1;
-  font-weight: 950;
+  font-weight: 900;
   background: var(--grad-brand);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1335,9 +1493,9 @@ body.menu-open .site-header {
 .fw-card h3 {
   margin: 0;
   color: var(--white);
-  font-size: 22px;
-  line-height: 1.15;
-  font-weight: 850;
+  font-size: clamp(20px, 2.4vw, 24px);
+  line-height: 1.2;
+  font-weight: 800;
 }
 
 .fw-card > p {
@@ -1345,7 +1503,7 @@ body.menu-open .site-header {
   color: var(--ice);
   font-size: 16px;
   line-height: 1.6;
-  font-weight: 650;
+  font-weight: 600;
   word-break: keep-all;
 }
 
@@ -1499,7 +1657,7 @@ body.menu-open .site-header {
   color: var(--text-l-1);
   font-size: clamp(20px, 2.4vw, 24px);
   line-height: 1.2;
-  font-weight: 820;
+  font-weight: 800;
 }
 
 .service-card p {
@@ -1524,7 +1682,7 @@ body.menu-open .site-header {
   color: var(--text-l-1);
   font-size: 15px;
   line-height: 1.45;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .service-card li::before {
@@ -1606,8 +1764,8 @@ body.menu-open .site-header {
   border-radius: var(--r-pill);
   border: 1px solid var(--border-3);
   color: var(--cyan);
-  font-size: 10px;
-  font-weight: 900;
+  font-size: 11px;
+  font-weight: 800;
   letter-spacing: 0.1em;
 }
 
@@ -1630,7 +1788,7 @@ body.menu-open .site-header {
   color: var(--text-l-1);
   font-size: clamp(20px, 2.6vw, 28px);
   line-height: 1.25;
-  font-weight: 850;
+  font-weight: 800;
   word-break: keep-all;
 }
 
@@ -1661,15 +1819,15 @@ body.menu-open .site-header {
 .mp-card h4 {
   margin: 0;
   color: var(--text-l-1);
-  font-size: 17px;
-  line-height: 1.25;
-  font-weight: 820;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 800;
 }
 
 .mp-card p {
   margin: 8px 0 0;
   color: var(--text-l-2);
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.6;
   word-break: keep-all;
 }
@@ -1679,7 +1837,7 @@ body.menu-open .site-header {
   margin-top: 14px;
   color: var(--blue);
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 /* =========================================================
@@ -1824,16 +1982,16 @@ body.menu-open .site-header {
 .loop-no {
   color: var(--text-d-4);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
 }
 
 .loop-body strong {
   color: var(--white);
-  font-size: 22px;
-  line-height: 1.1;
-  font-weight: 820;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 800;
 }
 
 .loop-body p {
@@ -1960,7 +2118,7 @@ body.menu-open .site-header {
 
 .panel-kpis span {
   display: block;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2197,6 +2355,7 @@ body.menu-open .site-header {
 .tab-button {
   min-height: 40px;
   padding: 0 18px;
+  font-size: 14px;
   border: 1px solid var(--border-2);
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.05);
@@ -2274,9 +2433,9 @@ body.menu-open .site-header {
 .work-card h3 {
   margin: 18px 0 0;
   color: var(--white);
-  font-size: clamp(22px, 2.6vw, 30px);
+  font-size: clamp(22px, 2.4vw, 26px);
   line-height: 1.15;
-  font-weight: 850;
+  font-weight: 800;
   word-break: keep-all;
 }
 
@@ -2297,7 +2456,7 @@ body.menu-open .site-header {
   background: var(--surface-1);
   color: var(--white);
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   align-content: center;
 }
@@ -2346,14 +2505,14 @@ body.menu-open .site-header {
   display: block;
   color: var(--white);
   font-size: clamp(18px, 2.2vw, 24px);
-  font-weight: 850;
+  font-weight: 800;
   word-break: keep-all;
 }
 
 .cta-band p {
   margin: 8px 0 0;
   color: var(--text-d-3);
-  font-size: 13.5px;
+  font-size: 13px;
   word-break: keep-all;
 }
 
@@ -2502,7 +2661,7 @@ body.menu-open .site-header {
 
 .insight-list strong {
   color: var(--text-l-1);
-  font-size: clamp(18px, 2.4vw, 28px);
+  font-size: clamp(18px, 2.2vw, 26px);
   line-height: 1.25;
   font-weight: 800;
   word-break: keep-all;
@@ -2510,6 +2669,7 @@ body.menu-open .site-header {
 
 .insight-list em {
   color: var(--text-l-3);
+  font-size: 14px;
   font-style: normal;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -2523,7 +2683,7 @@ body.menu-open .site-header {
   border-radius: var(--r-pill);
   color: var(--text-l-3);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -2572,7 +2732,7 @@ body.menu-open .site-header {
 
 .contact-meta strong {
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 800;
   color: var(--white);
 }
 
@@ -2651,7 +2811,7 @@ body.menu-open .site-header {
   background: var(--surface-2);
   color: var(--text-d-2);
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 600;
   cursor: pointer;
   transition:
     border-color var(--dur-fast) ease,
@@ -2899,7 +3059,7 @@ body.menu-open .site-header {
 .footer-legal {
   margin: 0;
   color: var(--text-d-4);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.7;
   word-break: keep-all;
 }
@@ -2911,7 +3071,7 @@ body.menu-open .site-header {
   align-items: center;
   gap: 12px 20px;
   color: var(--text-d-4);
-  font-size: 12.5px;
+  font-size: 12px;
 }
 
 .footer-policy {
@@ -3130,8 +3290,11 @@ body.menu-open .site-header {
   }
 
   .hero {
-    min-height: auto;
     --hero-drift: -22px;
+  }
+
+  .hero-stage {
+    min-height: auto;
   }
 
   /* 모바일: blur 없는 경량 카드 등장 */
@@ -3222,6 +3385,34 @@ body.menu-open .site-header {
 
   .about-statement {
     min-height: 360px;
+  }
+
+  .why-close {
+    font-size: 16px;
+    padding-left: 12px;
+  }
+
+  .timeline {
+    padding: 20px;
+    gap: 10px;
+  }
+
+  .t-step {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 14px;
+    padding: 12px 10px;
+  }
+
+  .t-node {
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .t-step:not(:last-child)::before {
+    left: 29px;
+    top: 32px;
+    bottom: -42px;
   }
 
   .service-card,

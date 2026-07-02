@@ -9,6 +9,10 @@ const heroEl = document.querySelector(".hero");
 const heroConsole = document.querySelector(".hero-console-stack");
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const remap = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
+const easeInQuad = (t) => t * t;
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
@@ -39,7 +43,14 @@ let lastHs = "";
 let loopScrollSync = null; // Solution 루프 블록에서 주입
 
 function measureSections() {
+  pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
+  if (pinEnabled && heroEl && heroInner && heroConsole) {
+    // offsetLeft 기반(transform 무시) — 무대 콘텐츠 중앙까지의 X 이동량
+    const innerCenter = heroInner.offsetLeft + heroInner.offsetWidth / 2;
+    const consoleCenter = heroConsole.offsetLeft + heroConsole.offsetWidth / 2;
+    heroEl.style.setProperty("--console-dx", `${(innerCenter - consoleCenter).toFixed(0)}px`);
+  }
   if (fwSection) {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
@@ -77,8 +88,8 @@ function stripBoost() {
   }
 }
 
-const finePointer = window.matchMedia("(pointer:fine)");
-const parallaxAllowed = () => finePointer.matches && window.innerWidth > 1024;
+let pinEnabled = window.innerWidth > 1024; // 히어로 핀 스크럽(데스크탑 전용)
+const heroInner = document.querySelector(".hero-inner");
 
 function onScrollFrame() {
   const y = window.scrollY;
@@ -90,19 +101,31 @@ function onScrollFrame() {
     progressBar.style.setProperty("--p", max > 0 ? clamp(y / max, 0, 1).toFixed(4) : "0");
   }
 
-  heroProgress = clamp(y / (heroHeight * 0.85), 0, 1);
+  const vh = window.innerHeight;
+  const heroTrack = pinEnabled ? Math.max(1, heroHeight - vh) : heroHeight * 0.85;
+  heroProgress = clamp(y / heroTrack, 0, 1);
   scrollVelocity = clamp(Math.abs(y - lastScrollY) / 40, 0, 1);
   lastScrollY = y;
 
-  if (heroConsole) {
-    heroConsole.style.setProperty("--hp", parallaxAllowed() ? (heroProgress * -18).toFixed(1) : "0");
-  }
-
   if (heroEl) {
-    const hs = heroProgress.toFixed(3);
-    if (hs !== lastHs) {
-      heroEl.style.setProperty("--hs", hs);
-      lastHs = hs;
+    const key = heroProgress.toFixed(3) + (pinEnabled ? "p" : "m");
+    if (key !== lastHs) {
+      lastHs = key;
+      if (pinEnabled) {
+        const p = heroProgress;
+        heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.08, 0.42)).toFixed(3));
+        heroEl.style.setProperty("--hc", easeInOutCubic(remap(p, 0.3, 0.78)).toFixed(3));
+        heroEl.style.setProperty("--hsp", remap(p, 0.55, 0.8).toFixed(3));
+        heroEl.style.setProperty("--hbr", easeOutCubic(remap(p, 0.78, 0.95)).toFixed(3));
+        heroEl.style.setProperty("--hcue", remap(p, 0.72, 0.9).toFixed(3));
+        for (let i = 0; i < 3; i += 1) {
+          const st = 0.58 + 0.06 * i;
+          heroEl.style.setProperty(`--hk${i}`, easeOutCubic(remap(p, st, st + 0.14)).toFixed(3));
+        }
+        if (p > 0.05) heroEl.classList.add("scrubbed");
+      } else {
+        heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
+      }
     }
   }
 
@@ -555,6 +578,7 @@ if (canvas && canvas.getContext) {
       y: 0,
       f: 0,
       r: index % 7 === 0 ? 2.2 : 1.35,
+      d: 0.4 + Math.random() * 0.6,
       hub: index % 11 === 0,
       vx: (Math.random() - 0.5) * 0.22,
       vy: (Math.random() - 0.5) * 0.18,
@@ -587,7 +611,10 @@ if (canvas && canvas.getContext) {
     }
 
     context.clearRect(0, 0, viewW, viewH);
-    context.globalAlpha = 1 - heroProgress * 0.85;
+    context.globalAlpha = pinEnabled
+      ? 1 - 0.75 * remap(heroProgress, 0.6, 1)
+      : 1 - heroProgress * 0.85;
+    const spreadK = pinEnabled ? remap(heroProgress, 0.3, 0.85) : 0;
 
     const gx = viewW * 0.78;
     const gy = viewH * 0.24 + heroProgress * 40;
@@ -627,6 +654,11 @@ if (canvas && canvas.getContext) {
       p.x = p.baseX + p.ox;
       p.y = p.baseY + p.oy;
       p.f = f;
+      if (spreadK > 0) {
+        const k = 1 + 0.1 * p.d * spreadK;
+        p.x = viewW * 0.5 + (p.x - viewW * 0.5) * k;
+        p.y = viewH * 0.5 + (p.y - viewH * 0.5) * k;
+      }
     }
 
     // connections
@@ -688,9 +720,12 @@ if (canvas && canvas.getContext) {
     heroEl.addEventListener(
       "pointermove",
       (event) => {
-        // rect.left는 스크롤과 무관, top은 문서 기준 캐시에서 산술 계산(레이아웃 읽기 없음)
+        // rect.left는 스크롤과 무관, top은 산술 계산(레이아웃 읽기 없음)
         target.x = event.clientX - canvasRect.left;
-        target.y = event.clientY - (canvasDocTop - window.scrollY);
+        const stageTop = pinEnabled
+          ? Math.min(0, heroHeight - window.innerHeight - window.scrollY)
+          : canvasDocTop - window.scrollY;
+        target.y = event.clientY - stageTop;
         if (!pointer.active) {
           pointer.x = target.x;
           pointer.y = target.y;
