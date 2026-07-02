@@ -249,3 +249,23 @@ v2까지가 구조·카피·접근성 정비였다면, v3는 시각적 디자인
 
 ### 모션 토큰 보강
 - `--dur-med/--dur-reveal`, `--ease-emphasized`, `--stagger-step` 추가.
+
+## 11. 2차 디벨롭 — AQ 브랜드 철학 반영 (클라이언트 피드백)
+
+"AQNET가 왜 AQNET인지가 안 보인다"는 피드백을 반영해 AQ(Adaptability Quotient) 브랜드 정체성을 사이트에 심었습니다.
+
+### Why AQNET? (About 다크 박스 개편)
+- 기존 statement 박스를 `Why AQNET?` 중심으로 재구성: "AQ는 Adaptability Quotient, 변화에 적응하는 능력입니다." (그라데이션 강조) → "광고는 계속 변합니다. AI도 변합니다. 플랫폼도 변합니다." → "우리는 변화에 적응하는 능력 자체를 설계합니다." 기존 데이터 문장은 서브로 압축. Capabilities 태그 유지.
+
+### AQ Framework 섹션 신설 (About 직후, 다크 시그니처)
+- 제목: *Every Growth Starts with Adaptability.* + C·O·R·E 설명.
+- 4개 카드(고스트 이니셜 그라데이션): **C**ontrol(데이터를 통제합니다 — 광고 데이터·CRM·퍼널·KPI) / **O**wnership(성과를 끝까지 책임집니다 — ROAS·매출·LTV) / **R**each(성과를 확장합니다 — Media·Creative·Automation·Global) / **E**ndurance(성과를 지속시킵니다 — AI·System·Learning·Optimization).
+- 섹션 리듬: about(라이트) → framework(다크) → service(라이트) 교차. 내비 메뉴는 7개 유지(anchor `#framework`만 존재).
+
+### Media Products (Service 하단)
+- 디지털마케팅 대행 출발점을 명시: 검색광고(네이버 SA·Google Ads) / 디스플레이·배너광고(GFA·GDN·카카오모먼트) / SNS·영상광고(Meta·YouTube·TikTok) / 오픈마켓·쇼핑광고(네이버쇼핑·쿠팡) 4카드. 문의 폼 "광고 종류" 선택지와 용어 일치.
+
+### 문의 폼 확장 (8필드)
+- 회사명/업체명 · 사이트 URL(선택) · 담당자명 · 연락처 · 이메일 · 광고 종류(체크박스 복수: 검색/배너/오픈마켓/SNS) · 월 평균 마케팅 예산(라디오 4구간) · 문의 내용/주요 목표.
+- 선택 그룹은 칩형 UI(`.check`, `:has(:checked)` 하이라이트). mailto 본문에 전 항목 포함.
+- 주의: `.contact-form input` 공통 스타일은 `:not([type=checkbox]):not([type=radio])`로 체크/라디오 제외.
