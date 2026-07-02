@@ -77,8 +77,8 @@ function stripBoost() {
   }
 }
 
-const parallaxAllowed = () =>
-  window.matchMedia("(pointer:fine)").matches && window.innerWidth > 1024;
+const finePointer = window.matchMedia("(pointer:fine)");
+const parallaxAllowed = () => finePointer.matches && window.innerWidth > 1024;
 
 function onScrollFrame() {
   const y = window.scrollY;
@@ -219,8 +219,12 @@ const filterButtons = document.querySelectorAll("[data-filter]");
 const workStatus = document.querySelector("[data-work-status]");
 const filterLabels = { all: "전체", commerce: "Commerce", health: "Health", marketplace: "Marketplace" };
 
+const workGrid = document.querySelector(".work-grid");
+
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
+    // 필터 조작 시점엔 등장 연출이 끝난 것으로 간주 — display 토글 재생 방지
+    if (workGrid) workGrid.classList.add("stagger-done");
     const filter = button.dataset.filter;
     filterButtons.forEach((item) => {
       const isActive = item === button;
@@ -239,6 +243,20 @@ filterButtons.forEach((button) => {
       workStatus.textContent = `${filterLabels[filter] || filter} 사례 ${visibleCount}건을 표시합니다.`;
     }
   });
+});
+
+/* 폼 칩 선택 하이라이트 — :has() 미지원 브라우저 폴백(.checked 미러링) */
+document.querySelectorAll(".check input").forEach((input) => {
+  const sync = () => {
+    if (input.type === "radio") {
+      document.querySelectorAll(`.check input[name="${input.name}"]`).forEach((r) => {
+        r.closest(".check").classList.toggle("checked", r.checked);
+      });
+    } else {
+      input.closest(".check").classList.toggle("checked", input.checked);
+    }
+  };
+  input.addEventListener("change", sync);
 });
 
 /* Contact 폼 (mailto) */
@@ -264,11 +282,14 @@ if (contactForm) {
     const message = formData.get("message");
     const subject = encodeURIComponent(`[AQNET 문의] ${company} / ${name}`);
     const body = encodeURIComponent(
-      `회사명/업체명: ${company}\n사이트 URL: ${siteUrl}\n담당자명: ${name}\n연락처: ${phone}\n이메일: ${email}\n광고 종류: ${adTypeText}\n월 평균 마케팅 예산: ${budget}\n\n문의 내용/주요 목표:\n${message}`,
+      `회사명/업체명: ${company}\n사이트 URL: ${siteUrl}\n담당자명: ${name}\n연락처: ${phone}\n이메일: ${email}\n광고 종류: ${adTypeText}\n월 평균 마케팅 예산: ${budget}\n\n문의 내용/주요 목표:\n${message}\n\n개인정보 수집·이용 동의: 동의함`,
     );
 
     window.location.href = `mailto:contact@aqnet.co.kr?subject=${subject}&body=${body}`;
-    if (formNote) formNote.textContent = "메일 앱에서 문의 내용을 확인해주세요.";
+    if (formNote) {
+      formNote.textContent =
+        "메일 앱에서 문의 내용을 확인해주세요. 메일 앱이 열리지 않으면 contact@aqnet.co.kr 로 직접 보내주세요.";
+    }
   });
 }
 
@@ -313,6 +334,7 @@ if (counters.length) {
 
 /* 섹션 헤딩 라인 마스크 리빌 — <br> 단위 라인 래핑(노드 이동이라 .grad/.nowrap 보존) */
 document.querySelectorAll(".section-heading h2").forEach((h2) => {
+  if (!h2.closest("[data-reveal]")) return; // 리빌 트리거 없는 헤딩은 마스크 은닉 금지
   const lines = [[]];
   Array.from(h2.childNodes).forEach((node) => {
     if (node.nodeName === "BR") {
@@ -413,7 +435,11 @@ if (loop) {
     }
   };
   measureSolution();
-  window.addEventListener("resize", () => window.setTimeout(measureSolution, 200));
+  let solTimer;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(solTimer);
+    solTimer = window.setTimeout(measureSolution, 200);
+  });
 
   loopScrollSync = (y) => {
     if (!solutionSection || !loopVisible || scrollVelocity < 0.02) return;

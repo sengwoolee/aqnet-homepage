@@ -288,3 +288,19 @@ v2까지가 구조·카피·접근성 정비였다면, v3는 시각적 디자인
 - 캔버스 포인터 rect: 스크롤마다 gBCR 호출 제거 → 문서 기준 top 캐시 + 산술 계산.
 - `--text-d-4` 0.34→0.45 (다크 소형 텍스트 대비 개선), skip-link `#main` 직행, `.button-primary:hover` 중복 규칙 병합, 리빌 완료 후 `will-change: auto`.
 - 미해결 백로그 재확인: **개인정보처리방침 페이지(우선순위 높음)**, footer 실데이터.
+
+## 13. v6 — 3역할 검토 폴리시 (기획·디자인·개발 서브에이전트 감사)
+
+기획자·디자이너·개발자 관점의 병렬 감사 후 즉시 실행 가능한 19건을 적용했습니다.
+
+### 디자인 폴리시 (8)
+- Signal Strip 라벨 1200 밴드 정렬, **Service 도트 텍스처 미렌더 버그 수정**(`var(--bg-dots)` 미정의 → 상단 페이드 도트로 구현), Works 탭 hover/active 상태 분리(active만 그라데이션+글로우), Solution↔Works 이음매 헤어라인+mesh 차등, 모바일 로고월 3열 축소(스크롤 ~47%↓), ≤480 폼 칩 1열, 모바일 스냅샷 2×2 유지, C·O·R·E 카드 밀도·선언문 위계(--ice 승격).
+
+### 개발 수정 (7)
+- **Works 필터 keyframe 재실행 버그**(display 토글 시 빈 그리드/깜빡임) → `.stagger-done` 고정(0,3,0 특이도로 모바일 media 재지정보다 우선), 헤딩 래핑에 `[data-reveal]` 조상 가드(영구 은닉 회귀 방지), mobile-panel `visibility` 병행(inert 미지원 폴백), hero `82vh` 폴백, `:has()` 폴백(.checked JS 미러링), 연락처 `pattern` 검증+mailto에 동의 기록, `matchMedia` 캐시·measureSolution 디바운스.
+
+### 콘텐츠/전환 (4)
+- Insight 죽은 클릭 어포던스 제거 → **"발행 예정" 상태 라벨**, Works 하단 **전환 CTA 밴드**("무료 성장 진단 요청" → #contact), 히어로 콘솔에 "예시 화면" 캡션(연출 수치 오해 방지), mailto 실패 대비 보조 안내문.
+
+### 검토 후 보류(클라이언트 데이터 필요)
+- Works 운영 기간·ROAS 표기, Snapshot 외부 지표 교체, 개인정보처리방침 페이지, 서버리스 폼 — SDD 백로그 참조.
