@@ -443,18 +443,13 @@ if (loop) {
   let timer;
 
   const measureNodes = () => {
-    const activeShift = parseFloat(getComputedStyle(loop).getPropertyValue("--loop-active-shift")) || 0;
+    const cursorX = parseFloat(getComputedStyle(loop).getPropertyValue("--loop-cursor-x")) || 40;
     const loopRect = loop.getBoundingClientRect();
     nodeCenters = nodes.map((node) => {
-      const icon = node.querySelector(".loop-ic");
-      if (!icon) {
-        return { x: 40 + activeShift, y: node.offsetTop + node.offsetHeight / 2 };
-      }
-      const iconRect = icon.getBoundingClientRect();
-      const shiftX = node.classList.contains("active") ? 0 : activeShift;
+      const nodeRect = node.getBoundingClientRect();
       return {
-        x: iconRect.left - loopRect.left + iconRect.width / 2 + shiftX,
-        y: iconRect.top - loopRect.top + iconRect.height / 2,
+        x: cursorX,
+        y: nodeRect.top - loopRect.top + nodeRect.height / 2,
       };
     });
   };
@@ -471,6 +466,7 @@ if (loop) {
     syncEls.forEach((el) => el.classList.toggle("lit", el.dataset.sync === String(index)));
     loop.classList.toggle("returning", index === nodes.length - 1);
     if (panel) panel.classList.toggle("learning", index === nodes.length - 1);
+    measureNodes();
     if (nodeCenters.length) {
       loop.style.setProperty("--cx", `${nodeCenters[index].x}px`);
       loop.style.setProperty("--cy", `${nodeCenters[index].y}px`);

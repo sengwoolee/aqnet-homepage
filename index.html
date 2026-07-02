@@ -119,41 +119,44 @@
             <!-- 라이브 콘솔 카드 스택 -->
             <div class="hero-console-stack" aria-label="AQ Growth OS 라이브 콘솔">
               <div class="console-card console-back" aria-hidden="true"></div>
-              <div class="console-card console-main">
-                <div class="console-head">
-                  <span class="console-title">AQ GROWTH OS</span>
-                  <span class="live-badge"><i aria-hidden="true"></i>LIVE</span>
+              <div class="console-card console-main hero-dashboard" role="img" aria-label="AQ Growth OS 대시보드 예시 화면">
+                <div class="panel-chrome" aria-hidden="true">
+                  <span class="chrome-dots"><i></i><i></i><i></i></span>
+                  <span class="chrome-url">AQ Growth OS · Dashboard</span>
+                  <span class="preview-badge">v1.0 PREVIEW</span>
                 </div>
-                <div class="console-spark" role="img" aria-label="성장 추세 스파크라인">
-                  <svg viewBox="0 0 280 84" preserveAspectRatio="none" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#2ed3ff" stop-opacity="0.28" />
-                        <stop offset="1" stop-color="#2276ff" stop-opacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path class="spark-area" d="M0,64 L24,58 L52,62 L80,44 L108,50 L140,30 L172,38 L200,20 L232,26 L280,10 L280,84 L0,84 Z" fill="url(#sparkFill)" />
-                    <path class="spark-line" pathLength="1" d="M0,64 L24,58 L52,62 L80,44 L108,50 L140,30 L172,38 L200,20 L232,26 L280,10" fill="none" stroke="#2ed3ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
+
+                <div class="panel-kpis hero-dashboard-kpis">
+                  <div>
+                    <span>Total Spend</span>
+                    <strong>₩84.2M</strong>
+                    <em>+12.4%</em>
+                  </div>
+                  <div>
+                    <span>Impressions</span>
+                    <strong>12.4M</strong>
+                    <em>+8.1%</em>
+                  </div>
+                  <div>
+                    <span>Conversions</span>
+                    <strong>3,284</strong>
+                    <em>+21.6%</em>
+                  </div>
+                  <div>
+                    <span>Avg. ROAS</span>
+                    <strong data-count="427" data-suffix="%">0</strong>
+                    <em>+0.34x</em>
+                  </div>
                 </div>
-                <ul class="console-kpis">
-                  <li>
-                    <span class="kpi-label">Unified Data</span>
-                    <span class="kpi-value">12<em>sources</em></span>
-                    <span class="kpi-delta up">connected</span>
-                  </li>
-                  <li>
-                    <span class="kpi-label">Blended ROAS</span>
-                    <span class="kpi-value" data-count="324" data-suffix="%">0</span>
-                    <span class="kpi-delta up">▲ 12.4%</span>
-                  </li>
-                  <li>
-                    <span class="kpi-label">Next Action</span>
-                    <span class="kpi-value kpi-text">예산 재배분</span>
-                    <span class="kpi-delta">priority</span>
-                  </li>
-                </ul>
-                <span class="console-note">AQ Growth 콘솔 OS 예시 화면입니다.</span>
+
+                <div class="panel-channels hero-dashboard-channels drawn" role="img"
+                  aria-label="채널별 ROAS 예시: 카카오 412%, 네이버 388%, 메타 506%, 구글 441%">
+                  <span class="panel-cap">CHANNEL ROAS</span>
+                  <div class="ch-row"><b>Kakao</b><span class="ch-track"><span class="ch-fill" style="--h: 74%"></span></span><strong>412%</strong></div>
+                  <div class="ch-row"><b>Naver</b><span class="ch-track"><span class="ch-fill" style="--h: 69%"></span></span><strong>388%</strong></div>
+                  <div class="ch-row"><b>Meta</b><span class="ch-track"><span class="ch-fill hot" style="--h: 90%"></span></span><strong>506%</strong></div>
+                  <div class="ch-row"><b>Google</b><span class="ch-track"><span class="ch-fill" style="--h: 79%"></span></span><strong>441%</strong></div>
+                </div>
               </div>
               <p class="hero-bridge">
                 AQNET 의 AQ Growth OS 입니다.

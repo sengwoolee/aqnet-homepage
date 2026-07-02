@@ -504,8 +504,8 @@ body.menu-open .site-header {
   width: 100%;
   padding: calc(var(--header-height) + 28px) max(24px, calc((100% - var(--max)) / 2)) 56px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
-  gap: clamp(32px, 6vw, 72px);
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 560px);
+  gap: clamp(28px, 4.5vw, 58px);
   align-items: center;
 }
 
@@ -628,6 +628,38 @@ body.menu-open .site-header {
   position: relative;
   z-index: 1;
   padding: 22px 22px 18px;
+}
+
+.hero-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+  background: linear-gradient(180deg, rgba(16, 27, 48, 0.94), rgba(10, 17, 31, 0.96));
+}
+
+.hero-dashboard .panel-chrome {
+  padding-bottom: 12px;
+}
+
+.hero-dashboard-kpis {
+  gap: 10px;
+}
+
+.hero-dashboard-kpis > div {
+  padding: 12px;
+}
+
+.hero-dashboard-kpis strong {
+  font-size: clamp(18px, 1.7vw, 24px);
+}
+
+.hero-dashboard-channels {
+  padding: 14px 16px;
+}
+
+.hero-dashboard-channels .ch-track {
+  height: 10px;
 }
 
 .console-head {
@@ -1877,6 +1909,7 @@ body.menu-open .site-header {
 .growth-loop {
   position: relative;
   --loop-active-shift: 4px;
+  --loop-cursor-x: 40px;
   list-style: none;
   margin: 0;
   padding: 0;
