@@ -179,7 +179,8 @@ textarea {
 
 .site-shell {
   min-height: 100vh;
-  overflow-x: hidden;
+  /* Keep desktop sticky sections pinned while preventing horizontal bleed. */
+  overflow-x: clip;
   background: var(--surface-0);
 }
 
