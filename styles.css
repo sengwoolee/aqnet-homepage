@@ -1876,6 +1876,7 @@ body.menu-open .site-header {
 
 .growth-loop {
   position: relative;
+  --loop-active-shift: 4px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1904,16 +1905,15 @@ body.menu-open .site-header {
 /* 진행 커서 도트 — active 노드 아이콘 중심을 따라 이동 */
 .loop-cursor {
   position: absolute;
-  left: 40px;
+  left: var(--cx, 40px);
   top: 0;
   width: 12px;
   height: 12px;
-  margin-left: -6px;
   border-radius: 50%;
   background: var(--cyan);
   box-shadow: var(--glow-cyan);
   z-index: 2;
-  transform: translateY(calc(var(--cy, 40px) - 6px));
+  transform: translate(-50%, calc(var(--cy, 40px) - 50%));
   transition: transform var(--dur-slow) var(--ease-emphasized);
   pointer-events: none;
 }
@@ -2006,7 +2006,7 @@ body.menu-open .site-header {
 .loop-node.active {
   background: var(--surface-3);
   border-color: var(--border-3);
-  transform: translateX(4px);
+  transform: translateX(var(--loop-active-shift));
 }
 
 .loop-node.active .loop-ic {

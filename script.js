@@ -438,13 +438,25 @@ if (loop) {
     "STEP 04 · Execute — 캠페인 액션 반영 중",
     "STEP 05 · Learn — 다음 가설로 학습 반영",
   ];
-  let nodeTops = [];
+  let nodeCenters = [];
   let active = 0;
   let timer;
 
   const measureNodes = () => {
-    // 아이콘 중심 = 노드 offsetTop + padding 16 + 아이콘 절반 24
-    nodeTops = nodes.map((n) => n.offsetTop + 40);
+    const activeShift = parseFloat(getComputedStyle(loop).getPropertyValue("--loop-active-shift")) || 0;
+    const loopRect = loop.getBoundingClientRect();
+    nodeCenters = nodes.map((node) => {
+      const icon = node.querySelector(".loop-ic");
+      if (!icon) {
+        return { x: 40 + activeShift, y: node.offsetTop + node.offsetHeight / 2 };
+      }
+      const iconRect = icon.getBoundingClientRect();
+      const shiftX = node.classList.contains("active") ? 0 : activeShift;
+      return {
+        x: iconRect.left - loopRect.left + iconRect.width / 2 + shiftX,
+        y: iconRect.top - loopRect.top + iconRect.height / 2,
+      };
+    });
   };
 
   const setActive = (index) => {
@@ -459,7 +471,10 @@ if (loop) {
     syncEls.forEach((el) => el.classList.toggle("lit", el.dataset.sync === String(index)));
     loop.classList.toggle("returning", index === nodes.length - 1);
     if (panel) panel.classList.toggle("learning", index === nodes.length - 1);
-    if (nodeTops.length) loop.style.setProperty("--cy", `${nodeTops[index]}px`);
+    if (nodeCenters.length) {
+      loop.style.setProperty("--cx", `${nodeCenters[index].x}px`);
+      loop.style.setProperty("--cy", `${nodeCenters[index].y}px`);
+    }
     if (statusEl) {
       statusEl.textContent = STATUS[index] || "";
       if (statusEl.animate) {
@@ -494,7 +509,10 @@ if (loop) {
   let solTimer;
   window.addEventListener("resize", () => {
     window.clearTimeout(solTimer);
-    solTimer = window.setTimeout(measureSolution, 200);
+    solTimer = window.setTimeout(() => {
+      measureSolution();
+      setActive(active);
+    }, 200);
   });
 
   loopScrollSync = (y) => {
