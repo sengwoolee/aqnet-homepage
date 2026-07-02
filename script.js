@@ -30,6 +30,53 @@ let lastScrollY = window.scrollY;
 let heroHeight = heroEl ? heroEl.offsetHeight : 1;
 let scrollTicking = false;
 
+/* 섹션 스크럽 — 레이아웃 읽기는 load/resize에서만, 스크롤 중엔 산술만 */
+const fwSection = document.querySelector(".framework-section");
+let fwTop = 0;
+let fwHeight = 1;
+let lastFwp = "";
+let lastHs = "";
+let loopScrollSync = null; // Solution 루프 블록에서 주입
+
+function measureSections() {
+  heroHeight = heroEl ? heroEl.offsetHeight : 1;
+  if (fwSection) {
+    fwTop = fwSection.offsetTop;
+    fwHeight = fwSection.offsetHeight;
+  }
+}
+
+/* 채널띠 가속 — 스크롤 속도에 비례해 재생 배율 상승, 멈추면 자연 감쇠 */
+let stripAnim = null;
+let stripRate = 1;
+let stripDecayRaf = null;
+
+function stripDecay() {
+  stripRate += (1 - stripRate) * 0.05;
+  if (stripRate < 1.02) {
+    stripRate = 1;
+    if (stripAnim) stripAnim.updatePlaybackRate(1);
+    stripDecayRaf = null;
+    return;
+  }
+  stripAnim.updatePlaybackRate(stripRate);
+  stripDecayRaf = requestAnimationFrame(stripDecay);
+}
+
+function stripBoost() {
+  if (!stripTrack || scrollVelocity < 0.05) return;
+  if (!stripAnim && stripTrack.getAnimations) {
+    stripAnim = stripTrack.getAnimations()[0] || null;
+  }
+  if (!stripAnim) return;
+  const target = Math.min(1 + scrollVelocity * 2.5, 3.5);
+  if (target > stripRate + 0.05) {
+    stripRate = target;
+    stripAnim.updatePlaybackRate(stripRate);
+    if (!stripDecayRaf) stripDecayRaf = requestAnimationFrame(stripDecay);
+  }
+}
+
 const parallaxAllowed = () =>
   window.matchMedia("(pointer:fine)").matches && window.innerWidth > 1024;
 
@@ -51,6 +98,26 @@ function onScrollFrame() {
     heroConsole.style.setProperty("--hp", parallaxAllowed() ? (heroProgress * -18).toFixed(1) : "0");
   }
 
+  if (heroEl) {
+    const hs = heroProgress.toFixed(3);
+    if (hs !== lastHs) {
+      heroEl.style.setProperty("--hs", hs);
+      lastHs = hs;
+    }
+  }
+
+  if (fwSection) {
+    const vh = window.innerHeight;
+    const fwp = clamp((y + vh - fwTop) / (vh + fwHeight), 0, 1).toFixed(3);
+    if (fwp !== lastFwp) {
+      fwSection.style.setProperty("--fwp", fwp);
+      lastFwp = fwp;
+    }
+  }
+
+  if (loopScrollSync) loopScrollSync(y);
+  stripBoost();
+
   scrollTicking = false;
 }
 
@@ -64,6 +131,13 @@ window.addEventListener(
   },
   { passive: true },
 );
+
+let measureTimer;
+window.addEventListener("resize", () => {
+  window.clearTimeout(measureTimer);
+  measureTimer = window.setTimeout(measureSections, 160);
+});
+measureSections();
 onScrollFrame();
 
 /* 모바일 메뉴 */
@@ -115,6 +189,14 @@ if (navLinks.length && "IntersectionObserver" in window) {
     const id = link.getAttribute("href").replace("#", "");
     const section = document.getElementById(id);
     if (section) byId.set(section, link);
+  });
+
+  // 내비에 없는 섹션은 인접 메뉴로 매핑(스파이 사각지대 제거)
+  const proxyMap = { framework: "about", reference: "works" };
+  Object.entries(proxyMap).forEach(([sectionId, navId]) => {
+    const section = document.getElementById(sectionId);
+    const link = Array.from(navLinks).find((l) => l.getAttribute("href") === `#${navId}`);
+    if (section && link) byId.set(section, link);
   });
 
   const spy = new IntersectionObserver(
@@ -229,6 +311,35 @@ if (counters.length) {
   counters.forEach((el) => countObserver.observe(el));
 }
 
+/* 섹션 헤딩 라인 마스크 리빌 — <br> 단위 라인 래핑(노드 이동이라 .grad/.nowrap 보존) */
+document.querySelectorAll(".section-heading h2").forEach((h2) => {
+  const lines = [[]];
+  Array.from(h2.childNodes).forEach((node) => {
+    if (node.nodeName === "BR") {
+      lines.push([]);
+      node.remove();
+    } else {
+      lines[lines.length - 1].push(node);
+    }
+  });
+  lines.forEach((nodes, lineIndex) => {
+    const outer = document.createElement("span");
+    outer.className = "h-line";
+    const inner = document.createElement("span");
+    inner.className = "h-line-inner";
+    inner.style.setProperty("--ln", lineIndex);
+    nodes.forEach((n) => inner.appendChild(n));
+    outer.appendChild(inner);
+    h2.appendChild(outer);
+  });
+  h2.classList.add("lines-ready");
+});
+
+/* 로고월 타일 stagger 인덱스(지연 상한 캡) */
+document.querySelectorAll(".logo-tile").forEach((tile, i) => {
+  tile.style.setProperty("--li", Math.min(i, 34));
+});
+
 /* 스크롤 진입 리빌 (+ stagger 인덱스, 차트 그로우) */
 const revealItems = document.querySelectorAll("[data-reveal]");
 
@@ -288,15 +399,56 @@ if (loop) {
     }, 3000);
   };
 
+  let loopVisible = false;
+  let idleTimer = null;
+
+  /* 스크롤 스크럽 — 섹션 통과 진행도로 루프를 문지르고, 멈추면 4초 후 자동 순환 재개 */
+  const solutionSection = document.querySelector(".solution-section");
+  let solTop = 0;
+  let solHeight = 1;
+  const measureSolution = () => {
+    if (solutionSection) {
+      solTop = solutionSection.offsetTop;
+      solHeight = solutionSection.offsetHeight;
+    }
+  };
+  measureSolution();
+  window.addEventListener("resize", () => window.setTimeout(measureSolution, 200));
+
+  loopScrollSync = (y) => {
+    if (!solutionSection || !loopVisible || scrollVelocity < 0.02) return;
+    const vh = window.innerHeight;
+    const p = (y + vh - solTop) / (vh + solHeight);
+    if (p <= 0 || p >= 1) return;
+    const wide = window.innerWidth > 1024;
+    const lo = wide ? 0.2 : 0.15;
+    const span = wide ? 0.6 : 0.7;
+    const idx = clamp(Math.floor(((p - lo) / span) * nodes.length), 0, nodes.length - 1);
+    if (idx !== active) {
+      if (timer) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+      active = idx;
+      setActive(active);
+    }
+    window.clearTimeout(idleTimer);
+    idleTimer = window.setTimeout(() => {
+      if (!timer && loopVisible) start();
+    }, 4000);
+  };
+
   if ("IntersectionObserver" in window) {
     const loopObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          loopVisible = entry.isIntersecting;
           if (entry.isIntersecting) {
             if (!timer) start();
           } else {
             window.clearInterval(timer);
             timer = null;
+            window.clearTimeout(idleTimer);
           }
         });
       },
@@ -304,6 +456,7 @@ if (loop) {
     );
     loopObserver.observe(loop);
   } else {
+    loopVisible = true;
     start();
   }
 }
@@ -321,6 +474,7 @@ if (canvas && canvas.getContext) {
   let viewW = 0;
   let viewH = 0;
   let canvasRect = canvas.getBoundingClientRect();
+  let canvasDocTop = canvasRect.top + window.scrollY;
 
   const pointer = { x: -9999, y: -9999, active: false };
   const target = { x: -9999, y: -9999 };
@@ -358,6 +512,7 @@ if (canvas && canvas.getContext) {
     const ratio = Math.min(window.devicePixelRatio || 1, dprCap);
     const rect = canvas.getBoundingClientRect();
     canvasRect = rect;
+    canvasDocTop = rect.top + window.scrollY;
     viewW = rect.width;
     viewH = rect.height;
     canvas.width = Math.floor(viewW * ratio);
@@ -474,8 +629,9 @@ if (canvas && canvas.getContext) {
     heroEl.addEventListener(
       "pointermove",
       (event) => {
+        // rect.left는 스크롤과 무관, top은 문서 기준 캐시에서 산술 계산(레이아웃 읽기 없음)
         target.x = event.clientX - canvasRect.left;
-        target.y = event.clientY - canvasRect.top;
+        target.y = event.clientY - (canvasDocTop - window.scrollY);
         if (!pointer.active) {
           pointer.x = target.x;
           pointer.y = target.y;
@@ -507,15 +663,6 @@ if (canvas && canvas.getContext) {
     if (document.hidden) stopLoop();
     else if (heroVisible) startLoop();
   });
-
-  // 스크롤 시 캔버스 위치 변하므로 포인터 기준 rect 갱신
-  window.addEventListener(
-    "scroll",
-    () => {
-      canvasRect = canvas.getBoundingClientRect();
-    },
-    { passive: true },
-  );
 
   resizeCanvas();
   startLoop();

@@ -41,7 +41,7 @@
   --text-d-1: #ffffff;
   --text-d-2: rgba(255, 255, 255, 0.72);
   --text-d-3: rgba(255, 255, 255, 0.5);
-  --text-d-4: rgba(255, 255, 255, 0.34);
+  --text-d-4: rgba(255, 255, 255, 0.45);
   --text-l-1: #0a1020;
   --text-l-2: #3a4861;
   --text-l-3: #6b7a92;
@@ -88,7 +88,7 @@
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
-  --stagger-step: 60ms;
+  --stagger-step: 70ms;
 
   font-family:
     "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial,
@@ -498,6 +498,12 @@ body.menu-open .site-header {
 
 .hero-copy {
   max-width: 820px;
+  /* 스크롤 스크럽 — 히어로 이탈 시 카피가 배경과 시차를 두고 침강 */
+  transform: translate3d(0, calc(var(--hs, 0) * var(--hero-drift, -46px)), 0)
+    scale(calc(1 - var(--hs, 0) * 0.03));
+  transform-origin: left center;
+  opacity: calc(1 - var(--hs, 0) * 0.85);
+  will-change: transform, opacity;
 }
 
 .hero-title {
@@ -558,6 +564,7 @@ body.menu-open .site-header {
 .button-primary:focus-visible {
   transform: translateY(-1px);
   filter: brightness(1.06);
+  box-shadow: 0 22px 60px rgba(34, 118, 255, 0.36);
 }
 
 .button-ghost {
@@ -580,11 +587,6 @@ body.menu-open .site-header {
 .button:active {
   transform: translateY(0) scale(0.98);
   transition-duration: var(--dur-fast);
-}
-
-.button-primary:hover,
-.button-primary:focus-visible {
-  box-shadow: 0 22px 60px rgba(34, 118, 255, 0.36);
 }
 
 /* ---- Hero live console ---- */
@@ -675,6 +677,30 @@ body.menu-open .site-header {
   display: block;
 }
 
+/* 로드 시 스파크라인이 데이터를 그리듯 드로우-온 */
+.spark-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: sparkDraw 1.4s var(--ease-inout) 300ms forwards;
+}
+
+.spark-area {
+  opacity: 0;
+  animation: sparkFillIn 600ms ease 1.3s forwards;
+}
+
+@keyframes sparkDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sparkFillIn {
+  to {
+    opacity: 1;
+  }
+}
+
 .console-kpis {
   list-style: none;
   margin: 0;
@@ -734,6 +760,7 @@ body.menu-open .site-header {
   left: 50%;
   bottom: 22px;
   transform: translateX(-50%);
+  opacity: calc(1 - var(--hs, 0) * 3.5);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1266,6 +1293,27 @@ body.menu-open .site-header {
 
 .fw-card:hover .fw-initial {
   opacity: 0.42;
+}
+
+/* C·O·R·E 이니셜 스크롤 스크럽 — 섹션 통과 진행도에 따라 카드별 다른 속도로 부상 */
+.fw-initial {
+  transform: translateY(calc((1 - var(--fwp, 1)) * 26px * var(--k, 1)));
+}
+
+.fw-card:nth-child(1) .fw-initial {
+  --k: 1;
+}
+
+.fw-card:nth-child(2) .fw-initial {
+  --k: 1.4;
+}
+
+.fw-card:nth-child(3) .fw-initial {
+  --k: 0.75;
+}
+
+.fw-card:nth-child(4) .fw-initial {
+  --k: 1.2;
 }
 
 .fw-card h3 {
@@ -2635,16 +2683,97 @@ body.menu-open .site-header {
   transition:
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
-  will-change: opacity, transform;
 }
 
 [data-reveal].is-visible {
   opacity: 1;
   transform: none;
+  will-change: auto;
+}
+
+/* 카드 그룹 stagger — keyframe 기반 (hover transition과 완전 분리) */
+[data-stagger] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 [data-stagger] > * {
-  transition-delay: calc(var(--i, 0) * var(--stagger-step));
+  opacity: 0;
+}
+
+.is-visible[data-stagger] > *,
+[data-reveal].is-visible [data-stagger] > * {
+  animation: cardIn 640ms var(--ease-emphasized) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-step));
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.965);
+    filter: blur(5px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes cardInLite {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 헤딩 라인 마스크 리빌 — <br> 단위 라인이 아래에서 차오름 */
+.h-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.09em;
+  margin-bottom: -0.09em;
+}
+
+.lines-ready .h-line-inner {
+  display: block;
+  transform: translateY(112%);
+  transition: transform 760ms var(--ease-emphasized) calc(var(--ln, 0) * 90ms);
+}
+
+[data-reveal].is-visible .h-line-inner {
+  transform: none;
+}
+
+/* 로고월 타일 stagger */
+.logo-wall[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.logo-wall:not(.is-visible) .logo-tile {
+  opacity: 0;
+}
+
+.logo-wall.is-visible .logo-tile {
+  animation: tileIn 480ms var(--ease-out) both;
+  animation-delay: calc(var(--li, 0) * 16ms);
+}
+
+@keyframes tileIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /* 모션 정책: 요청에 따라 모든 애니메이션/인터랙션을 OS '모션 줄이기' 설정과
@@ -2730,6 +2859,13 @@ body.menu-open .site-header {
 
   .hero {
     min-height: auto;
+    --hero-drift: -22px;
+  }
+
+  /* 모바일: blur 없는 경량 카드 등장 */
+  .is-visible[data-stagger] > *,
+  [data-reveal].is-visible [data-stagger] > * {
+    animation-name: cardInLite;
   }
 
   .hero-inner {

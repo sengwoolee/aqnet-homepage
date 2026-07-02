@@ -269,3 +269,22 @@ v2까지가 구조·카피·접근성 정비였다면, v3는 시각적 디자인
 - 회사명/업체명 · 사이트 URL(선택) · 담당자명 · 연락처 · 이메일 · 광고 종류(체크박스 복수: 검색/배너/오픈마켓/SNS) · 월 평균 마케팅 예산(라디오 4구간) · 문의 내용/주요 목표.
 - 선택 그룹은 칩형 UI(`.check`, `:has(:checked)` 하이라이트). mailto 본문에 전 항목 포함.
 - 주의: `.contact-form input` 공통 스타일은 `:not([type=checkbox]):not([type=radio])`로 체크/라디오 제외.
+
+## 12. Scroll Experience v5 — 스크롤 인터랙션 강화
+
+전수 감사(요구사항 전 항목 충족 확인) 후 "스크롤하면 살아 움직이는" 경험을 추가했습니다. 전부 바닐라 rAF/IO, transform·opacity·filter만 사용, 레이아웃 읽기는 load/resize에서만.
+
+### 신규 스크롤 인터랙션
+- **히어로 스크럽**: 스크롤 이탈 시 카피가 translateY(-46px, 모바일 -22px)·scale 0.97·opacity 0.15로 침강 — 콘솔 카드(-18px)와 시차를 만들어 레이어 깊이감. `--hs` 변수(기존 heroProgress 재활용).
+- **헤딩 라인 마스크 리빌**: `.section-heading h2`를 JS가 `<br>` 단위로 라인 래핑(노드 이동 방식이라 `.grad`/`.nowrap` 보존, SEO 무영향) → 라인이 아래에서 90ms 간격으로 차오름. 히어로 h1은 제외.
+- **카드 stagger 재구축**: transition 기반 → **keyframe(cardIn: translateY+scale 0.965+blur 5px→0)** 전환. 기존 stagger의 transition-delay가 카드 hover 반응을 최대 350ms 지연시키던 **버그 수정**(감사 발견). 모바일은 blur 없는 cardInLite.
+- **C·O·R·E 이니셜 스크럽**: 섹션 통과 진행도(`--fwp`)에 따라 고스트 이니셜이 카드별 다른 계수(1/1.4/0.75/1.2)로 부상.
+- **채널띠 스크롤 가속**: 죽은 코드였던 scrollVelocity를 소비 — WAAPI `updatePlaybackRate`로 1→최대 3.5배 가속 후 프레임당 5% 감쇠. 미지원 브라우저는 조용히 기본 속도.
+- **Solution 루프 스크롤 스크럽**: 섹션 진행도를 5단계 양자화해 스크롤로 루프를 "문지르고", 멈추면 4초 후 기존 3초 자동 순환이 현재 노드에서 재개.
+- **로고월 타일 stagger**(인덱스×16ms, 상한 캡 34), **스파크라인 드로우-온**(pathLength=1, 로드 후 1.4s 드로잉).
+
+### 감사 수정 사항
+- scrollspy 사각지대: framework→About, reference→Works 프록시 매핑.
+- 캔버스 포인터 rect: 스크롤마다 gBCR 호출 제거 → 문서 기준 top 캐시 + 산술 계산.
+- `--text-d-4` 0.34→0.45 (다크 소형 텍스트 대비 개선), skip-link `#main` 직행, `.button-primary:hover` 중복 규칙 병합, 리빌 완료 후 `will-change: auto`.
+- 미해결 백로그 재확인: **개인정보처리방침 페이지(우선순위 높음)**, footer 실데이터.

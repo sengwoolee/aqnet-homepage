@@ -90,7 +90,8 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 
 - 히어로 캔버스: 포인터 잔물결(반경 150/push 14/damp 0.88), 스크롤 페이드, 허브 노드 글로우. 화면 밖/탭 비활성 시 rAF 자동 정지(성능).
 - 통합 스크롤 핸들러(단일 rAF): 헤더 상태·진행바·히어로 진행도·콘솔 패럴랙스(-18px, 데스크탑 fine 포인터만).
-- 스크롤 리빌(`[data-reveal]`+`[data-stagger]` 60ms), 카운트업, eyebrow 밑줄 그로우, Solution 루프 3초 순환(가시 구간에서만).
+- 스크롤 리빌(`[data-reveal]` 페이드업 + `[data-stagger]` keyframe 70ms stagger — hover transition과 분리), 카운트업, eyebrow 밑줄 그로우.
+- **v5 스크롤 경험**: 히어로 카피 스크럽(`--hs`), 헤딩 라인 마스크 리빌(JS가 h2를 `<br>` 단위 래핑), C·O·R·E 이니셜 스크럽(`--fwp`), 채널띠 스크롤 가속(WAAPI playbackRate 1→3.5 감쇠), Solution 루프 스크롤 스크럽(멈추면 4초 후 자동 순환 재개), 로고월 타일 stagger, 스파크라인 드로우-온. 레이아웃 읽기는 load/resize에서만(오프셋 캐시).
 
 ## 8. 작업 이력 (라운드 요약)
 
@@ -106,6 +107,7 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 | 배포 | GitHub Pages 배포(sengwoolee), OG 카드 제작, 커스텀 도메인 해제 대응 | — |
 | 폴리시 | reduce-motion 전면 해제(항상 재생), 로고월 톤 균일화, 헤더 로고 안정화, 개행 다듬기 다수, footer 2단 개편(대표 김관호·개인정보책임자 이승우), 폼 1열 | — |
 | **2차 디벨롭** | **AQ 브랜드 철학 반영**(과장님 피드백): Why AQNET?, AQ Framework(C·O·R·E), Media Products, 폼 8필드 확장 | §11 |
+| **v5** | **스크롤 경험 강화**: 전수 감사(요구 전 항목 충족, stagger hover-지연 버그 발견·수정) + 히어로 스크럽/헤딩 라인 리빌/이니셜 스크럽/마퀴 가속/루프 스크롤 스크럽/로고월 stagger/스파크라인 드로우-온, scrollspy 사각지대·대비·skip-link 보완 | §12 |
 
 <details>
 <summary>커밋 로그 (git init 이후, 오래된 순)</summary>
