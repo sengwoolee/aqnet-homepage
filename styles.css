@@ -509,8 +509,7 @@ body.menu-open .site-header {
   width: 100%;
   padding: calc(var(--header-height) + 28px) max(24px, calc((100% - var(--max)) / 2)) 56px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(460px, 560px);
-  gap: clamp(28px, 4.5vw, 58px);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
 }
 
@@ -607,209 +606,29 @@ body.menu-open .site-header {
   transition-duration: var(--dur-fast);
 }
 
-/* ---- Hero live console ---- */
-.hero-console-stack {
-  position: relative;
-  min-height: 300px;
-}
-
-.console-card {
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-lg);
-  background: var(--surface-glass);
-  backdrop-filter: blur(20px);
-  box-shadow: var(--e-dark-1);
-}
-
-.console-back {
+/* ---- Hero signal lanes — 파티클 필드가 정렬되는 4개 레인의 분류 라벨 (데스크탑 핀 전용) ---- */
+.hero-lanes span {
+  display: none;
   position: absolute;
-  inset: 0;
-  transform: translate(16px, 18px);
-  opacity: 0.45;
-  z-index: 0;
-}
-
-.console-main {
-  position: relative;
-  z-index: 1;
-  padding: 22px 22px 18px;
-}
-
-.hero-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 26px;
-  background: linear-gradient(180deg, rgba(16, 27, 48, 0.94), rgba(10, 17, 31, 0.96));
-}
-
-.hero-dashboard .panel-chrome {
-  padding-bottom: 12px;
-}
-
-.hero-dashboard-kpis {
-  gap: 10px;
-}
-
-.hero-dashboard-kpis > div {
-  padding: 12px;
-}
-
-.hero-dashboard-kpis strong {
-  font-size: clamp(18px, 1.7vw, 24px);
-}
-
-.hero-dashboard-channels {
-  padding: 14px 16px;
-}
-
-.hero-dashboard-channels .ch-track {
-  height: 10px;
-}
-
-.console-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.console-title {
-  font-size: 12px;
+  top: var(--ly);
+  right: max(28px, calc((100% - var(--max)) / 2 - 40px));
+  transform: translate(calc(10px - var(--hln, 0) * 10px), -50%);
+  opacity: var(--hln, 0);
+  color: var(--text-d-4);
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--text-d-3);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
-.live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border: 1px solid var(--border-3);
-  border-radius: var(--r-pill);
-  background: rgba(46, 211, 255, 0.12);
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
-.live-badge i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--cyan);
-  animation: livePulse 1.8s ease-out infinite;
-}
-
-@keyframes livePulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(46, 211, 255, 0.55);
-  }
-  100% {
-    box-shadow: 0 0 0 10px rgba(46, 211, 255, 0);
-  }
-}
-
-.console-spark {
-  height: 84px;
-  margin-bottom: 6px;
-  border-radius: var(--r-sm);
-  overflow: hidden;
-}
-
-.console-spark svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* 로드 시 스파크라인이 데이터를 그리듯 드로우-온 */
-.spark-line {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: sparkDraw 1.4s var(--ease-inout) 300ms forwards;
-}
-
-.spark-area {
-  opacity: 0;
-  animation: sparkFillIn 600ms ease 1.3s forwards;
-}
-
-@keyframes sparkDraw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes sparkFillIn {
-  to {
-    opacity: 1;
-  }
-}
-
-.console-kpis {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.console-kpis li {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--border-1);
-}
-
+/* Solution 콘솔 캡션(공유) — 히어로 제거 후에도 Solution 패널 푸터가 사용 */
 .console-note {
   display: block;
   margin-top: 10px;
   color: var(--text-d-4);
   font-size: 11px;
   letter-spacing: 0.04em;
-}
-
-.kpi-label {
-  color: var(--text-d-3);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.kpi-value {
-  text-align: right;
-  color: var(--white);
-  font-size: 18px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.kpi-value.kpi-text {
-  font-size: 15px;
-}
-
-.kpi-value em {
-  margin-left: 4px;
-  font-style: normal;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-d-3);
-}
-
-.kpi-delta {
-  justify-self: end;
-  min-width: 64px;
-  text-align: right;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--text-d-3);
-}
-
-.kpi-delta.up {
-  color: var(--cyan);
 }
 
 .hero-scrollcue {
@@ -835,15 +654,19 @@ body.menu-open .site-header {
   animation: scrollCue 1.8s ease-in-out infinite;
 }
 
-/* Solution 브리지 — 콘솔 하단 캡션+미니 CTA */
+/* Solution 브리지 — 수렴 서사의 결론 캡션+미니 CTA (모바일: 정적, 데스크탑: 레일 위 스크럽) */
 .hero-bridge {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
-  margin: 14px 2px 0;
+  margin: 0;
+  padding: 0 24px 36px;
   font-size: 13px;
   color: var(--text-d-3);
   word-break: keep-all;
+  text-align: center;
 }
 
 .hero-bridge a {
@@ -886,12 +709,8 @@ body.menu-open .site-header {
   animation: heroIn 640ms var(--ease-emphasized) 480ms backwards;
 }
 
-.hero-console-stack {
-  animation: heroIn 760ms var(--ease-emphasized) 620ms backwards;
-}
-
 /* 데스크탑 핀 스크럽 — 히어로 260svh 트랙 + sticky 무대
-   (카피 침강 → 콘솔 센터-스테이지 → exit 핸드오프: 파티클 수렴 + 레일 + Signal Strip 오버랩) */
+   (카피 침강 → 파티클 4레인 정렬·좌향 동기화 → exit 핸드오프: 레일 융합 + Signal Strip 오버랩) */
 @media (min-width: 1025px) {
   .hero {
     height: 260vh;
@@ -964,58 +783,24 @@ body.menu-open .site-header {
   .hero-copy {
     transform: translate3d(0, calc(var(--hs, 0) * var(--hero-drift)), 0)
       scale(calc(1 - var(--hs, 0) * 0.04));
-    opacity: calc(1 - var(--hs, 0) * 0.9);
+    /* 완전 소등 — 무대 중앙 브리지 캡션과의 잔상 겹침 방지 */
+    opacity: calc(1 - var(--hs, 0));
   }
 
-  .hero-console-stack {
-    transform: translate3d(
-        calc(var(--hc, 0) * var(--console-dx, -300px)),
-        calc(var(--hc, 0) * -20px),
-        0
-      )
-      scale(calc(1 + var(--hc, 0) * 0.14));
-    will-change: transform;
+  .hero-lanes span {
+    display: block;
   }
 
-  .console-back {
-    opacity: calc(0.45 - var(--hc, 0) * 0.45);
-    transform: translate(calc(16px + var(--hc, 0) * 18px), calc(18px + var(--hc, 0) * 22px));
-  }
-
-  /* 스케일 중 backdrop-filter 재래스터화 비용 제거 */
-  .console-card {
-    backdrop-filter: none;
-    background: linear-gradient(180deg, rgba(18, 30, 54, 0.92), rgba(14, 23, 41, 0.88));
-  }
-
-  .hero.scrubbed .spark-line {
-    animation: none;
-    stroke-dashoffset: calc(1 - var(--hsp, 0));
-  }
-
-  .hero.scrubbed .spark-area {
-    animation: none;
-    opacity: var(--hsp, 0);
-  }
-
-  .hero.scrubbed .console-kpis li:nth-child(1) {
-    opacity: calc(0.35 + var(--hk0, 1) * 0.65);
-    transform: translateY(calc(8px - var(--hk0, 1) * 8px));
-  }
-
-  .hero.scrubbed .console-kpis li:nth-child(2) {
-    opacity: calc(0.35 + var(--hk1, 1) * 0.65);
-    transform: translateY(calc(8px - var(--hk1, 1) * 8px));
-  }
-
-  .hero.scrubbed .console-kpis li:nth-child(3) {
-    opacity: calc(0.35 + var(--hk2, 1) * 0.65);
-    transform: translateY(calc(8px - var(--hk2, 1) * 8px));
-  }
-
+  /* 브리지 캡션 — 레일 예정선 위 중앙, 수렴 직전 서사의 결론으로 등장 */
   .hero-bridge {
+    position: absolute;
+    left: 50%;
+    top: calc(43.7% - 64px);
+    width: max-content;
+    max-width: 80vw;
+    padding: 0;
     opacity: var(--hbr, 0);
-    transform: translateY(calc(12px - var(--hbr, 0) * 12px));
+    transform: translate(-50%, calc(12px - var(--hbr, 0) * 12px));
   }
 
   .hero-scrollcue {
@@ -3317,7 +3102,6 @@ body.menu-open .site-header {
     justify-self: end;
   }
 
-  .hero-inner,
   .about-grid,
   .solution-layout,
   .contact-section {
@@ -3415,14 +3199,6 @@ body.menu-open .site-header {
   .hero-actions {
     display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .hero-console-stack {
-    min-height: 0;
-  }
-
-  .console-back {
-    display: none;
   }
 
   .service-grid,

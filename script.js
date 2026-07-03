@@ -6,7 +6,6 @@ const formNote = document.querySelector("[data-form-note]");
 const stripTrack = document.querySelector("[data-strip]");
 const progressBar = document.querySelector("[data-progress]");
 const heroEl = document.querySelector(".hero");
-const heroConsole = document.querySelector(".hero-console-stack");
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const remap = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
@@ -49,12 +48,6 @@ let loopScrollSync = null; // Solution 루프 블록에서 주입
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
-  if (pinEnabled && heroEl && heroInner && heroConsole) {
-    // offsetLeft 기반(transform 무시) — 무대 콘텐츠 중앙까지의 X 이동량
-    const innerCenter = heroInner.offsetLeft + heroInner.offsetWidth / 2;
-    const consoleCenter = heroConsole.offsetLeft + heroConsole.offsetWidth / 2;
-    heroEl.style.setProperty("--console-dx", `${(innerCenter - consoleCenter).toFixed(0)}px`);
-  }
   if (fwSection) {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
@@ -93,7 +86,6 @@ function stripBoost() {
 }
 
 let pinEnabled = window.innerWidth > 1024; // 히어로 핀 스크럽(데스크탑 전용)
-const heroInner = document.querySelector(".hero-inner");
 
 function onScrollFrame() {
   const y = window.scrollY;
@@ -118,20 +110,18 @@ function onScrollFrame() {
       if (pinEnabled) {
         const p = heroProgress;
         const pi = remap(p, 0, HERO_IN_END); // IN 위상 진행도
-        heroEl.style.setProperty("--hs", easeInQuad(remap(pi, 0.08, 0.42)).toFixed(3));
-        heroEl.style.setProperty("--hc", easeInOutCubic(remap(pi, 0.3, 0.78)).toFixed(3));
-        heroEl.style.setProperty("--hsp", remap(pi, 0.55, 0.8).toFixed(3));
+        // 카피 침강 — 콘솔 클리어런스가 사라져 첫 화면 체류를 늘림(0.08–0.42 → 0.12–0.50)
+        heroEl.style.setProperty("--hs", easeInQuad(remap(pi, 0.12, 0.5)).toFixed(3));
+        // 레인 라벨 — 정렬 후반 점등(pi 0.46–0.64), 수렴 시작과 함께 퇴장(p 0.66–0.76)
+        const hlnIn = easeOutCubic(remap(pi, 0.46, 0.64));
+        const hlnOut = remap(p, 0.66, 0.76);
+        heroEl.style.setProperty("--hln", (hlnIn * (1 - hlnOut)).toFixed(3));
         heroEl.style.setProperty("--hbr", easeOutCubic(remap(pi, 0.78, 0.95)).toFixed(3));
         heroEl.style.setProperty("--hcue", remap(pi, 0.72, 0.9).toFixed(3));
-        for (let i = 0; i < 3; i += 1) {
-          const st = 0.58 + 0.06 * i;
-          heroEl.style.setProperty(`--hk${i}`, easeOutCubic(remap(pi, st, st + 0.14)).toFixed(3));
-        }
         // exit 핸드오프 — 무대 후퇴·스크림(--hx), 레일 드로우(--hrl). 종점 p≤0.98(해제 전 정지)
         heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.64, 0.98)).toFixed(3));
         heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.7, 0.88)).toFixed(3));
         heroEl.classList.toggle("exiting", p > 0.55 && p < 1);
-        if (p > 0.05) heroEl.classList.add("scrubbed");
       } else {
         heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
       }
@@ -585,23 +575,30 @@ if (canvas && canvas.getContext) {
 
   const pointer = { x: -9999, y: -9999, active: false };
   const target = { x: -9999, y: -9999 };
-  const PR = { radiusSq: 150 * 150, push: 14, damp: 0.88, lerp: 0.12 };
+  const PR = { radiusSq: 170 * 170, push: 14, damp: 0.88, lerp: 0.12 };
 
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4;
 
+  // 신호 레인 — 수렴 밴드(43.7%, .hero-rail) 기준 대칭 4레인. 라벨(.hero-lanes)과 동일 좌표
+  const LANES = [0.227, 0.367, 0.507, 0.647];
+  const bootT = performance.now(); // 로드 인트로(캔버스 페이드-인) 기준 시각
+
   function buildScene(width, height) {
-    let count = clamp(Math.round((width * height) / 22000), 28, 70);
+    let count = clamp(Math.round((width * height) / 18000), 32, 92);
     if (width < 720) count = Math.min(count, 40);
     if (lowPower) count = Math.round(count * 0.7);
 
     particles = Array.from({ length: count }, (_, index) => ({
-      baseX: Math.random() * width,
+      // 카피(좌측)가 주인공인 첫 화면 — 파티클 60%를 우측 반부에 편향 배치
+      baseX: index % 5 < 3 ? width * (0.45 + Math.random() * 0.6) : Math.random() * width,
       baseY: Math.random() * height,
       ox: 0,
       oy: 0,
       x: 0,
       y: 0,
       f: 0,
+      g: 1,
+      lane: 0,
       r: index % 7 === 0 ? 2.2 : 1.35,
       d: 0.4 + Math.random() * 0.6,
       hub: index % 11 === 0,
@@ -610,6 +607,13 @@ if (canvas && canvas.getContext) {
       alpha: 0.28 + Math.random() * 0.48,
     }));
     particles.forEach((p) => {
+      // 최근접 레인 배정(정렬 시 교차 없이 미끄러지도록) + 허브는 레인 근처에 상주(질서의 복선)
+      let best = 0;
+      for (let li = 1; li < LANES.length; li += 1) {
+        if (Math.abs(p.baseY - LANES[li] * height) < Math.abs(p.baseY - LANES[best] * height)) best = li;
+      }
+      p.lane = best;
+      if (p.hub) p.baseY = (LANES[best] + (Math.random() - 0.5) * 0.05) * height;
       p.x = p.baseX;
       p.y = p.baseY;
     });
@@ -630,7 +634,8 @@ if (canvas && canvas.getContext) {
     buildScene(viewW, viewH);
   }
 
-  function drawScene() {
+  function drawScene(frameNow) {
+    const now = frameNow || performance.now();
     if (pointer.active) {
       pointer.x += (target.x - pointer.x) * PR.lerp;
       pointer.y += (target.y - pointer.y) * PR.lerp;
@@ -641,10 +646,25 @@ if (canvas && canvas.getContext) {
     // 페이드를 완만화하고, 최종 페이드는 오버랩 종반(0.88~0.99)에 배정
     const pIn = pinEnabled ? remap(heroProgress, 0, HERO_IN_END) : heroProgress;
     const convergeK = pinEnabled ? easeInOutCubic(remap(heroProgress, 0.66, 0.9)) : 0;
-    context.globalAlpha = pinEnabled
-      ? (1 - 0.6 * remap(pIn, 0.6, 1)) * (1 - remap(heroProgress, 0.88, 0.99))
-      : 1 - heroProgress * 0.85;
-    const spreadK = pinEnabled ? remap(pIn, 0.3, 0.85) : 0;
+    // 레인 정렬 — 데스크탑: 스크럽(p 순수 함수), 모바일: 시간 기반 자율 사이클(산포⇄정렬 ~14s 호흡)
+    let laneK;
+    if (pinEnabled) {
+      laneK = easeInOutCubic(remap(pIn, 0.18, 0.58));
+    } else {
+      // 모바일 — 카피 뒤에서 "산포⇄정렬"이 은은하게 숨쉬는 자율 사이클(라벨·가이드 없음)
+      const s = 0.5 + 0.5 * Math.sin(((now - bootT) * Math.PI * 2) / 14000 - Math.PI / 2);
+      laneK = s * s * (3 - 2 * s) * 0.85;
+    }
+    // 좌향 흐름(동기화) — 마퀴 방향 사전 예고. 데스크탑은 스크럽, 모바일은 정렬에 비례
+    const flowK = pinEnabled ? remap(pIn, 0.5, 0.85) : laneK * 0.6;
+    // 카피 보호 게이트 — 카피 침강에 비례해 좌측 감쇠 해제
+    const sinkK = pinEnabled ? easeInQuad(remap(pIn, 0.12, 0.5)) : 0;
+    const introK = easeOutCubic(clamp((now - bootT) / 1100, 0, 1)); // 로드 페이드-인
+    context.globalAlpha =
+      introK *
+      (pinEnabled
+        ? (1 - 0.6 * remap(pIn, 0.6, 1)) * (1 - remap(heroProgress, 0.88, 0.99))
+        : 1 - heroProgress * 0.85);
 
     // 오버랩에 가려진 종반 — 드로우 패스 생략(rAF만 유지)
     if (context.globalAlpha < 0.02) {
@@ -662,11 +682,13 @@ if (canvas && canvas.getContext) {
     context.fillStyle = gradient;
     context.fillRect(0, 0, viewW, viewH);
 
-    // update pass — drift + pointer ripple + restore
+    // update pass — drift + flow + pointer ripple + lane/converge (좌표는 매 프레임 재계산: p 순수 함수)
     for (let i = 0; i < particles.length; i += 1) {
       const p = particles[i];
       p.baseX += p.vx;
       p.baseY += p.vy;
+      // 동기화(Sync) — 레인 위 파티클이 마퀴 방향(좌향)으로 흐름. 허브는 패킷처럼 빠르게
+      if (flowK > 0) p.baseX -= flowK * p.d * (p.hub ? 0.9 : 0.55);
       if (p.baseX < -20) p.baseX = viewW + 20;
       if (p.baseX > viewW + 20) p.baseX = -20;
       if (p.baseY < -20) p.baseY = viewH + 20;
@@ -683,8 +705,10 @@ if (canvas && canvas.getContext) {
         if (d2 < PR.radiusSq) {
           f = 1 - d2 / PR.radiusSq;
           const inv = 1 / (Math.sqrt(d2) + 0.001);
-          p.ox += dx * inv * PR.push * f * 0.15;
-          p.oy += dy * inv * PR.push * f * 0.15;
+          // 레인 형성 후에는 리플 감쇠 — 구조가 흩어지지 않고 출렁임 후 복귀
+          const push = PR.push * (1 - laneK * 0.7);
+          p.ox += dx * inv * push * f * 0.15;
+          p.oy += dy * inv * push * f * 0.15;
         }
       }
       p.ox *= PR.damp;
@@ -692,21 +716,43 @@ if (canvas && canvas.getContext) {
       p.x = p.baseX + p.ox;
       p.y = p.baseY + p.oy;
       p.f = f;
-      if (spreadK > 0) {
-        const k = 1 + 0.1 * p.d * spreadK;
-        p.x = viewW * 0.5 + (p.x - viewW * 0.5) * k;
-        p.y = viewH * 0.5 + (p.y - viewH * 0.5) * k;
+      if (laneK > 0) {
+        // 정렬(Sort) — 산포된 신호가 배정 레인으로 y-스냅
+        p.y += (viewH * LANES[p.lane] - p.y) * laneK * 0.92;
       }
       if (convergeK > 0) {
-        // 수렴 — 산포된 노드가 레일 밴드(무대 43.7% 높이 = .hero-rail)로 정렬되고
+        // 융합(Merge) — 4레인이 레일 밴드(무대 43.7% = .hero-rail) 한 줄로 합류하고
         // 마퀴 진행 방향(좌향)으로 드리프트. p의 순수 함수라 역스크롤 시 자연 복원
         const bandY = viewH * 0.437;
         p.y += (bandY + (p.y - bandY) * 0.1 - p.y) * convergeK;
         p.x -= 70 * p.d * convergeK;
       }
+      // 카피 보호 게이트 — 좌측 반부 알파 감쇠(침강 완료에 비례해 해제). 모바일 미적용
+      p.g = pinEnabled && p.x < viewW * 0.46 ? 0.55 + 0.45 * sinkK : 1;
+    }
+
+    // 레인 가이드 — 정렬이 "설계된 구조"로 읽히도록 4레인 기준선을 은은하게 드로우
+    // (수렴 시 4선이 레일 밴드로 접히며 소멸 → 레일(.hero-rail)이 이어받음)
+    if (pinEnabled && laneK > 0.02) {
+      const guideA = 0.16 * laneK * (1 - convergeK);
+      context.lineWidth = 1;
+      for (let li = 0; li < LANES.length; li += 1) {
+        const gyLane = viewH * (LANES[li] + (0.437 - LANES[li]) * convergeK);
+        const grad = context.createLinearGradient(0, 0, viewW, 0);
+        grad.addColorStop(0, "rgba(34, 118, 255, 0)");
+        grad.addColorStop(0.5, `rgba(122, 183, 255, ${guideA})`);
+        grad.addColorStop(1, `rgba(46, 211, 255, ${guideA * 0.6})`);
+        context.strokeStyle = grad;
+        context.beginPath();
+        context.moveTo(0, gyLane);
+        context.lineTo(viewW, gyLane);
+        context.stroke();
+      }
     }
 
     // connections
+    const structK = Math.max(laneK * 0.6, convergeK);
+    const linkBoost = 1 + 1.1 * structK;
     context.lineWidth = 1;
     for (let i = 0; i < particles.length; i += 1) {
       const a = particles[i];
@@ -714,15 +760,15 @@ if (canvas && canvas.getContext) {
         const b = particles[j];
         const dx = a.x - b.x;
         const dy = a.y - b.y;
-        // 수렴 중 이방성 판정 — 세로 링크 감쇠·가로 링크 증폭(체인/스트림化), sqrt 추가 없음
+        // 정렬·수렴 중 이방성 판정 — 세로 링크 감쇠·가로 링크 증폭(체인/스트림化), sqrt 추가 없음
         const d2 =
-          convergeK > 0
-            ? dx * dx * (1 - 0.5 * convergeK) + dy * dy * (1 + 2 * convergeK)
+          structK > 0
+            ? dx * dx * (1 - 0.5 * structK) + dy * dy * (1 + 2 * structK)
             : dx * dx + dy * dy;
         if (d2 < 16384) {
           const dist = Math.sqrt(d2);
           const near = Math.max(a.f, b.f);
-          const alpha = 0.14 * (1 - dist / 128) + 0.22 * near;
+          const alpha = (0.14 * (1 - dist / 128) + 0.22 * near) * linkBoost * ((a.g + b.g) * 0.5);
           context.strokeStyle =
             near > 0.02 ? `rgba(46, 211, 255, ${alpha})` : `rgba(122, 183, 255, ${alpha})`;
           context.beginPath();
@@ -740,7 +786,7 @@ if (canvas && canvas.getContext) {
         context.shadowBlur = 6;
         context.shadowColor = "rgba(46, 211, 255, 0.8)";
       }
-      context.fillStyle = `rgba(255, 255, 255, ${Math.min(1, p.alpha + 0.5 * p.f)})`;
+      context.fillStyle = `rgba(255, 255, 255, ${Math.min(1, p.alpha + 0.5 * p.f + 0.2 * laneK) * p.g})`;
       context.beginPath();
       context.arc(p.x, p.y, p.r + 1.1 * p.f, 0, Math.PI * 2);
       context.fill();
