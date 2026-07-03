@@ -325,3 +325,22 @@ v2까지가 구조·카피·접근성 정비였다면, v3는 시각적 디자인
 
 ### 클라이언트 확인 대기
 - 콘솔 크롬바 URL: `app.aqnet.io` 도메인 확정 시 "AQ Growth OS · Dashboard" → "app.aqnet.io/dashboard" 교체. PREVIEW 문구 컨펌.
+
+## 15. v9 — 히어로 exit 핸드오프 "Signal Convergence" (데이터 스트림 바통터치)
+
+클라이언트 피드백("콘솔을 가운데 보여주는 느낌에서 끝난다 — 기하학적 애니메이션이 다음 섹션으로 넘어가는 효과")에 따라, 기획·개발 2관점 서브에이전트 스펙 후 히어로 핀 후반부에 exit 위상을 신설했습니다.
+
+### 컨셉
+"흩어진 신호 → 하나의 시스템"이라는 히어로 서사를 스크롤로 완결: 콘솔 클로즈업 정점 이후 배경 파티클 네트워크가 **수평 스트림 라인(레일)으로 수렴**하고, 무대가 반 발 물러나며 어두워지는 동안 **Signal Strip이 무대 위로 슬라이드 인**해 레일과 바통터치. 스트립 마퀴의 좌향 흐름·스크롤 가속(stripBoost)이 운동 연속성을 이어받음.
+
+### 구조 (트랙 260svh, 위상 분리)
+- `.hero` 200→260svh. `HERO_IN_END=0.625`로 위상 분리 — 기존 IN 안무(카피 침강→콘솔 센터→KPI 점등→브리지)는 `pi=remap(p,0,0.625)`에 이전해 **물리적 스크롤 거리 불변**. 뒤 60svh가 exit 전용.
+- `.signal-strip{margin-top:-60svh}`(데스크탑) — 트랙 연장분과 정확히 상쇄, **페이지 총 길이 불변**. 후행 섹션(strip·snapshot·about)이 DOM 순서 페인팅으로 핀 무대 위에 그려짐(z-index 미지정, `position:relative`만).
+- exit 비트: `--hx`(0.64–0.98, easeInOutCubic) 무대 translateY -4vh·scale 0.955 + `::after` 스크림 opacity 0.45(컴포지터 전용, filter 금지) / `--hrl`(0.70–0.88) 레일 scaleX 드로우 / 캔버스 수렴 `convergeK`(0.66–0.90).
+- **레일**: `.hero-rail` top 43.7% — p=1 시점 Signal Strip border-top과 만나도록 무대 transform(translate -4vh·scale 0.955, origin center)을 역산한 값. 실측 정합 델타 0.1px. z-index -1(콘솔 뒤 평면, 양옆으로 드러남).
+- **캔버스 수렴**: 파티클 y를 레일 밴드(viewH 43.7%)로 lerp + 마퀴 방향 좌향 드리프트(70px·심도별). 연결선 판정을 이방성(세로 감쇠·가로 증폭)으로 전환해 체인/스트림化. 전부 p의 순수 함수 — 역스크롤 자연 복원, 상태 누적 없음. 페이드는 "사라짐"이 아니라 "모임"이 보이도록 완만화(0.6배) 후 오버랩 종반(0.88–0.99)에 최종 페이드, alpha<0.02면 드로우 패스 스킵.
+- 모든 exit 커브 종점 p≤0.98 — sticky 해제 프레임에 이미 정지 상태(덜컥임 방지).
+
+### 가드
+- `will-change:transform`은 `.hero.exiting`(p 0.55~1)에만(100svh 레이어 상시 승격 방지). 수렴 중 포인터 리플 무시(convergeK>0.2). resizeCanvas 크기 판독을 gBCR→offsetWidth/Height(transform 독립). lazy 이미지 로드 후 오프셋 재측정(`load`시 measureSections).
+- 모바일(≤1024): 전부 미적용 — 트랙 연장·마진·레일·transform 모두 데스크탑 미디어쿼리 내부. 기존 폴백 경로 그대로.

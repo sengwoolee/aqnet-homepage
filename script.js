@@ -14,6 +14,10 @@ const easeInQuad = (t) => t * t;
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
+/* 히어로 위상 분리 — 트랙 260svh 중 앞 100svh(p 0~0.625)는 기존 IN 안무,
+   뒤 60svh(p 0.625~1)는 exit 핸드오프. 기존 안무의 물리적 스크롤 거리 불변. */
+const HERO_IN_END = 0.625;
+
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
   const clones = Array.from(stripTrack.children).map((item) => {
@@ -113,15 +117,20 @@ function onScrollFrame() {
       lastHs = key;
       if (pinEnabled) {
         const p = heroProgress;
-        heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.08, 0.42)).toFixed(3));
-        heroEl.style.setProperty("--hc", easeInOutCubic(remap(p, 0.3, 0.78)).toFixed(3));
-        heroEl.style.setProperty("--hsp", remap(p, 0.55, 0.8).toFixed(3));
-        heroEl.style.setProperty("--hbr", easeOutCubic(remap(p, 0.78, 0.95)).toFixed(3));
-        heroEl.style.setProperty("--hcue", remap(p, 0.72, 0.9).toFixed(3));
+        const pi = remap(p, 0, HERO_IN_END); // IN 위상 진행도
+        heroEl.style.setProperty("--hs", easeInQuad(remap(pi, 0.08, 0.42)).toFixed(3));
+        heroEl.style.setProperty("--hc", easeInOutCubic(remap(pi, 0.3, 0.78)).toFixed(3));
+        heroEl.style.setProperty("--hsp", remap(pi, 0.55, 0.8).toFixed(3));
+        heroEl.style.setProperty("--hbr", easeOutCubic(remap(pi, 0.78, 0.95)).toFixed(3));
+        heroEl.style.setProperty("--hcue", remap(pi, 0.72, 0.9).toFixed(3));
         for (let i = 0; i < 3; i += 1) {
           const st = 0.58 + 0.06 * i;
-          heroEl.style.setProperty(`--hk${i}`, easeOutCubic(remap(p, st, st + 0.14)).toFixed(3));
+          heroEl.style.setProperty(`--hk${i}`, easeOutCubic(remap(pi, st, st + 0.14)).toFixed(3));
         }
+        // exit 핸드오프 — 무대 후퇴·스크림(--hx), 레일 드로우(--hrl). 종점 p≤0.98(해제 전 정지)
+        heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.64, 0.98)).toFixed(3));
+        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.7, 0.88)).toFixed(3));
+        heroEl.classList.toggle("exiting", p > 0.55 && p < 1);
         if (p > 0.05) heroEl.classList.add("scrubbed");
       } else {
         heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
@@ -162,6 +171,8 @@ window.addEventListener("resize", () => {
 });
 measureSections();
 onScrollFrame();
+// lazy 이미지 로드로 후행 섹션 높이가 변한 뒤 오프셋 캐시 재측정
+window.addEventListener("load", measureSections);
 
 /* 모바일 메뉴 */
 if (menuToggle && mobilePanel) {
@@ -610,8 +621,9 @@ if (canvas && canvas.getContext) {
     const rect = canvas.getBoundingClientRect();
     canvasRect = rect;
     canvasDocTop = rect.top + window.scrollY;
-    viewW = rect.width;
-    viewH = rect.height;
+    // 크기는 offset 값 사용 — exit 중 무대가 scale된 상태에서 리사이즈돼도 백버퍼 유지
+    viewW = canvas.offsetWidth;
+    viewH = canvas.offsetHeight;
     canvas.width = Math.floor(viewW * ratio);
     canvas.height = Math.floor(viewH * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -625,10 +637,21 @@ if (canvas && canvas.getContext) {
     }
 
     context.clearRect(0, 0, viewW, viewH);
+    // IN 위상 진행도(위상 분리) — 수렴 구간에는 "사라지는" 게 아니라 "모이는" 것이 보이도록
+    // 페이드를 완만화하고, 최종 페이드는 오버랩 종반(0.88~0.99)에 배정
+    const pIn = pinEnabled ? remap(heroProgress, 0, HERO_IN_END) : heroProgress;
+    const convergeK = pinEnabled ? easeInOutCubic(remap(heroProgress, 0.66, 0.9)) : 0;
     context.globalAlpha = pinEnabled
-      ? 1 - 0.75 * remap(heroProgress, 0.6, 1)
+      ? (1 - 0.6 * remap(pIn, 0.6, 1)) * (1 - remap(heroProgress, 0.88, 0.99))
       : 1 - heroProgress * 0.85;
-    const spreadK = pinEnabled ? remap(heroProgress, 0.3, 0.85) : 0;
+    const spreadK = pinEnabled ? remap(pIn, 0.3, 0.85) : 0;
+
+    // 오버랩에 가려진 종반 — 드로우 패스 생략(rAF만 유지)
+    if (context.globalAlpha < 0.02) {
+      context.globalAlpha = 1;
+      if (running) animationFrame = requestAnimationFrame(drawScene);
+      return;
+    }
 
     const gx = viewW * 0.78;
     const gy = viewH * 0.24 + heroProgress * 40;
@@ -652,7 +675,8 @@ if (canvas && canvas.getContext) {
       let f = 0;
       const px = p.baseX + p.ox;
       const py = p.baseY + p.oy;
-      if (pointer.active) {
+      // 수렴 중에는 포인터 리플 무시(무대 transform으로 시각/레이아웃 좌표가 어긋나는 구간)
+      if (pointer.active && convergeK < 0.2) {
         const dx = px - pointer.x;
         const dy = py - pointer.y;
         const d2 = dx * dx + dy * dy;
@@ -673,6 +697,13 @@ if (canvas && canvas.getContext) {
         p.x = viewW * 0.5 + (p.x - viewW * 0.5) * k;
         p.y = viewH * 0.5 + (p.y - viewH * 0.5) * k;
       }
+      if (convergeK > 0) {
+        // 수렴 — 산포된 노드가 레일 밴드(무대 43.7% 높이 = .hero-rail)로 정렬되고
+        // 마퀴 진행 방향(좌향)으로 드리프트. p의 순수 함수라 역스크롤 시 자연 복원
+        const bandY = viewH * 0.437;
+        p.y += (bandY + (p.y - bandY) * 0.1 - p.y) * convergeK;
+        p.x -= 70 * p.d * convergeK;
+      }
     }
 
     // connections
@@ -683,7 +714,11 @@ if (canvas && canvas.getContext) {
         const b = particles[j];
         const dx = a.x - b.x;
         const dy = a.y - b.y;
-        const d2 = dx * dx + dy * dy;
+        // 수렴 중 이방성 판정 — 세로 링크 감쇠·가로 링크 증폭(체인/스트림化), sqrt 추가 없음
+        const d2 =
+          convergeK > 0
+            ? dx * dx * (1 - 0.5 * convergeK) + dy * dy * (1 + 2 * convergeK)
+            : dx * dx + dy * dy;
         if (d2 < 16384) {
           const dist = Math.sqrt(d2);
           const near = Math.max(a.f, b.f);

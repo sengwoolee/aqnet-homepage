@@ -490,6 +490,11 @@ body.menu-open .site-header {
   z-index: -2;
 }
 
+/* 핸드오프 레일 — 데스크탑 핀 스크럽 exit 전용(미디어쿼리에서 활성화) */
+.hero-rail {
+  display: none;
+}
+
 .hero-noise {
   z-index: -1;
   opacity: 0.2;
@@ -885,11 +890,12 @@ body.menu-open .site-header {
   animation: heroIn 760ms var(--ease-emphasized) 620ms backwards;
 }
 
-/* 데스크탑 핀 스크럽 — 히어로 200svh 트랙 + sticky 무대 (카피 침강 → 콘솔 센터-스테이지) */
+/* 데스크탑 핀 스크럽 — 히어로 260svh 트랙 + sticky 무대
+   (카피 침강 → 콘솔 센터-스테이지 → exit 핸드오프: 파티클 수렴 + 레일 + Signal Strip 오버랩) */
 @media (min-width: 1025px) {
   .hero {
-    height: 200vh;
-    height: 200svh;
+    height: 260vh;
+    height: 260svh;
     --hero-drift: -56px;
   }
 
@@ -900,6 +906,59 @@ body.menu-open .site-header {
     height: 100svh;
     min-height: 0;
     overflow: hidden;
+    /* exit — 무대가 반 발 물러나며 다음 섹션에 자리를 양보 */
+    transform: translate3d(0, calc(var(--hx, 0) * -4vh), 0) scale(calc(1 - var(--hx, 0) * 0.045));
+  }
+
+  .hero.exiting .hero-stage {
+    will-change: transform;
+  }
+
+  /* exit 스크림 — filter 대신 opacity(컴포지터 전용)로 어둡게 */
+  .hero-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: var(--surface-0);
+    opacity: calc(var(--hx, 0) * 0.45);
+    pointer-events: none;
+  }
+
+  /* 핸드오프 레일 — 파티클이 수렴하는 수평 스트림 라인. 콘솔 뒤(z -1)를 지나
+     양옆으로 드러나는 배경 평면 요소. top 43.7%는 p=1(스크림·후퇴 완료) 시점에
+     Signal Strip border-top과 시각적으로 만나도록 무대 transform을 역산한 값 */
+  .hero-rail {
+    display: block;
+    position: absolute;
+    top: 43.7%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: -1;
+    background: linear-gradient(
+      90deg,
+      rgba(34, 118, 255, 0),
+      var(--blue) 18%,
+      var(--cyan) 82%,
+      rgba(46, 211, 255, 0)
+    );
+    box-shadow: 0 0 18px rgba(46, 211, 255, 0.45);
+    transform: scaleX(var(--hrl, 0));
+    transform-origin: center;
+    pointer-events: none;
+  }
+
+  /* 트랙 연장분(+60svh)과 정확히 상쇄 — 페이지 총 스크롤 길이 불변.
+     후행 섹션이 핀 무대 위로 슬라이드 인(오버랩)하며 레일과 바통터치 */
+  .signal-strip {
+    margin-top: -60vh;
+    margin-top: -60svh;
+  }
+
+  .reference-snapshot,
+  .about-section {
+    position: relative;
   }
 
   .hero-copy {

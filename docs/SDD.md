@@ -1,7 +1,7 @@
 # AQNET 홈페이지 — SDD (Spec & Development Document)
 
 > 다른 대화/세션에서 업무 맥락을 이어받기 위한 작업 명세서.
-> 마지막 갱신: 2026-07-02 · 디자인 의사결정의 상세 근거는 [design.md](../design.md) 참조.
+> 마지막 갱신: 2026-07-03 · 디자인 의사결정의 상세 근거는 [design.md](../design.md) 참조.
 
 ---
 
@@ -49,7 +49,7 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 | # | 섹션 (id) | 톤 | 핵심 스펙 |
 |---|---|---|---|
 | 1 | Header | 다크(고정) | 로고 + 7메뉴 + CTA. 스크롤 시 블러 배경(테두리/blur 레이어 상시 유지 — 로고 밀림 방지). 스크롤스파이 활성 표시. 상단 2px 스크롤 진행바 |
-| 2 | Hero (`#home`) | 다크 | 텍스트 H1(메인 카피, "설계" 그라데이션) + **라이브 콘솔 카드**(스파크라인·KPI·LIVE). 배경: 기하학 파티클 네트워크 캔버스(포인터 잔물결 반응, 스크롤 페이드). ※떨어지는 네모 스트림은 제거됨 |
+| 2 | Hero (`#home`) | 다크 | 텍스트 H1(메인 카피, "설계" 그라데이션) + **대시보드 콘솔 카드**(KPI 4셀·채널 ROAS). 데스크탑: **260svh 핀 스크럽** — 카피 침강→콘솔 센터-스테이지→exit 핸드오프(파티클 레일 수렴 + Signal Strip 오버랩 바통터치, design.md §15). 배경: 기하학 파티클 네트워크 캔버스(포인터 잔물결 반응) |
 | 3 | Signal Strip | 다크 | 운영 채널·데이터 스택 12종 무한 마퀴(hover 일시정지) |
 | 4 | Snapshot | 다크 | 카운트업 지표 4종: 70+ 운영 브랜드 / 6 / 5 / 1 |
 | 5 | About (`#about`) | 라이트 | **Why AQNET?** 다크 박스(AQ=Adaptability Quotient 정의 + "광고는 계속 변합니다…" + Capabilities 태그) + 운영 원칙 타임라인(진단→실행→자동화→학습) |
@@ -92,6 +92,7 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 - 통합 스크롤 핸들러(단일 rAF): 헤더 상태·진행바·히어로 진행도·콘솔 패럴랙스(-18px, 데스크탑 fine 포인터만).
 - 스크롤 리빌(`[data-reveal]` 페이드업 + `[data-stagger]` keyframe 70ms stagger — hover transition과 분리), 카운트업, eyebrow 밑줄 그로우.
 - **v5 스크롤 경험**: 히어로 카피 스크럽(`--hs`), 헤딩 라인 마스크 리빌(JS가 h2를 `<br>` 단위 래핑), C·O·R·E 이니셜 스크럽(`--fwp`), 채널띠 스크롤 가속(WAAPI playbackRate 1→3.5 감쇠), Solution 루프 스크롤 스크럽(멈추면 4초 후 자동 순환 재개), 로고월 타일 stagger, 스파크라인 드로우-온. 레이아웃 읽기는 load/resize에서만(오프셋 캐시).
+- **히어로 핀 스크럽(데스크탑 >1024px)**: 260svh 트랙 + 100svh sticky 무대. `HERO_IN_END=0.625` 위상 분리 — IN(카피 침강 `--hs`→콘솔 센터 `--hc`→KPI `--hk0~2`→브리지 `--hbr`) / EXIT(무대 후퇴·스크림 `--hx`, 레일 드로우 `--hrl`, 캔버스 수렴 convergeK). Signal Strip `margin-top:-60svh` 오버랩으로 페이지 총 길이 불변. 상세: design.md §15.
 
 ## 8. 작업 이력 (라운드 요약)
 
@@ -109,6 +110,9 @@ assets/references/  # 광고주 레퍼런스 로고 70종 (priority 18종)
 | **2차 디벨롭** | **AQ 브랜드 철학 반영**(과장님 피드백): Why AQNET?, AQ Framework(C·O·R·E), Media Products, 폼 8필드 확장 | §11 |
 | **v5** | **스크롤 경험 강화**: 전수 감사(요구 전 항목 충족, stagger hover-지연 버그 발견·수정) + 히어로 스크럽/헤딩 라인 리빌/이니셜 스크럽/마퀴 가속/루프 스크롤 스크럽/로고월 stagger/스파크라인 드로우-온, scrollspy 사각지대·대비·skip-link 보완 | §12 |
 | **v6** | **3역할(기획·디자인·개발) 병렬 감사 폴리시 19건**: Service 도트 미렌더·Works 필터 깜빡임 버그 수정, 탭 상태 분리, 모바일 로고월 3열, Insight "발행 예정" 라벨, Works 하단 CTA 밴드, 콘솔 "예시 화면" 캡션, :has/svh/inert 폴백, 폼 검증 강화. **회사소개서 13p 확장안 도출**(온보딩·리포팅·회사개요 — 클라이언트 소스 대기) | §13 |
+| **v7** | **AQ Growth OS 섹션 리디자인**: 콘솔을 제품 목업으로 격상(크롬바·PREVIEW·KPI·채널바·레포트 티저·데모 CTA), 노드↔존 `data-sync` 1:1 점등 | §14 |
+| **v8** | **히어로 핀 스크럽**(다른 워크머신에서 완성): 200svh 트랙 + sticky 무대, 카피 침강→콘솔 센터-스테이지, About·폰트 하이어라키 정비 | — |
+| **v9** | **히어로 exit 핸드오프 "Signal Convergence"**: 트랙 260svh 확장(위상 분리, 기존 안무 스크롤 거리 불변), 파티클 레일 수렴 + 무대 후퇴·스크림 + Signal Strip 오버랩 바통터치(레일↔스트립 정합 0.1px) | §15 |
 
 <details>
 <summary>커밋 로그 (git init 이후, 오래된 순)</summary>
