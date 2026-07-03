@@ -701,9 +701,10 @@ if (canvas && canvas.getContext) {
     // ── 오비탈 시스템 코어 — 시각 앵커. 막3에서 링이 안쪽→바깥 순차 확대·소멸되는
     //    "통과 게이트"가 됨(카메라 전진 서사 — 파괴가 아니라 통과)
     const minDim = Math.min(viewW, viewH);
-    const orbCx = viewW * (pinEnabled ? 0.7 : 0.76);
-    const orbCy = viewH * (pinEnabled ? 0.42 : 0.3); // 데스크탑: 레일(42%)과 동일 좌표 정박
-    const orbScale = pinEnabled ? 1 : 0.62;
+    const compactHero = !pinEnabled && viewW < 720;
+    const orbCx = viewW * (pinEnabled ? 0.7 : compactHero ? 0.78 : 0.76);
+    const orbCy = viewH * (pinEnabled ? 0.42 : compactHero ? 0.24 : 0.3); // 데스크탑: 레일(42%)과 동일 좌표 정박
+    const orbScale = pinEnabled ? 1 : compactHero ? 0.46 : 0.62;
     const orbT = (now - bootT) / 1000;
     const orbSpin = 1 + alignK * 0.8; // 정렬되면 시스템이 빨라짐
     const orbDraw = easeOutCubic(clamp((now - bootT - 250) / 1500, 0, 1)); // 로드 드로우-온
@@ -724,8 +725,9 @@ if (canvas && canvas.getContext) {
 
     // 링 3개(중간 링은 점선) — 통과 근접 시 선이 굵어짐(원근)
     for (let ri = 0; ri < 3; ri += 1) {
+      if (compactHero && ri === 1) continue;
       const rr = ORB_R[ri] * minDim * orbScale * ringS[ri];
-      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * ringA[ri];
+      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * ringA[ri] * (compactHero ? 0.62 : 1);
       if (ra < 0.01) continue;
       context.lineWidth = 1 + Math.min(1.5, 1.5 * remap(ringS[ri], 1, 8));
       context.strokeStyle = `rgba(122, 183, 255, ${ra})`;
@@ -740,14 +742,15 @@ if (canvas && canvas.getContext) {
     const tickFade = pinEnabled ? 1 - remap(p9, 0.5, 0.58) : 1;
     const tickR = ORB_R[2] * minDim * orbScale * ringS[2];
     if (tickFade > 0.01) {
-      context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * tickFade})`;
+      context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * tickFade * (compactHero ? 0.5 : 1)})`;
       context.beginPath();
-      for (let ti = 0; ti < 24; ti += 1) {
-        const ang = orbT * 0.045 + (ti / 24) * Math.PI * 2;
+      const tickCount = compactHero ? 12 : 24;
+      for (let ti = 0; ti < tickCount; ti += 1) {
+        const ang = orbT * 0.045 + (ti / tickCount) * Math.PI * 2;
         const ca = Math.cos(ang);
         const sa = Math.sin(ang);
         context.moveTo(orbCx + ca * tickR, orbCy + sa * tickR);
-        context.lineTo(orbCx + ca * (tickR + 6), orbCy + sa * (tickR + 6));
+        context.lineTo(orbCx + ca * (tickR + (compactHero ? 4 : 6)), orbCy + sa * (tickR + (compactHero ? 4 : 6)));
       }
       context.stroke();
     }
@@ -901,7 +904,7 @@ if (canvas && canvas.getContext) {
     }
 
     // 궤도 위성 노드 — 소속 링의 스케일·알파 승계(링과 함께 다가와 화면을 스쳐 지나감)
-    const satBase = (pinEnabled ? 0.85 : 0.6) * orbDraw;
+    const satBase = (pinEnabled ? 0.85 : compactHero ? 0.28 : 0.6) * orbDraw;
     for (let si = 0; si < ORB_SATS.length; si += 1) {
       const s = ORB_SATS[si];
       const sa = satBase * ringA[s.ri];
@@ -948,7 +951,7 @@ if (canvas && canvas.getContext) {
 
     // AQ Growth OS 원형 메시지 — 네 운영 원칙을 궤도 점에 고정하고 중앙에 시스템명을 둠
     const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.78, 0.92)) : 0;
-    const labelFade = orbDraw * (1 - labelExit);
+    const labelFade = compactHero ? 0 : orbDraw * (1 - labelExit);
     if (labelFade > 0.01) {
       const baseAlpha = context.globalAlpha;
       const labelOrbitK = pinEnabled ? easeInOutCubic(remap(p9, 0.34, 0.66)) : 0;
@@ -956,15 +959,21 @@ if (canvas && canvas.getContext) {
       const labelFont = clamp(minDim * 0.017, 11, 14);
       const coreFont = clamp(minDim * 0.024, 15, 21);
       const labelHeight = labelFont + 17;
+      const labelPadX = 16;
+      const labelFontFace =
+        `800 ${labelFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
 
       context.save();
       context.globalAlpha = baseAlpha * labelFade;
+      context.font = labelFontFace;
 
       const coreW = Math.max(132, coreFont * 7.8);
       const coreH = Math.max(44, coreFont * 2.45);
       const coreX = orbCx - coreW / 2;
       const coreY = orbCy - coreH / 2;
-      const labelItems = ORB_LABELS.map((item, index) => {
+      const labelItems = compactHero
+        ? []
+        : ORB_LABELS.map((item, index) => {
         const bob = Math.sin(orbT * 0.9 + index * 1.3) * (3 - labelOrbitK * 1.5);
         const angle = item.angle + labelOrbitK * 0.18 + Math.sin(orbT * 0.18 + index) * 0.025 * alignK;
         const radius = stableR + (index % 2 === 0 ? 10 : -2);
@@ -977,7 +986,7 @@ if (canvas && canvas.getContext) {
           viewH - labelHeight / 2 - 28,
         );
         const textWidth = context.measureText(item.label).width;
-        const labelWidth = textWidth + 24;
+        const labelWidth = Math.ceil(textWidth) + labelPadX * 2 + 2;
         let labelX = dx >= 0 ? dotX + 15 : dotX - labelWidth - 15;
         const labelMinX = pinEnabled ? viewW * 0.5 : 10;
         labelX = clamp(labelX, labelMinX, viewW - labelWidth - 28);
@@ -1002,21 +1011,64 @@ if (canvas && canvas.getContext) {
         context.stroke();
       });
 
-      roundedRectPath(context, coreX, coreY, coreW, coreH, 18);
-      context.fillStyle = "rgba(7, 15, 29, 0.84)";
-      context.fill();
-      context.strokeStyle = "rgba(122, 183, 255, 0.34)";
+      const coreRadius = Math.min(20, coreH / 2);
+      const coreFill = context.createLinearGradient(coreX, coreY, coreX + coreW, coreY + coreH);
+      coreFill.addColorStop(0, "rgba(12, 36, 60, 0.94)");
+      coreFill.addColorStop(0.54, "rgba(6, 15, 31, 0.94)");
+      coreFill.addColorStop(1, "rgba(8, 27, 46, 0.9)");
+
+      roundedRectPath(context, coreX - 6, coreY - 6, coreW + 12, coreH + 12, coreRadius + 6);
+      context.strokeStyle = "rgba(46, 211, 255, 0.16)";
       context.lineWidth = 1;
       context.stroke();
+
+      roundedRectPath(context, coreX, coreY, coreW, coreH, coreRadius);
+      context.fillStyle = coreFill;
+      context.fill();
+      context.strokeStyle = "rgba(46, 211, 255, 0.58)";
+      context.lineWidth = 1.2;
+      context.stroke();
+
+      roundedRectPath(context, coreX + 4, coreY + 4, coreW - 8, coreH - 8, Math.max(10, coreRadius - 4));
+      context.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      context.lineWidth = 1;
+      context.stroke();
+
+      const coreAccent = context.createLinearGradient(coreX + 18, coreY, coreX + coreW - 18, coreY);
+      coreAccent.addColorStop(0, "rgba(46, 211, 255, 0)");
+      coreAccent.addColorStop(0.5, "rgba(46, 211, 255, 0.64)");
+      coreAccent.addColorStop(1, "rgba(46, 211, 255, 0)");
+      context.strokeStyle = coreAccent;
+      context.beginPath();
+      context.moveTo(coreX + 22, coreY + 1.5);
+      context.lineTo(coreX + coreW - 22, coreY + 1.5);
+      context.stroke();
+
+      context.fillStyle = "rgba(46, 211, 255, 0.96)";
+      [coreX, coreX + coreW].forEach((portX) => {
+        context.beginPath();
+        context.arc(portX, orbCy, 3.4, 0, Math.PI * 2);
+        context.fill();
+      });
+      context.fillStyle = "rgba(122, 183, 255, 0.9)";
+      [coreY, coreY + coreH].forEach((portY) => {
+        context.beginPath();
+        context.arc(orbCx, portY, 2.2, 0, Math.PI * 2);
+        context.fill();
+      });
+
       context.font =
         `900 ${coreFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillStyle = "rgba(255, 255, 255, 0.94)";
+      const coreTextFill = context.createLinearGradient(coreX, orbCy, coreX + coreW, orbCy);
+      coreTextFill.addColorStop(0, "rgba(255, 255, 255, 0.96)");
+      coreTextFill.addColorStop(0.56, "rgba(232, 247, 255, 1)");
+      coreTextFill.addColorStop(1, "rgba(122, 183, 255, 0.96)");
+      context.fillStyle = coreTextFill;
       context.fillText("AQ Growth OS", orbCx, orbCy + 0.5);
 
-      context.font =
-        `800 ${labelFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
+      context.font = labelFontFace;
       context.textBaseline = "middle";
       labelItems.forEach((item) => {
         context.strokeStyle = "rgba(46, 211, 255, 0.28)";
@@ -1041,7 +1093,7 @@ if (canvas && canvas.getContext) {
         context.stroke();
         context.fillStyle = "rgba(232, 242, 255, 0.9)";
         context.textAlign = "left";
-        context.fillText(item.label, item.labelX + 12, item.dotY);
+        context.fillText(item.label, item.labelX + labelPadX, item.dotY);
       });
       context.restore();
     }

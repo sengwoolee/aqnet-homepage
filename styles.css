@@ -654,6 +654,27 @@ body.menu-open .site-header {
   text-align: center;
 }
 
+.hero-bridge-core {
+  position: relative;
+  display: inline-block;
+  color: var(--cyan);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: 0 0 16px rgba(46, 211, 255, 0.34);
+  white-space: nowrap;
+}
+
+.hero-bridge-core::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(46, 211, 255, 0.9), transparent);
+  opacity: 0.86;
+}
+
 .hero-bridge a {
   color: var(--cyan);
   font-weight: 800;
