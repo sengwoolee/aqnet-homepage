@@ -638,24 +638,25 @@ body.menu-open .site-header {
   animation: scrollCue 1.8s ease-in-out infinite;
 }
 
-/* Solution 브리지 — 수렴 서사의 결론 캡션+미니 CTA (모바일: 정적, 데스크탑: 레일 위 스크럽) */
+/* Solution 브리지 — 통과 서사의 결론 선언+CTA (모바일: 정적, 데스크탑: 레일 위 스크럽) */
 .hero-bridge {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 6px 14px;
   margin: 0;
   padding: 0 24px 36px;
-  font-size: 13px;
-  color: var(--text-d-3);
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 700;
+  color: var(--text-d-1);
   word-break: keep-all;
   text-align: center;
 }
 
 .hero-bridge a {
   color: var(--cyan);
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
