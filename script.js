@@ -13,6 +13,9 @@ const easeInQuad = (t) => t * t;
 const easeInCubic = (t) => t * t * t;
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const isWindowsPlatform = /Win/i.test(`${navigator.platform || ""} ${navigator.userAgent || ""}`);
+const reduceMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+const smoothWindowsHeroScroll = isWindowsPlatform && !(reduceMotionQuery && reduceMotionQuery.matches);
 
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
@@ -29,10 +32,13 @@ if (stripTrack) {
    - 헤더 상태 / 스크롤 진행바 / 히어로 진행도·속도 / 콘솔 패럴랙스
    --------------------------------------------------------- */
 let heroProgress = 0;
+let heroTargetProgress = 0;
 let scrollVelocity = 0;
 let lastScrollY = window.scrollY;
 let heroHeight = heroEl ? heroEl.offsetHeight : 1;
 let scrollTicking = false;
+let heroSmoothingRaf = null;
+let heroScrollInitialized = false;
 
 /* 섹션 스크럽 — 레이아웃 읽기는 load/resize에서만, 스크롤 중엔 산술만 */
 const fwSection = document.querySelector(".framework-section");
@@ -84,6 +90,73 @@ function stripBoost() {
 
 let pinEnabled = window.innerWidth > 1024; // 히어로 핀 스크럽(데스크탑 전용)
 
+function shouldSmoothHeroProgress() {
+  return smoothWindowsHeroScroll && pinEnabled;
+}
+
+function syncHeroProgressVars() {
+  if (!heroEl) return;
+  const key = heroProgress.toFixed(3) + (pinEnabled ? "p" : "m");
+  if (key === lastHs) return;
+
+  lastHs = key;
+  if (pinEnabled) {
+    const p = heroProgress;
+    heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(3));
+    heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(3));
+
+    const bridgeIn = easeOutCubic(remap(p, 0.68, 0.78));
+    const bridgeOut = 1 - easeInQuad(remap(p, 0.9, 0.98));
+    heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(3));
+    heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.9, 1)).toFixed(3));
+
+    const railIn = easeOutCubic(remap(p, 0.78, 0.94));
+    const railOut = 1 - easeInQuad(remap(p, 0.96, 1));
+    heroEl.style.setProperty("--hrl", railIn.toFixed(3));
+    heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(3));
+    heroEl.classList.toggle("exiting", p > 0.86 && p < 1);
+  } else {
+    heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
+  }
+}
+
+function smoothHeroProgressFrame() {
+  heroSmoothingRaf = null;
+
+  if (!shouldSmoothHeroProgress()) {
+    heroProgress = heroTargetProgress;
+    syncHeroProgressVars();
+    return;
+  }
+
+  const diff = heroTargetProgress - heroProgress;
+  if (Math.abs(diff) < 0.0008) {
+    heroProgress = heroTargetProgress;
+    syncHeroProgressVars();
+    return;
+  }
+
+  const progressLerp = clamp(0.22 + scrollVelocity * 0.12, 0.22, 0.34);
+  heroProgress += diff * progressLerp;
+  syncHeroProgressVars();
+  heroSmoothingRaf = requestAnimationFrame(smoothHeroProgressFrame);
+}
+
+function queueHeroProgressSync() {
+  if (!heroScrollInitialized || !shouldSmoothHeroProgress()) {
+    if (heroSmoothingRaf) {
+      cancelAnimationFrame(heroSmoothingRaf);
+      heroSmoothingRaf = null;
+    }
+    heroProgress = heroTargetProgress;
+    heroScrollInitialized = true;
+    syncHeroProgressVars();
+    return;
+  }
+
+  if (!heroSmoothingRaf) heroSmoothingRaf = requestAnimationFrame(smoothHeroProgressFrame);
+}
+
 function onScrollFrame() {
   const y = window.scrollY;
 
@@ -96,35 +169,10 @@ function onScrollFrame() {
 
   const vh = window.innerHeight;
   const heroTrack = pinEnabled ? Math.max(1, heroHeight - vh) : heroHeight * 0.85;
-  heroProgress = clamp(y / heroTrack, 0, 1);
+  heroTargetProgress = clamp(y / heroTrack, 0, 1);
   scrollVelocity = clamp(Math.abs(y - lastScrollY) / 40, 0, 1);
   lastScrollY = y;
-
-  if (heroEl) {
-    const key = heroProgress.toFixed(3) + (pinEnabled ? "p" : "m");
-    if (key !== lastHs) {
-      lastHs = key;
-      if (pinEnabled) {
-        // Fly-through 4막 — 한 구간 = 한 지배 모션. 전 커브 p 직접 기준, 종점 p≤0.98
-        const p = heroProgress;
-        heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(3)); // 막1 카피 침강
-        heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(3));
-        // 브리지 — 카피 소등 직후 바통을 받아 여정 내내 서사의 닻으로 상주(빈 애니메이션 방지)
-        const bridgeIn = easeOutCubic(remap(p, 0.34, 0.44));
-        const bridgeOut = 1 - easeInQuad(remap(p, 0.78, 0.92));
-        heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(3));
-        heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.78, 0.98)).toFixed(3)); // 막4 상향+스크림
-        // 레일 스트릭 — 브리지 카피 등장과 동시에 퍼져 다음 섹션으로 핸드오프
-        const railIn = easeOutCubic(remap(p, 0.34, 0.62));
-        const railOut = 1 - easeInQuad(remap(p, 0.84, 0.98));
-        heroEl.style.setProperty("--hrl", railIn.toFixed(3));
-        heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(3));
-        heroEl.classList.toggle("exiting", p > 0.72 && p < 1);
-      } else {
-        heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
-      }
-    }
-  }
+  queueHeroProgressSync();
 
   if (fwSection) {
     const vh = window.innerHeight;
@@ -575,7 +623,7 @@ if (canvas && canvas.getContext) {
   const target = { x: -9999, y: -9999 };
   const PR = { radiusSq: 170 * 170, push: 14, damp: 0.88, lerp: 0.12 };
 
-  const isWindows = /Win/i.test(`${navigator.platform || ""} ${navigator.userAgent || ""}`);
+  const isWindows = isWindowsPlatform;
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4;
   const motionLite = isWindows || lowPower;
 
@@ -640,7 +688,7 @@ if (canvas && canvas.getContext) {
   }
 
   function resizeCanvas() {
-    const dprCap = window.innerWidth < 720 ? 1.4 : motionLite ? 1.35 : 2;
+    const dprCap = window.innerWidth < 720 ? 1.4 : isWindows ? 1.2 : lowPower ? 1.35 : 2;
     const ratio = Math.min(window.devicePixelRatio || 1, dprCap);
     const rect = canvas.getBoundingClientRect();
     canvasRect = rect;
@@ -680,7 +728,7 @@ if (canvas && canvas.getContext) {
     const introK = easeOutCubic(clamp((now - bootT) / 1100, 0, 1)); // 로드 페이드-인
     context.globalAlpha =
       introK *
-      (pinEnabled ? 1 - 0.9 * easeInQuad(remap(p9, 0.84, 0.97)) : 1 - heroProgress * 0.85);
+      (pinEnabled ? 1 - easeInQuad(remap(p9, 0.54, 0.72)) : 1 - heroProgress * 0.85);
 
     // 오버랩에 가려진 종반 — 드로우 패스 생략(rAF만 유지)
     if (context.globalAlpha < 0.02) {
@@ -711,9 +759,9 @@ if (canvas && canvas.getContext) {
     const ORB_R = [0.16, 0.235, 0.315];
     // 게이트 창(p): 외곽이 먼저 다가와 통과(0.50–0.64), 중간(0.58–0.72), 내곽(0.66–0.80)
     const GATES = [
-      [0.66, 0.8],
-      [0.58, 0.72],
-      [0.5, 0.64],
+      [0.56, 0.68],
+      [0.5, 0.62],
+      [0.44, 0.56],
     ];
     const ringS = [1, 1, 1];
     const ringA = [1, 1, 1];
@@ -922,7 +970,7 @@ if (canvas && canvas.getContext) {
       context.shadowBlur = 0;
     }
     // 코어 — 펄스 글로우. 통과 순간(0.78–0.83) 플레어 후 레일 스트릭에 바통(0.84–0.90 페이드)
-    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.78, 0.83)) * (1 - remap(p9, 0.83, 0.9)) : 0;
+    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.58, 0.64)) * (1 - remap(p9, 0.64, 0.72)) : 0;
     if (flare > 0.01) {
       const fr = 90 + 60 * flare;
       const fg = context.createRadialGradient(orbCx, orbCy, 0, orbCx, orbCy, fr);
@@ -931,7 +979,7 @@ if (canvas && canvas.getContext) {
       context.fillStyle = fg;
       context.fillRect(orbCx - fr, orbCy - fr, fr * 2, fr * 2);
     }
-    const coreFade = pinEnabled ? 1 - remap(p9, 0.84, 0.9) : 1;
+    const coreFade = pinEnabled ? 1 - remap(p9, 0.54, 0.72) : 1;
     if (coreFade > 0.01) {
       const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
       const glowR = (10 + 3 * pulse) * (1 + 1.2 * (pinEnabled ? remap(p9, 0.6, 0.8) : 0));
@@ -950,7 +998,7 @@ if (canvas && canvas.getContext) {
     }
 
     // AQ Growth OS 원형 메시지 — 네 운영 원칙을 궤도 점에 고정하고 중앙에 시스템명을 둠
-    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.78, 0.92)) : 0;
+    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.52, 0.68)) : 0;
     const labelFade = compactHero ? 0 : orbDraw * (1 - labelExit);
     if (labelFade > 0.01) {
       const baseAlpha = context.globalAlpha;
