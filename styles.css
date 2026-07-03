@@ -606,22 +606,6 @@ body.menu-open .site-header {
   transition-duration: var(--dur-fast);
 }
 
-/* ---- Hero signal lanes — 파티클 필드가 정렬되는 4개 레인의 분류 라벨 (데스크탑 핀 전용) ---- */
-.hero-lanes span {
-  display: none;
-  position: absolute;
-  top: var(--ly);
-  right: max(28px, calc((100% - var(--max)) / 2 - 40px));
-  transform: translate(calc(10px - var(--hln, 0) * 10px), -50%);
-  opacity: var(--hln, 0);
-  color: var(--text-d-4);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
 /* Solution 콘솔 캡션(공유) — 히어로 제거 후에도 Solution 패널 푸터가 사용 */
 .console-note {
   display: block;
@@ -725,8 +709,8 @@ body.menu-open .site-header {
     height: 100svh;
     min-height: 0;
     overflow: hidden;
-    /* exit — 무대가 반 발 물러나며 다음 섹션에 자리를 양보 */
-    transform: translate3d(0, calc(var(--hx, 0) * -4vh), 0) scale(calc(1 - var(--hx, 0) * 0.045));
+    /* exit — 상향 이탈(스크롤 관성 방향)만. scale은 줌 연출과 모순이라 미사용 */
+    transform: translate3d(0, calc(var(--hx, 0) * -2vh), 0);
   }
 
   .hero.exiting .hero-stage {
@@ -740,17 +724,16 @@ body.menu-open .site-header {
     inset: 0;
     z-index: 3;
     background: var(--surface-0);
-    opacity: calc(var(--hx, 0) * 0.45);
+    opacity: calc(var(--hx, 0) * 0.5);
     pointer-events: none;
   }
 
-  /* 핸드오프 레일 — 파티클이 수렴하는 수평 스트림 라인. 콘솔 뒤(z -1)를 지나
-     양옆으로 드러나는 배경 평면 요소. top 43.7%는 p=1(스크림·후퇴 완료) 시점에
-     Signal Strip border-top과 시각적으로 만나도록 무대 transform을 역산한 값 */
+  /* 핸드오프 레일 — 코어(70%W)를 고속 통과할 때의 모션 스트릭이 수평 광선으로 확장.
+     top 42% − 무대 translateY 2vh = 40svh = p=1 시점 Signal Strip border-top(200−160svh)과 정합 */
   .hero-rail {
     display: block;
     position: absolute;
-    top: 43.7%;
+    top: 42%;
     left: 0;
     right: 0;
     height: 2px;
@@ -764,7 +747,7 @@ body.menu-open .site-header {
     );
     box-shadow: 0 0 18px rgba(46, 211, 255, 0.45);
     transform: scaleX(var(--hrl, 0));
-    transform-origin: center;
+    transform-origin: 70% 50%;
     pointer-events: none;
   }
 
@@ -787,15 +770,11 @@ body.menu-open .site-header {
     opacity: calc(1 - var(--hs, 0));
   }
 
-  .hero-lanes span {
-    display: block;
-  }
-
-  /* 브리지 캡션 — 레일 예정선 위 중앙, 수렴 직전 서사의 결론으로 등장 */
+  /* 브리지 캡션 — 통과 직후(막 4) 레일 위에서 서사의 결론으로 등장 */
   .hero-bridge {
     position: absolute;
     left: 50%;
-    top: calc(43.7% - 64px);
+    top: calc(42% - 64px);
     width: max-content;
     max-width: 80vw;
     padding: 0;

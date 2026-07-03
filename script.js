@@ -10,12 +10,9 @@ const heroEl = document.querySelector(".hero");
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const remap = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
 const easeInQuad = (t) => t * t;
+const easeInCubic = (t) => t * t * t;
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-/* 히어로 위상 분리 — 트랙 260svh 중 앞 100svh(p 0~0.625)는 기존 IN 안무,
-   뒤 60svh(p 0.625~1)는 exit 핸드오프. 기존 안무의 물리적 스크롤 거리 불변. */
-const HERO_IN_END = 0.625;
 
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
@@ -108,20 +105,14 @@ function onScrollFrame() {
     if (key !== lastHs) {
       lastHs = key;
       if (pinEnabled) {
+        // Fly-through 4막 — 한 구간 = 한 지배 모션. 전 커브 p 직접 기준, 종점 p≤0.98
         const p = heroProgress;
-        const pi = remap(p, 0, HERO_IN_END); // IN 위상 진행도
-        // 카피 침강 — 콘솔 클리어런스가 사라져 첫 화면 체류를 늘림(0.08–0.42 → 0.12–0.50)
-        heroEl.style.setProperty("--hs", easeInQuad(remap(pi, 0.12, 0.5)).toFixed(3));
-        // 레인 라벨 — 정렬 후반 점등(pi 0.46–0.64), 수렴 시작과 함께 퇴장(p 0.66–0.76)
-        const hlnIn = easeOutCubic(remap(pi, 0.46, 0.64));
-        const hlnOut = remap(p, 0.66, 0.76);
-        heroEl.style.setProperty("--hln", (hlnIn * (1 - hlnOut)).toFixed(3));
-        heroEl.style.setProperty("--hbr", easeOutCubic(remap(pi, 0.78, 0.95)).toFixed(3));
-        heroEl.style.setProperty("--hcue", remap(pi, 0.72, 0.9).toFixed(3));
-        // exit 핸드오프 — 무대 후퇴·스크림(--hx), 레일 드로우(--hrl). 종점 p≤0.98(해제 전 정지)
-        heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.64, 0.98)).toFixed(3));
-        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.7, 0.88)).toFixed(3));
-        heroEl.classList.toggle("exiting", p > 0.55 && p < 1);
+        heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(3)); // 막1 카피 침강
+        heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(3));
+        heroEl.style.setProperty("--hbr", easeOutCubic(remap(p, 0.8, 0.9)).toFixed(3)); // 막4 브리지
+        heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.78, 0.98)).toFixed(3)); // 막4 상향+스크림
+        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.8, 0.92)).toFixed(3)); // 막4 레일 스트릭
+        heroEl.classList.toggle("exiting", p > 0.72 && p < 1);
       } else {
         heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
       }
@@ -579,8 +570,6 @@ if (canvas && canvas.getContext) {
 
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4;
 
-  // 신호 레인 — 수렴 밴드(43.7%, .hero-rail) 기준 대칭 4레인. 라벨(.hero-lanes)과 동일 좌표
-  const LANES = [0.227, 0.367, 0.507, 0.647];
   // 오비탈 코어 위성 — ri: 링 인덱스, w: 각속도(rad/s, 부호=방향), ph: 초기 위상
   const ORB_SATS = [
     { ri: 0, w: 0.5, ph: 0.4 },
@@ -606,22 +595,16 @@ if (canvas && canvas.getContext) {
       y: 0,
       f: 0,
       g: 1,
-      lane: 0,
+      s: 1,
       r: index % 7 === 0 ? 2.2 : 1.35,
-      d: 0.4 + Math.random() * 0.6,
+      // 심도 성층 — 1/8은 원경(끝까지 화면에 남아 줌 후반 공백 방지), 나머지는 근·중경
+      d: index % 8 === 0 ? 0.12 + Math.random() * 0.08 : 0.35 + Math.random() * 0.65,
       hub: index % 11 === 0,
       vx: (Math.random() - 0.5) * 0.22,
       vy: (Math.random() - 0.5) * 0.18,
       alpha: 0.28 + Math.random() * 0.48,
     }));
     particles.forEach((p) => {
-      // 최근접 레인 배정(정렬 시 교차 없이 미끄러지도록) + 허브는 레인 근처에 상주(질서의 복선)
-      let best = 0;
-      for (let li = 1; li < LANES.length; li += 1) {
-        if (Math.abs(p.baseY - LANES[li] * height) < Math.abs(p.baseY - LANES[best] * height)) best = li;
-      }
-      p.lane = best;
-      if (p.hub) p.baseY = (LANES[best] + (Math.random() - 0.5) * 0.05) * height;
       p.x = p.baseX;
       p.y = p.baseY;
     });
@@ -650,29 +633,25 @@ if (canvas && canvas.getContext) {
     }
 
     context.clearRect(0, 0, viewW, viewH);
-    // IN 위상 진행도(위상 분리) — 수렴 구간에는 "사라지는" 게 아니라 "모이는" 것이 보이도록
-    // 페이드를 완만화하고, 최종 페이드는 오버랩 종반(0.88~0.99)에 배정
-    const pIn = pinEnabled ? remap(heroProgress, 0, HERO_IN_END) : heroProgress;
-    const convergeK = pinEnabled ? easeInOutCubic(remap(heroProgress, 0.66, 0.9)) : 0;
-    // 레인 정렬 — 데스크탑: 스크럽(p 순수 함수), 모바일: 시간 기반 자율 사이클(산포⇄정렬 ~14s 호흡)
-    let laneK;
+    // Fly-through 마스터 커브 — 전부 p 순수 함수(역스크롤 자연 복원)
+    const p9 = heroProgress;
+    // 막2 질서: 지터 감쇠 + 좌향 층류. 모바일은 시간 기반 자율 사이클(~14s 호흡)
+    let alignK;
     if (pinEnabled) {
-      laneK = easeInOutCubic(remap(pIn, 0.18, 0.58));
+      alignK = easeInOutCubic(remap(p9, 0.28, 0.44));
     } else {
-      // 모바일 — 카피 뒤에서 "산포⇄정렬"이 은은하게 숨쉬는 자율 사이클(라벨·가이드 없음)
       const s = 0.5 + 0.5 * Math.sin(((now - bootT) * Math.PI * 2) / 14000 - Math.PI / 2);
-      laneK = s * s * (3 - 2 * s) * 0.85;
+      alignK = s * s * (3 - 2 * s) * 0.85;
     }
-    // 좌향 흐름(동기화) — 마퀴 방향 사전 예고. 데스크탑은 스크럽, 모바일은 정렬에 비례
-    const flowK = pinEnabled ? remap(pIn, 0.5, 0.85) : laneK * 0.6;
-    // 카피 보호 게이트 — 카피 침강에 비례해 좌측 감쇠 해제
-    const sinkK = pinEnabled ? easeInQuad(remap(pIn, 0.12, 0.5)) : 0;
+    // 막3 진입: 방사 줌 마스터(초점 = 코어). 층류는 줌에 자리를 양보
+    const Zm = pinEnabled ? easeInQuad(remap(p9, 0.44, 0.78)) : 0;
+    const flowK = alignK * (1 - 0.8 * (pinEnabled ? remap(p9, 0.48, 0.62) : 0));
+    // 막1 카피 게이트 — 침강에 비례해 좌측 감쇠 해제
+    const sinkK = pinEnabled ? easeInQuad(remap(p9, 0.06, 0.3)) : 0;
     const introK = easeOutCubic(clamp((now - bootT) / 1100, 0, 1)); // 로드 페이드-인
     context.globalAlpha =
       introK *
-      (pinEnabled
-        ? (1 - 0.6 * remap(pIn, 0.6, 1)) * (1 - remap(heroProgress, 0.88, 0.99))
-        : 1 - heroProgress * 0.85);
+      (pinEnabled ? 1 - 0.9 * easeInQuad(remap(p9, 0.84, 0.97)) : 1 - heroProgress * 0.85);
 
     // 오버랩에 가려진 종반 — 드로우 패스 생략(rAF만 유지)
     if (context.globalAlpha < 0.02) {
@@ -690,66 +669,85 @@ if (canvas && canvas.getContext) {
     context.fillStyle = gradient;
     context.fillRect(0, 0, viewW, viewH);
 
-    // ── 오비탈 시스템 코어 — 히어로의 시각 앵커(상시 회전하는 대형 기하 구조물).
-    //    코어 y를 레일(43.7%)에 정박 — exit에서 원이 납작해지며 그대로 레일 선으로 붕괴(원→선)
+    // ── 오비탈 시스템 코어 — 시각 앵커. 막3에서 링이 안쪽→바깥 순차 확대·소멸되는
+    //    "통과 게이트"가 됨(카메라 전진 서사 — 파괴가 아니라 통과)
     const minDim = Math.min(viewW, viewH);
     const orbCx = viewW * (pinEnabled ? 0.7 : 0.76);
-    const orbCy = viewH * (pinEnabled ? 0.437 : 0.3);
+    const orbCy = viewH * (pinEnabled ? 0.42 : 0.3); // 데스크탑: 레일(42%)과 동일 좌표 정박
     const orbScale = pinEnabled ? 1 : 0.62;
     const orbT = (now - bootT) / 1000;
-    const orbSpin = 1 + laneK * 0.8; // 정렬되면 시스템이 빨라짐
+    const orbSpin = 1 + alignK * 0.8; // 정렬되면 시스템이 빨라짐
     const orbDraw = easeOutCubic(clamp((now - bootT - 250) / 1500, 0, 1)); // 로드 드로우-온
-    const flat = convergeK; // 원 → 선 붕괴 계수
     const ORB_R = [0.16, 0.235, 0.315];
-    const flatY = 1 - 0.97 * flat;
-    const flatX = 1 + 0.22 * flat;
-
-    // 링 3개(중간 링은 점선) — 배경 레이어
-    context.lineWidth = 1;
+    // 게이트 창(p): 외곽이 먼저 다가와 통과(0.50–0.64), 중간(0.58–0.72), 내곽(0.66–0.80)
+    const GATES = [
+      [0.66, 0.8],
+      [0.58, 0.72],
+      [0.5, 0.64],
+    ];
+    const ringS = [1, 1, 1];
+    const ringA = [1, 1, 1];
     for (let ri = 0; ri < 3; ri += 1) {
-      const r = ORB_R[ri] * minDim * orbScale;
-      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * (1 - 0.3 * flat);
+      const gk = pinEnabled ? easeInCubic(remap(p9, GATES[ri][0], GATES[ri][1])) : 0;
+      ringS[ri] = 1 + 7 * gk; // 최종 반경 ≈ 2.5·minDim(뷰포트 밖)
+      ringA[ri] = pinEnabled ? 1 - remap(p9, GATES[ri][1] - 0.06, GATES[ri][1] - 0.01) : 1;
+    }
+
+    // 링 3개(중간 링은 점선) — 통과 근접 시 선이 굵어짐(원근)
+    for (let ri = 0; ri < 3; ri += 1) {
+      const rr = ORB_R[ri] * minDim * orbScale * ringS[ri];
+      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * ringA[ri];
+      if (ra < 0.01) continue;
+      context.lineWidth = 1 + Math.min(1.5, 1.5 * remap(ringS[ri], 1, 8));
       context.strokeStyle = `rgba(122, 183, 255, ${ra})`;
       if (ri === 1) context.setLineDash([3, 7]);
       context.beginPath();
-      context.ellipse(orbCx, orbCy, r * flatX, r * flatY, 0, -Math.PI / 2, -Math.PI / 2 + orbDraw * Math.PI * 2);
+      context.ellipse(orbCx, orbCy, rr, rr, 0, -Math.PI / 2, -Math.PI / 2 + orbDraw * Math.PI * 2);
       context.stroke();
       if (ri === 1) context.setLineDash([]);
     }
-    // 외곽 링 계기 틱 24개 — 천천히 회전
-    const tickR = ORB_R[2] * minDim * orbScale;
-    context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * (1 - flat)})`;
-    context.beginPath();
-    for (let ti = 0; ti < 24; ti += 1) {
-      const ang = orbT * 0.045 + (ti / 24) * Math.PI * 2;
-      const ca = Math.cos(ang);
-      const sa = Math.sin(ang);
-      context.moveTo(orbCx + ca * tickR * flatX, orbCy + sa * tickR * flatY);
-      context.lineTo(orbCx + ca * (tickR + 6) * flatX, orbCy + sa * (tickR + 6) * flatY);
+    context.lineWidth = 1;
+    // 외곽 링 계기 틱 24개 — 줌 시작 전 조기 소등(확대 중 지터 방지)
+    const tickFade = pinEnabled ? 1 - remap(p9, 0.5, 0.58) : 1;
+    const tickR = ORB_R[2] * minDim * orbScale * ringS[2];
+    if (tickFade > 0.01) {
+      context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * tickFade})`;
+      context.beginPath();
+      for (let ti = 0; ti < 24; ti += 1) {
+        const ang = orbT * 0.045 + (ti / 24) * Math.PI * 2;
+        const ca = Math.cos(ang);
+        const sa = Math.sin(ang);
+        context.moveTo(orbCx + ca * tickR, orbCy + sa * tickR);
+        context.lineTo(orbCx + ca * (tickR + 6), orbCy + sa * (tickR + 6));
+      }
+      context.stroke();
     }
-    context.stroke();
-    // 회전 스윕 아크 — 시스템이 신호를 스캔하는 하이라이트(외곽 순방향 + 중간 역방향)
+    // 회전 스윕 아크 — 소속 링의 스케일·알파를 승계(링과 함께 다가와 함께 지나감)
     context.lineWidth = 1.6;
-    const sweepA = orbT * 0.24 * orbSpin;
-    context.strokeStyle = `rgba(46, 211, 255, ${0.5 * orbDraw * (1 - flat)})`;
-    context.beginPath();
-    context.ellipse(orbCx, orbCy, tickR * flatX, tickR * flatY, 0, sweepA, sweepA + 0.55);
-    context.stroke();
-    const sweepB = -orbT * 0.16 * orbSpin + 2.4;
-    const midR = ORB_R[1] * minDim * orbScale;
-    context.strokeStyle = `rgba(34, 118, 255, ${0.55 * orbDraw * (1 - flat)})`;
-    context.beginPath();
-    context.ellipse(orbCx, orbCy, midR * flatX, midR * flatY, 0, sweepB, sweepB + 0.4);
-    context.stroke();
+    if (ringA[2] > 0.01) {
+      const sweepA = orbT * 0.24 * orbSpin;
+      context.strokeStyle = `rgba(46, 211, 255, ${0.5 * orbDraw * ringA[2]})`;
+      context.beginPath();
+      context.ellipse(orbCx, orbCy, tickR, tickR, 0, sweepA, sweepA + 0.55);
+      context.stroke();
+    }
+    if (ringA[1] > 0.01) {
+      const sweepB = -orbT * 0.16 * orbSpin + 2.4;
+      const midR = ORB_R[1] * minDim * orbScale * ringS[1];
+      context.strokeStyle = `rgba(34, 118, 255, ${0.55 * orbDraw * ringA[1]})`;
+      context.beginPath();
+      context.ellipse(orbCx, orbCy, midR, midR, 0, sweepB, sweepB + 0.4);
+      context.stroke();
+    }
     context.lineWidth = 1;
 
-    // update pass — drift + flow + pointer ripple + lane/converge (좌표는 매 프레임 재계산: p 순수 함수)
+    // update pass — drift + 층류 + pointer ripple + 방사 줌 (좌표는 매 프레임 재계산: p 순수 함수)
     for (let i = 0; i < particles.length; i += 1) {
       const p = particles[i];
       p.baseX += p.vx;
-      p.baseY += p.vy;
-      // 동기화(Sync) — 레인 위 파티클이 마퀴 방향(좌향)으로 흐름. 허브는 패킷처럼 빠르게
-      if (flowK > 0) p.baseX -= flowK * p.d * (p.hub ? 0.9 : 0.55);
+      p.baseY += p.vy * (1 - alignK); // 막2 질서 — 세로 지터 감쇠(방향 정렬)
+      // 막2 층류 — 마퀴 방향(좌향) 흐름. 허브는 패킷처럼 빠르게. 줌 시작 후 자리 양보
+      if (flowK > 0) p.baseX -= flowK * p.d * (p.hub ? 1.6 : 0.9);
       if (p.baseX < -20) p.baseX = viewW + 20;
       if (p.baseX > viewW + 20) p.baseX = -20;
       if (p.baseY < -20) p.baseY = viewH + 20;
@@ -758,16 +756,16 @@ if (canvas && canvas.getContext) {
       let f = 0;
       const px = p.baseX + p.ox;
       const py = p.baseY + p.oy;
-      // 수렴 중에는 포인터 리플 무시(무대 transform으로 시각/레이아웃 좌표가 어긋나는 구간)
-      if (pointer.active && convergeK < 0.2) {
+      // 줌 중에는 포인터 리플 무시(투영 좌표와 포인터 좌표가 어긋나는 구간)
+      if (pointer.active && Zm < 0.15) {
         const dx = px - pointer.x;
         const dy = py - pointer.y;
         const d2 = dx * dx + dy * dy;
         if (d2 < PR.radiusSq) {
           f = 1 - d2 / PR.radiusSq;
           const inv = 1 / (Math.sqrt(d2) + 0.001);
-          // 레인 형성 후에는 리플 감쇠 — 구조가 흩어지지 않고 출렁임 후 복귀
-          const push = PR.push * (1 - laneK * 0.7);
+          // 정렬 후에는 리플 감쇠 — 구조가 흩어지지 않고 출렁임 후 복귀
+          const push = PR.push * (1 - alignK * 0.7);
           p.ox += dx * inv * push * f * 0.15;
           p.oy += dy * inv * push * f * 0.15;
         }
@@ -777,130 +775,146 @@ if (canvas && canvas.getContext) {
       p.x = p.baseX + p.ox;
       p.y = p.baseY + p.oy;
       p.f = f;
-      if (laneK > 0) {
-        // 정렬(Sort) — 산포된 신호가 배정 레인으로 y-스냅
-        p.y += (viewH * LANES[p.lane] - p.y) * laneK * 0.92;
-      }
-      if (convergeK > 0) {
-        // 융합(Merge) — 4레인이 레일 밴드(무대 43.7% = .hero-rail) 한 줄로 합류하고
-        // 마퀴 진행 방향(좌향)으로 드리프트. p의 순수 함수라 역스크롤 시 자연 복원
-        const bandY = viewH * 0.437;
-        p.y += (bandY + (p.y - bandY) * 0.1 - p.y) * convergeK;
-        p.x -= 70 * p.d * convergeK;
+      // 막3 방사 줌 — 초점(코어)에서 심도별 확산. 가까운 것(d 큼)이 먼저 빠르게 지나감
+      if (Zm > 0) {
+        const S = 1 + Zm * (0.8 + 11 * p.d * p.d);
+        p.x = orbCx + (p.x - orbCx) * S;
+        p.y = orbCy + (p.y - orbCy) * S;
+        p.s = S;
+      } else {
+        p.s = 1;
       }
       // 카피 보호 게이트 — 좌측 반부 알파 감쇠(침강 완료에 비례해 해제). 모바일 미적용
       p.g = pinEnabled && p.x < viewW * 0.46 ? 0.55 + 0.45 * sinkK : 1;
     }
 
-    // 레인 가이드 — 정렬이 "설계된 구조"로 읽히도록 4레인 기준선을 은은하게 드로우
-    // (수렴 시 4선이 레일 밴드로 접히며 소멸 → 레일(.hero-rail)이 이어받음)
-    if (pinEnabled && laneK > 0.02) {
-      const guideA = 0.16 * laneK * (1 - convergeK);
+    // connections — 줌 진입과 함께 페이드아웃, 이후 루프 자체를 스킵(성능)
+    const structK = alignK * 0.5;
+    const linkFade = pinEnabled ? 1 - remap(p9, 0.46, 0.6) : 1;
+    if (linkFade > 0.01) {
+      const linkBoost = 1 + 1.1 * structK;
       context.lineWidth = 1;
-      for (let li = 0; li < LANES.length; li += 1) {
-        const gyLane = viewH * (LANES[li] + (0.437 - LANES[li]) * convergeK);
-        const grad = context.createLinearGradient(0, 0, viewW, 0);
-        grad.addColorStop(0, "rgba(34, 118, 255, 0)");
-        grad.addColorStop(0.5, `rgba(122, 183, 255, ${guideA})`);
-        grad.addColorStop(1, `rgba(46, 211, 255, ${guideA * 0.6})`);
-        context.strokeStyle = grad;
-        context.beginPath();
-        context.moveTo(0, gyLane);
-        context.lineTo(viewW, gyLane);
-        context.stroke();
+      for (let i = 0; i < particles.length; i += 1) {
+        const a = particles[i];
+        for (let j = i + 1; j < particles.length; j += 1) {
+          const b = particles[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          // 정렬 중 이방성 판정 — 세로 링크 감쇠·가로 링크 증폭(스트림化), sqrt 추가 없음
+          const d2 =
+            structK > 0
+              ? dx * dx * (1 - 0.5 * structK) + dy * dy * (1 + 2 * structK)
+              : dx * dx + dy * dy;
+          if (d2 < 16384) {
+            const dist = Math.sqrt(d2);
+            const near = Math.max(a.f, b.f);
+            const alpha =
+              (0.14 * (1 - dist / 128) + 0.22 * near) * linkBoost * linkFade * ((a.g + b.g) * 0.5);
+            context.strokeStyle =
+              near > 0.02 ? `rgba(46, 211, 255, ${alpha})` : `rgba(122, 183, 255, ${alpha})`;
+            context.beginPath();
+            context.moveTo(a.x, a.y);
+            context.lineTo(b.x, b.y);
+            context.stroke();
+          }
+        }
       }
     }
 
-    // connections
-    const structK = Math.max(laneK * 0.6, convergeK);
-    const linkBoost = 1 + 1.1 * structK;
-    context.lineWidth = 1;
+    // nodes — 저속: 도트 / 고속 통과(S>2.5): 방사 방향 모션 스트릭
     for (let i = 0; i < particles.length; i += 1) {
-      const a = particles[i];
-      for (let j = i + 1; j < particles.length; j += 1) {
-        const b = particles[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        // 정렬·수렴 중 이방성 판정 — 세로 링크 감쇠·가로 링크 증폭(체인/스트림化), sqrt 추가 없음
-        const d2 =
-          structK > 0
-            ? dx * dx * (1 - 0.5 * structK) + dy * dy * (1 + 2 * structK)
-            : dx * dx + dy * dy;
-        if (d2 < 16384) {
-          const dist = Math.sqrt(d2);
-          const near = Math.max(a.f, b.f);
-          const alpha = (0.14 * (1 - dist / 128) + 0.22 * near) * linkBoost * ((a.g + b.g) * 0.5);
-          context.strokeStyle =
-            near > 0.02 ? `rgba(46, 211, 255, ${alpha})` : `rgba(122, 183, 255, ${alpha})`;
+      const p = particles[i];
+      const nodeA = Math.min(1, p.alpha + 0.5 * p.f + 0.2 * alignK) * p.g;
+      if (p.s > 2.5) {
+        const ddx = p.x - orbCx;
+        const ddy = p.y - orbCy;
+        const dl = Math.sqrt(ddx * ddx + ddy * ddy) + 0.001;
+        const L = Math.min((p.s - 2.5) * 3, 16);
+        context.strokeStyle = `rgba(255, 255, 255, ${nodeA * 0.8})`;
+        context.lineWidth = Math.min(p.r * (1 + (p.s - 1) * 0.15), 2.4);
+        context.beginPath();
+        context.moveTo(p.x, p.y);
+        context.lineTo(p.x - (ddx / dl) * L, p.y - (ddy / dl) * L);
+        context.stroke();
+      } else {
+        if (p.hub) {
+          context.shadowBlur = 6;
+          context.shadowColor = "rgba(46, 211, 255, 0.8)";
+        }
+        context.fillStyle = `rgba(255, 255, 255, ${nodeA})`;
+        context.beginPath();
+        context.arc(p.x, p.y, Math.min(p.r * (1 + (p.s - 1) * 0.35), 6) + 1.1 * p.f, 0, Math.PI * 2);
+        context.fill();
+        if (p.hub) context.shadowBlur = 0;
+      }
+    }
+    context.lineWidth = 1;
+
+    // 코어 → 근접 허브 인입선 — 줌 시작과 함께 페이드(신호를 읽는 시스템 은유)
+    const inflowFade = pinEnabled ? 1 - remap(p9, 0.44, 0.55) : 1;
+    if (inflowFade > 0.01) {
+      const baseTickR = ORB_R[2] * minDim * orbScale;
+      const linkR2 = baseTickR * baseTickR * 1.3;
+      for (let i = 0; i < particles.length; i += 1) {
+        const hp = particles[i];
+        if (!hp.hub) continue;
+        const hdx = hp.x - orbCx;
+        const hdy = hp.y - orbCy;
+        if (hdx * hdx + hdy * hdy < linkR2) {
+          context.strokeStyle = `rgba(46, 211, 255, ${0.14 * orbDraw * inflowFade * hp.g})`;
           context.beginPath();
-          context.moveTo(a.x, a.y);
-          context.lineTo(b.x, b.y);
+          context.moveTo(orbCx, orbCy);
+          context.lineTo(hp.x, hp.y);
           context.stroke();
         }
       }
     }
 
-    // nodes
-    for (let i = 0; i < particles.length; i += 1) {
-      const p = particles[i];
-      if (p.hub) {
-        context.shadowBlur = 6;
-        context.shadowColor = "rgba(46, 211, 255, 0.8)";
-      }
-      context.fillStyle = `rgba(255, 255, 255, ${Math.min(1, p.alpha + 0.5 * p.f + 0.2 * laneK) * p.g})`;
-      context.beginPath();
-      context.arc(p.x, p.y, p.r + 1.1 * p.f, 0, Math.PI * 2);
-      context.fill();
-      if (p.hub) context.shadowBlur = 0;
-    }
-
-    // 코어 → 근접 허브 연결 — 시스템이 필드의 신호를 읽는 인입선
-    context.lineWidth = 1;
-    const linkR2 = tickR * tickR * 1.3;
-    for (let i = 0; i < particles.length; i += 1) {
-      const hp = particles[i];
-      if (!hp.hub) continue;
-      const hdx = hp.x - orbCx;
-      const hdy = hp.y - orbCy;
-      if (hdx * hdx + hdy * hdy < linkR2) {
-        context.strokeStyle = `rgba(46, 211, 255, ${0.14 * orbDraw * (1 - flat) * hp.g})`;
-        context.beginPath();
-        context.moveTo(orbCx, orbCy);
-        context.lineTo(hp.x, hp.y);
-        context.stroke();
-      }
-    }
-
-    // 궤도 위성 노드 — 링 위를 서로 다른 속도·방향으로 공전(밝은 최상층)
-    const satAlpha = (pinEnabled ? 0.85 : 0.6) * orbDraw * (1 - 0.4 * flat);
+    // 궤도 위성 노드 — 소속 링의 스케일·알파 승계(링과 함께 다가와 화면을 스쳐 지나감)
+    const satBase = (pinEnabled ? 0.85 : 0.6) * orbDraw;
     for (let si = 0; si < ORB_SATS.length; si += 1) {
       const s = ORB_SATS[si];
-      const r = ORB_R[s.ri] * minDim * orbScale;
+      const sa = satBase * ringA[s.ri];
+      if (sa < 0.02) continue;
+      const rr = ORB_R[s.ri] * minDim * orbScale * ringS[s.ri];
       const ang = s.ph + orbT * s.w * orbSpin;
-      const sx = orbCx + Math.cos(ang) * r * flatX;
-      const sy = orbCy + Math.sin(ang) * r * flatY;
+      const sx = orbCx + Math.cos(ang) * rr;
+      const sy = orbCy + Math.sin(ang) * rr;
       context.shadowBlur = 10;
       context.shadowColor = "rgba(46, 211, 255, 0.9)";
-      context.fillStyle = `rgba(46, 211, 255, ${satAlpha})`;
+      context.fillStyle = `rgba(46, 211, 255, ${sa})`;
       context.beginPath();
-      context.arc(sx, sy, s.ri === 2 ? 2 : 2.6, 0, Math.PI * 2);
+      context.arc(sx, sy, (s.ri === 2 ? 2 : 2.6) * (1 + (ringS[s.ri] - 1) * 0.12), 0, Math.PI * 2);
       context.fill();
       context.shadowBlur = 0;
     }
-    // 코어 — 펄스 글로우 + 링 하이라이트
-    const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
-    context.shadowBlur = 14 * pulse;
-    context.shadowColor = "rgba(46, 211, 255, 0.85)";
-    context.fillStyle = `rgba(255, 255, 255, ${0.95 * orbDraw})`;
-    context.beginPath();
-    context.arc(orbCx, orbCy, 3.2, 0, Math.PI * 2);
-    context.fill();
-    context.shadowBlur = 0;
-    context.strokeStyle = `rgba(46, 211, 255, ${0.5 * pulse * orbDraw * (1 - flat)})`;
-    context.lineWidth = 1;
-    context.beginPath();
-    context.arc(orbCx, orbCy, 10 + 3 * pulse, 0, Math.PI * 2);
-    context.stroke();
+    // 코어 — 펄스 글로우. 통과 순간(0.78–0.83) 플레어 후 레일 스트릭에 바통(0.84–0.90 페이드)
+    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.78, 0.83)) * (1 - remap(p9, 0.83, 0.9)) : 0;
+    if (flare > 0.01) {
+      const fr = 90 + 60 * flare;
+      const fg = context.createRadialGradient(orbCx, orbCy, 0, orbCx, orbCy, fr);
+      fg.addColorStop(0, `rgba(46, 211, 255, ${0.35 * flare})`);
+      fg.addColorStop(1, "rgba(46, 211, 255, 0)");
+      context.fillStyle = fg;
+      context.fillRect(orbCx - fr, orbCy - fr, fr * 2, fr * 2);
+    }
+    const coreFade = pinEnabled ? 1 - remap(p9, 0.84, 0.9) : 1;
+    if (coreFade > 0.01) {
+      const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
+      const glowR = (10 + 3 * pulse) * (1 + 1.2 * (pinEnabled ? remap(p9, 0.6, 0.8) : 0));
+      context.shadowBlur = 14 * pulse;
+      context.shadowColor = "rgba(46, 211, 255, 0.85)";
+      context.fillStyle = `rgba(255, 255, 255, ${0.95 * orbDraw * coreFade})`;
+      context.beginPath();
+      context.arc(orbCx, orbCy, 3.2, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+      context.strokeStyle = `rgba(46, 211, 255, ${0.5 * pulse * orbDraw * coreFade})`;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.arc(orbCx, orbCy, glowR, 0, Math.PI * 2);
+      context.stroke();
+    }
 
     context.globalAlpha = 1;
 
