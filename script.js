@@ -112,7 +112,8 @@ function onScrollFrame() {
         // 브리지 — 카피 소등 직후 바통을 받아 여정 내내 서사의 닻으로 상주(빈 애니메이션 방지)
         heroEl.style.setProperty("--hbr", easeOutCubic(remap(p, 0.34, 0.44)).toFixed(3));
         heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.78, 0.98)).toFixed(3)); // 막4 상향+스크림
-        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.8, 0.92)).toFixed(3)); // 막4 레일 스트릭
+        // 레일 스트릭 — 링 게이트 통과(원 확대)와 동시에 퍼짐(순차 아님)
+        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.62, 0.86)).toFixed(3));
         heroEl.classList.toggle("exiting", p > 0.72 && p < 1);
       } else {
         heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
