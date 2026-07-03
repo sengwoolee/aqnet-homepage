@@ -39,6 +39,10 @@ let heroHeight = heroEl ? heroEl.offsetHeight : 1;
 let scrollTicking = false;
 let heroSmoothingRaf = null;
 let heroScrollInitialized = false;
+let heroSmoothLastTime = 0;
+let heroWheelRaf = null;
+let heroWheelLastTime = 0;
+let heroWheelVelocity = 0;
 
 /* 섹션 스크럽 — 레이아웃 읽기는 load/resize에서만, 스크롤 중엔 산술만 */
 const fwSection = document.querySelector(".framework-section");
@@ -51,6 +55,12 @@ let loopScrollSync = null; // Solution 루프 블록에서 주입
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
+  if (!pinEnabled && heroWheelRaf) {
+    cancelAnimationFrame(heroWheelRaf);
+    heroWheelRaf = null;
+    heroWheelLastTime = 0;
+    heroWheelVelocity = 0;
+  }
   if (fwSection) {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
@@ -94,49 +104,132 @@ function shouldSmoothHeroProgress() {
   return smoothWindowsHeroScroll && pinEnabled;
 }
 
+function getHeroTrackLength() {
+  const vh = window.innerHeight;
+  return pinEnabled ? Math.max(1, heroHeight - vh) : heroHeight * 0.85;
+}
+
 function syncHeroProgressVars() {
   if (!heroEl) return;
-  const key = heroProgress.toFixed(3) + (pinEnabled ? "p" : "m");
+  const key = heroProgress.toFixed(4) + (pinEnabled ? "p" : "m");
   if (key === lastHs) return;
 
   lastHs = key;
   if (pinEnabled) {
     const p = heroProgress;
-    heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(3));
-    heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(3));
+    heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(4));
+    heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(4));
 
     const bridgeIn = easeOutCubic(remap(p, 0.68, 0.78));
     const bridgeOut = 1 - easeInQuad(remap(p, 0.9, 0.98));
-    heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(3));
-    heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.9, 1)).toFixed(3));
+    heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(4));
+    heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.9, 1)).toFixed(4));
 
     const railIn = easeOutCubic(remap(p, 0.78, 0.94));
     const railOut = 1 - easeInQuad(remap(p, 0.96, 1));
-    heroEl.style.setProperty("--hrl", railIn.toFixed(3));
-    heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(3));
+    heroEl.style.setProperty("--hrl", railIn.toFixed(4));
+    heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(4));
     heroEl.classList.toggle("exiting", p > 0.86 && p < 1);
   } else {
-    heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
+    heroEl.style.setProperty("--hs", heroProgress.toFixed(4));
   }
 }
 
-function smoothHeroProgressFrame() {
+function normalizeWheelDelta(event) {
+  if (event.deltaMode === 1) return event.deltaY * 38;
+  if (event.deltaMode === 2) return event.deltaY * window.innerHeight;
+  return event.deltaY;
+}
+
+function scrollToHeroY(y) {
+  window.scrollTo({ left: 0, top: y, behavior: "instant" });
+}
+
+function smoothHeroWheelFrame(frameNow) {
+  heroWheelRaf = null;
+
+  if (!shouldSmoothHeroProgress()) {
+    heroWheelLastTime = 0;
+    heroWheelVelocity = 0;
+    return;
+  }
+
+  const now = frameNow || performance.now();
+  const frameRatio = heroWheelLastTime ? clamp((now - heroWheelLastTime) / 16.67, 0.5, 2.5) : 1;
+  heroWheelLastTime = now;
+
+  const heroTrack = getHeroTrackLength();
+  const currentY = window.scrollY;
+  const nextY = clamp(currentY + heroWheelVelocity * frameRatio, 0, heroTrack);
+  const hitStart = nextY <= 0.5 && heroWheelVelocity < 0;
+  const hitEnd = nextY >= heroTrack - 0.5 && heroWheelVelocity > 0;
+
+  if (hitStart || hitEnd) {
+    scrollToHeroY(nextY);
+    heroWheelVelocity = 0;
+    heroWheelLastTime = 0;
+    return;
+  }
+
+  scrollToHeroY(nextY);
+  heroWheelVelocity *= Math.pow(0.88, frameRatio);
+
+  if (Math.abs(heroWheelVelocity) < 0.08) {
+    heroWheelVelocity = 0;
+    heroWheelLastTime = 0;
+    return;
+  }
+
+  heroWheelRaf = requestAnimationFrame(smoothHeroWheelFrame);
+}
+
+function onHeroWheel(event) {
+  if (!shouldSmoothHeroProgress() || event.ctrlKey) return;
+  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+
+  const heroTrack = getHeroTrackLength();
+  const currentY = window.scrollY;
+  if (currentY < -1 || currentY > heroTrack + 1) return;
+
+  const deltaY = normalizeWheelDelta(event);
+  if (Math.abs(deltaY) < 0.5) return;
+
+  const atStart = currentY <= 0.5 && deltaY < 0;
+  const atEnd = currentY >= heroTrack - 0.5 && deltaY > 0;
+  if (atStart || atEnd) return;
+
+  event.preventDefault();
+  heroWheelVelocity = clamp(heroWheelVelocity + deltaY * 0.07, -30, 30);
+  if (!heroWheelRaf) {
+    heroWheelLastTime = 0;
+    heroWheelRaf = requestAnimationFrame(smoothHeroWheelFrame);
+  }
+}
+
+function smoothHeroProgressFrame(frameNow) {
   heroSmoothingRaf = null;
 
   if (!shouldSmoothHeroProgress()) {
     heroProgress = heroTargetProgress;
+    heroSmoothLastTime = 0;
     syncHeroProgressVars();
     return;
   }
+
+  const now = frameNow || performance.now();
+  const frameRatio = heroSmoothLastTime ? clamp((now - heroSmoothLastTime) / 16.67, 0.5, 2.5) : 1;
+  heroSmoothLastTime = now;
 
   const diff = heroTargetProgress - heroProgress;
-  if (Math.abs(diff) < 0.0008) {
+  if (Math.abs(diff) < 0.0002) {
     heroProgress = heroTargetProgress;
+    heroSmoothLastTime = 0;
     syncHeroProgressVars();
     return;
   }
 
-  const progressLerp = clamp(0.22 + scrollVelocity * 0.12, 0.22, 0.34);
+  const baseLerp = clamp(0.12 + scrollVelocity * 0.04, 0.12, 0.18);
+  const progressLerp = 1 - Math.pow(1 - baseLerp, frameRatio);
   heroProgress += diff * progressLerp;
   syncHeroProgressVars();
   heroSmoothingRaf = requestAnimationFrame(smoothHeroProgressFrame);
@@ -148,6 +241,7 @@ function queueHeroProgressSync() {
       cancelAnimationFrame(heroSmoothingRaf);
       heroSmoothingRaf = null;
     }
+    heroSmoothLastTime = 0;
     heroProgress = heroTargetProgress;
     heroScrollInitialized = true;
     syncHeroProgressVars();
@@ -167,10 +261,12 @@ function onScrollFrame() {
     progressBar.style.setProperty("--p", max > 0 ? clamp(y / max, 0, 1).toFixed(4) : "0");
   }
 
-  const vh = window.innerHeight;
-  const heroTrack = pinEnabled ? Math.max(1, heroHeight - vh) : heroHeight * 0.85;
+  const heroTrack = getHeroTrackLength();
   heroTargetProgress = clamp(y / heroTrack, 0, 1);
-  scrollVelocity = clamp(Math.abs(y - lastScrollY) / 40, 0, 1);
+  const rawScrollVelocity = clamp(Math.abs(y - lastScrollY) / 40, 0, 1);
+  scrollVelocity = shouldSmoothHeroProgress()
+    ? scrollVelocity + (rawScrollVelocity - scrollVelocity) * 0.35
+    : rawScrollVelocity;
   lastScrollY = y;
   queueHeroProgressSync();
 
@@ -199,6 +295,10 @@ window.addEventListener(
   },
   { passive: true },
 );
+
+if (heroEl) {
+  window.addEventListener("wheel", onHeroWheel, { passive: false });
+}
 
 let measureTimer;
 window.addEventListener("resize", () => {
@@ -658,7 +758,9 @@ if (canvas && canvas.getContext) {
   }
 
   function buildScene(width, height) {
-    let count = clamp(Math.round((width * height) / (motionLite ? 21000 : 15500)), 34, motionLite ? 76 : 104);
+    const density = isWindows ? 26000 : motionLite ? 21000 : 15500;
+    const countMax = isWindows ? 62 : motionLite ? 76 : 104;
+    let count = clamp(Math.round((width * height) / density), 34, countMax);
     if (width < 720) count = Math.min(count, 40);
     if (lowPower) count = Math.round(count * 0.7);
 
@@ -688,7 +790,7 @@ if (canvas && canvas.getContext) {
   }
 
   function resizeCanvas() {
-    const dprCap = window.innerWidth < 720 ? 1.4 : isWindows ? 1.2 : lowPower ? 1.35 : 2;
+    const dprCap = window.innerWidth < 720 ? 1.4 : isWindows ? 1.1 : lowPower ? 1.35 : 2;
     const ratio = Math.min(window.devicePixelRatio || 1, dprCap);
     const rect = canvas.getBoundingClientRect();
     canvasRect = rect;
@@ -873,7 +975,7 @@ if (canvas && canvas.getContext) {
     const linkFade = pinEnabled ? 1 - remap(p9, 0.46, 0.6) : 1;
     if (linkFade > 0.01) {
       const linkBoost = 1 + 1.1 * structK;
-      const linkStep = motionLite ? 2 : 1;
+      const linkStep = isWindows ? 3 : motionLite ? 2 : 1;
       context.lineWidth = 1;
       for (let i = 0; i < particles.length; i += linkStep) {
         const a = particles[i];
