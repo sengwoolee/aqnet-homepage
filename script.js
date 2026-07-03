@@ -581,10 +581,18 @@ if (canvas && canvas.getContext) {
 
   // 신호 레인 — 수렴 밴드(43.7%, .hero-rail) 기준 대칭 4레인. 라벨(.hero-lanes)과 동일 좌표
   const LANES = [0.227, 0.367, 0.507, 0.647];
+  // 오비탈 코어 위성 — ri: 링 인덱스, w: 각속도(rad/s, 부호=방향), ph: 초기 위상
+  const ORB_SATS = [
+    { ri: 0, w: 0.5, ph: 0.4 },
+    { ri: 1, w: -0.3, ph: 2.1 },
+    { ri: 1, w: -0.3, ph: 5.2 },
+    { ri: 2, w: 0.19, ph: 1.1 },
+    { ri: 2, w: 0.19, ph: 4.3 },
+  ];
   const bootT = performance.now(); // 로드 인트로(캔버스 페이드-인) 기준 시각
 
   function buildScene(width, height) {
-    let count = clamp(Math.round((width * height) / 18000), 32, 92);
+    let count = clamp(Math.round((width * height) / 15500), 36, 104);
     if (width < 720) count = Math.min(count, 40);
     if (lowPower) count = Math.round(count * 0.7);
 
@@ -681,6 +689,59 @@ if (canvas && canvas.getContext) {
     gradient.addColorStop(1, "rgba(5, 7, 13, 0)");
     context.fillStyle = gradient;
     context.fillRect(0, 0, viewW, viewH);
+
+    // ── 오비탈 시스템 코어 — 히어로의 시각 앵커(상시 회전하는 대형 기하 구조물).
+    //    코어 y를 레일(43.7%)에 정박 — exit에서 원이 납작해지며 그대로 레일 선으로 붕괴(원→선)
+    const minDim = Math.min(viewW, viewH);
+    const orbCx = viewW * (pinEnabled ? 0.7 : 0.76);
+    const orbCy = viewH * (pinEnabled ? 0.437 : 0.3);
+    const orbScale = pinEnabled ? 1 : 0.62;
+    const orbT = (now - bootT) / 1000;
+    const orbSpin = 1 + laneK * 0.8; // 정렬되면 시스템이 빨라짐
+    const orbDraw = easeOutCubic(clamp((now - bootT - 250) / 1500, 0, 1)); // 로드 드로우-온
+    const flat = convergeK; // 원 → 선 붕괴 계수
+    const ORB_R = [0.16, 0.235, 0.315];
+    const flatY = 1 - 0.97 * flat;
+    const flatX = 1 + 0.22 * flat;
+
+    // 링 3개(중간 링은 점선) — 배경 레이어
+    context.lineWidth = 1;
+    for (let ri = 0; ri < 3; ri += 1) {
+      const r = ORB_R[ri] * minDim * orbScale;
+      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * (1 - 0.3 * flat);
+      context.strokeStyle = `rgba(122, 183, 255, ${ra})`;
+      if (ri === 1) context.setLineDash([3, 7]);
+      context.beginPath();
+      context.ellipse(orbCx, orbCy, r * flatX, r * flatY, 0, -Math.PI / 2, -Math.PI / 2 + orbDraw * Math.PI * 2);
+      context.stroke();
+      if (ri === 1) context.setLineDash([]);
+    }
+    // 외곽 링 계기 틱 24개 — 천천히 회전
+    const tickR = ORB_R[2] * minDim * orbScale;
+    context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * (1 - flat)})`;
+    context.beginPath();
+    for (let ti = 0; ti < 24; ti += 1) {
+      const ang = orbT * 0.045 + (ti / 24) * Math.PI * 2;
+      const ca = Math.cos(ang);
+      const sa = Math.sin(ang);
+      context.moveTo(orbCx + ca * tickR * flatX, orbCy + sa * tickR * flatY);
+      context.lineTo(orbCx + ca * (tickR + 6) * flatX, orbCy + sa * (tickR + 6) * flatY);
+    }
+    context.stroke();
+    // 회전 스윕 아크 — 시스템이 신호를 스캔하는 하이라이트(외곽 순방향 + 중간 역방향)
+    context.lineWidth = 1.6;
+    const sweepA = orbT * 0.24 * orbSpin;
+    context.strokeStyle = `rgba(46, 211, 255, ${0.5 * orbDraw * (1 - flat)})`;
+    context.beginPath();
+    context.ellipse(orbCx, orbCy, tickR * flatX, tickR * flatY, 0, sweepA, sweepA + 0.55);
+    context.stroke();
+    const sweepB = -orbT * 0.16 * orbSpin + 2.4;
+    const midR = ORB_R[1] * minDim * orbScale;
+    context.strokeStyle = `rgba(34, 118, 255, ${0.55 * orbDraw * (1 - flat)})`;
+    context.beginPath();
+    context.ellipse(orbCx, orbCy, midR * flatX, midR * flatY, 0, sweepB, sweepB + 0.4);
+    context.stroke();
+    context.lineWidth = 1;
 
     // update pass — drift + flow + pointer ripple + lane/converge (좌표는 매 프레임 재계산: p 순수 함수)
     for (let i = 0; i < particles.length; i += 1) {
@@ -792,6 +853,54 @@ if (canvas && canvas.getContext) {
       context.fill();
       if (p.hub) context.shadowBlur = 0;
     }
+
+    // 코어 → 근접 허브 연결 — 시스템이 필드의 신호를 읽는 인입선
+    context.lineWidth = 1;
+    const linkR2 = tickR * tickR * 1.3;
+    for (let i = 0; i < particles.length; i += 1) {
+      const hp = particles[i];
+      if (!hp.hub) continue;
+      const hdx = hp.x - orbCx;
+      const hdy = hp.y - orbCy;
+      if (hdx * hdx + hdy * hdy < linkR2) {
+        context.strokeStyle = `rgba(46, 211, 255, ${0.14 * orbDraw * (1 - flat) * hp.g})`;
+        context.beginPath();
+        context.moveTo(orbCx, orbCy);
+        context.lineTo(hp.x, hp.y);
+        context.stroke();
+      }
+    }
+
+    // 궤도 위성 노드 — 링 위를 서로 다른 속도·방향으로 공전(밝은 최상층)
+    const satAlpha = (pinEnabled ? 0.85 : 0.6) * orbDraw * (1 - 0.4 * flat);
+    for (let si = 0; si < ORB_SATS.length; si += 1) {
+      const s = ORB_SATS[si];
+      const r = ORB_R[s.ri] * minDim * orbScale;
+      const ang = s.ph + orbT * s.w * orbSpin;
+      const sx = orbCx + Math.cos(ang) * r * flatX;
+      const sy = orbCy + Math.sin(ang) * r * flatY;
+      context.shadowBlur = 10;
+      context.shadowColor = "rgba(46, 211, 255, 0.9)";
+      context.fillStyle = `rgba(46, 211, 255, ${satAlpha})`;
+      context.beginPath();
+      context.arc(sx, sy, s.ri === 2 ? 2 : 2.6, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+    }
+    // 코어 — 펄스 글로우 + 링 하이라이트
+    const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
+    context.shadowBlur = 14 * pulse;
+    context.shadowColor = "rgba(46, 211, 255, 0.85)";
+    context.fillStyle = `rgba(255, 255, 255, ${0.95 * orbDraw})`;
+    context.beginPath();
+    context.arc(orbCx, orbCy, 3.2, 0, Math.PI * 2);
+    context.fill();
+    context.shadowBlur = 0;
+    context.strokeStyle = `rgba(46, 211, 255, ${0.5 * pulse * orbDraw * (1 - flat)})`;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(orbCx, orbCy, 10 + 3 * pulse, 0, Math.PI * 2);
+    context.stroke();
 
     context.globalAlpha = 1;
 
