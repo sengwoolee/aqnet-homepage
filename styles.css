@@ -747,6 +747,7 @@ body.menu-open .site-header {
       rgba(46, 211, 255, 0)
     );
     box-shadow: 0 0 18px rgba(46, 211, 255, 0.45);
+    opacity: var(--hrla, 0);
     transform: scaleX(var(--hrl, 0));
     transform-origin: 70% 50%;
     pointer-events: none;

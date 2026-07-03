@@ -110,10 +110,15 @@ function onScrollFrame() {
         heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(3)); // 막1 카피 침강
         heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(3));
         // 브리지 — 카피 소등 직후 바통을 받아 여정 내내 서사의 닻으로 상주(빈 애니메이션 방지)
-        heroEl.style.setProperty("--hbr", easeOutCubic(remap(p, 0.34, 0.44)).toFixed(3));
+        const bridgeIn = easeOutCubic(remap(p, 0.34, 0.44));
+        const bridgeOut = 1 - easeInQuad(remap(p, 0.78, 0.92));
+        heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(3));
         heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.78, 0.98)).toFixed(3)); // 막4 상향+스크림
-        // 레일 스트릭 — 링 게이트 통과(원 확대)와 동시에 퍼짐(순차 아님)
-        heroEl.style.setProperty("--hrl", easeOutCubic(remap(p, 0.62, 0.86)).toFixed(3));
+        // 레일 스트릭 — 브리지 카피 등장과 동시에 퍼져 다음 섹션으로 핸드오프
+        const railIn = easeOutCubic(remap(p, 0.34, 0.62));
+        const railOut = 1 - easeInQuad(remap(p, 0.84, 0.98));
+        heroEl.style.setProperty("--hrl", railIn.toFixed(3));
+        heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(3));
         heroEl.classList.toggle("exiting", p > 0.72 && p < 1);
       } else {
         heroEl.style.setProperty("--hs", heroProgress.toFixed(3));
@@ -570,7 +575,9 @@ if (canvas && canvas.getContext) {
   const target = { x: -9999, y: -9999 };
   const PR = { radiusSq: 170 * 170, push: 14, damp: 0.88, lerp: 0.12 };
 
+  const isWindows = /Win/i.test(`${navigator.platform || ""} ${navigator.userAgent || ""}`);
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4;
+  const motionLite = isWindows || lowPower;
 
   // 오비탈 코어 위성 — ri: 링 인덱스, w: 각속도(rad/s, 부호=방향), ph: 초기 위상
   const ORB_SATS = [
@@ -580,10 +587,30 @@ if (canvas && canvas.getContext) {
     { ri: 2, w: 0.19, ph: 1.1 },
     { ri: 2, w: 0.19, ph: 4.3 },
   ];
+  const ORB_LABELS = [
+    { label: "Control", angle: -2.32 },
+    { label: "Ownership", angle: -0.48 },
+    { label: "Reach", angle: 0.55 },
+    { label: "Endurance", angle: 2.42 },
+  ];
   const bootT = performance.now(); // 로드 인트로(캔버스 페이드-인) 기준 시각
 
+  function roundedRectPath(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+  }
+
   function buildScene(width, height) {
-    let count = clamp(Math.round((width * height) / 15500), 36, 104);
+    let count = clamp(Math.round((width * height) / (motionLite ? 21000 : 15500)), 34, motionLite ? 76 : 104);
     if (width < 720) count = Math.min(count, 40);
     if (lowPower) count = Math.round(count * 0.7);
 
@@ -613,7 +640,7 @@ if (canvas && canvas.getContext) {
   }
 
   function resizeCanvas() {
-    const dprCap = window.innerWidth < 720 ? 1.5 : 2;
+    const dprCap = window.innerWidth < 720 ? 1.4 : motionLite ? 1.35 : 2;
     const ratio = Math.min(window.devicePixelRatio || 1, dprCap);
     const rect = canvas.getBoundingClientRect();
     canvasRect = rect;
@@ -795,10 +822,11 @@ if (canvas && canvas.getContext) {
     const linkFade = pinEnabled ? 1 - remap(p9, 0.46, 0.6) : 1;
     if (linkFade > 0.01) {
       const linkBoost = 1 + 1.1 * structK;
+      const linkStep = motionLite ? 2 : 1;
       context.lineWidth = 1;
-      for (let i = 0; i < particles.length; i += 1) {
+      for (let i = 0; i < particles.length; i += linkStep) {
         const a = particles[i];
-        for (let j = i + 1; j < particles.length; j += 1) {
+        for (let j = i + 1; j < particles.length; j += linkStep) {
           const b = particles[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
@@ -916,6 +944,106 @@ if (canvas && canvas.getContext) {
       context.beginPath();
       context.arc(orbCx, orbCy, glowR, 0, Math.PI * 2);
       context.stroke();
+    }
+
+    // AQ Growth OS 원형 메시지 — 네 운영 원칙을 궤도 점에 고정하고 중앙에 시스템명을 둠
+    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.78, 0.92)) : 0;
+    const labelFade = orbDraw * (1 - labelExit);
+    if (labelFade > 0.01) {
+      const baseAlpha = context.globalAlpha;
+      const labelOrbitK = pinEnabled ? easeInOutCubic(remap(p9, 0.34, 0.66)) : 0;
+      const stableR = ORB_R[2] * minDim * orbScale * (1 + 0.06 * alignK + 0.22 * labelOrbitK);
+      const labelFont = clamp(minDim * 0.017, 11, 14);
+      const coreFont = clamp(minDim * 0.024, 15, 21);
+      const labelHeight = labelFont + 17;
+
+      context.save();
+      context.globalAlpha = baseAlpha * labelFade;
+
+      const coreW = Math.max(132, coreFont * 7.8);
+      const coreH = Math.max(44, coreFont * 2.45);
+      const coreX = orbCx - coreW / 2;
+      const coreY = orbCy - coreH / 2;
+      const labelItems = ORB_LABELS.map((item, index) => {
+        const bob = Math.sin(orbT * 0.9 + index * 1.3) * (3 - labelOrbitK * 1.5);
+        const angle = item.angle + labelOrbitK * 0.18 + Math.sin(orbT * 0.18 + index) * 0.025 * alignK;
+        const radius = stableR + (index % 2 === 0 ? 10 : -2);
+        const dx = Math.cos(angle);
+        const dy = Math.sin(angle);
+        const dotX = orbCx + dx * radius;
+        const dotY = clamp(
+          orbCy + dy * radius + bob,
+          pinEnabled ? 104 : labelHeight / 2 + 8,
+          viewH - labelHeight / 2 - 28,
+        );
+        const textWidth = context.measureText(item.label).width;
+        const labelWidth = textWidth + 24;
+        let labelX = dx >= 0 ? dotX + 15 : dotX - labelWidth - 15;
+        const labelMinX = pinEnabled ? viewW * 0.5 : 10;
+        labelX = clamp(labelX, labelMinX, viewW - labelWidth - 28);
+        return {
+          ...item,
+          dx,
+          dy,
+          dotX,
+          dotY,
+          labelX,
+          labelY: dotY - labelHeight / 2,
+          labelWidth,
+        };
+      });
+
+      labelItems.forEach((item) => {
+        context.strokeStyle = `rgba(46, 211, 255, ${0.15 + alignK * 0.13})`;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(orbCx + item.dx * (coreW * 0.5), orbCy + item.dy * (coreH * 0.58));
+        context.lineTo(item.dotX - item.dx * 6, item.dotY - item.dy * 6);
+        context.stroke();
+      });
+
+      roundedRectPath(context, coreX, coreY, coreW, coreH, 18);
+      context.fillStyle = "rgba(7, 15, 29, 0.84)";
+      context.fill();
+      context.strokeStyle = "rgba(122, 183, 255, 0.34)";
+      context.lineWidth = 1;
+      context.stroke();
+      context.font =
+        `900 ${coreFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillStyle = "rgba(255, 255, 255, 0.94)";
+      context.fillText("AQ Growth OS", orbCx, orbCy + 0.5);
+
+      context.font =
+        `800 ${labelFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
+      context.textBaseline = "middle";
+      labelItems.forEach((item) => {
+        context.strokeStyle = "rgba(46, 211, 255, 0.28)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(item.dotX, item.dotY);
+        context.lineTo(item.dx >= 0 ? item.labelX : item.labelX + item.labelWidth, item.dotY);
+        context.stroke();
+
+        context.shadowBlur = 10;
+        context.shadowColor = "rgba(46, 211, 255, 0.8)";
+        context.fillStyle = "rgba(46, 211, 255, 0.96)";
+        context.beginPath();
+        context.arc(item.dotX, item.dotY, 4.2, 0, Math.PI * 2);
+        context.fill();
+        context.shadowBlur = 0;
+
+        roundedRectPath(context, item.labelX, item.labelY, item.labelWidth, labelHeight, labelHeight / 2);
+        context.fillStyle = "rgba(8, 18, 35, 0.78)";
+        context.fill();
+        context.strokeStyle = "rgba(122, 183, 255, 0.28)";
+        context.stroke();
+        context.fillStyle = "rgba(232, 242, 255, 0.9)";
+        context.textAlign = "left";
+        context.fillText(item.label, item.labelX + 12, item.dotY);
+      });
+      context.restore();
     }
 
     context.globalAlpha = 1;
