@@ -3094,6 +3094,8 @@ body.menu-open .site-header {
 @media (max-width: 1024px) {
   .site-header {
     grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    padding: 0 clamp(16px, 3vw, 28px);
   }
 
   .nav-links,
@@ -3161,7 +3163,7 @@ body.menu-open .site-header {
   }
 
   .site-header {
-    padding: 0 16px;
+    padding: 0 12px 0 18px;
   }
 
   .brand {
