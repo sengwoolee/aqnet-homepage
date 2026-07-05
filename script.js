@@ -15,7 +15,8 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const isWindowsPlatform = /Win/i.test(`${navigator.platform || ""} ${navigator.userAgent || ""}`);
 const reduceMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
-const smoothWindowsHeroScroll = isWindowsPlatform && !(reduceMotionQuery && reduceMotionQuery.matches);
+/* 애플 방식 — 네이티브 스크롤은 그대로 두고 시각 진행도만 lerp(전 데스크탑 공통) */
+const smoothHeroScroll = !(reduceMotionQuery && reduceMotionQuery.matches);
 
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
@@ -40,9 +41,6 @@ let scrollTicking = false;
 let heroSmoothingRaf = null;
 let heroScrollInitialized = false;
 let heroSmoothLastTime = 0;
-let heroWheelRaf = null;
-let heroWheelLastTime = 0;
-let heroWheelVelocity = 0;
 
 /* 섹션 스크럽 — 레이아웃 읽기는 load/resize에서만, 스크롤 중엔 산술만 */
 const fwSection = document.querySelector(".framework-section");
@@ -55,12 +53,6 @@ let loopScrollSync = null; // Solution 루프 블록에서 주입
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
-  if (!pinEnabled && heroWheelRaf) {
-    cancelAnimationFrame(heroWheelRaf);
-    heroWheelRaf = null;
-    heroWheelLastTime = 0;
-    heroWheelVelocity = 0;
-  }
   if (fwSection) {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
@@ -101,7 +93,7 @@ function stripBoost() {
 let pinEnabled = window.innerWidth > 1024; // 히어로 핀 스크럽(데스크탑 전용)
 
 function shouldSmoothHeroProgress() {
-  return smoothWindowsHeroScroll && pinEnabled;
+  return smoothHeroScroll && pinEnabled;
 }
 
 function getHeroTrackLength() {
@@ -109,6 +101,11 @@ function getHeroTrackLength() {
   return pinEnabled ? Math.max(1, heroHeight - vh) : heroHeight * 0.85;
 }
 
+const heroChapterDots = heroEl ? Array.from(heroEl.querySelectorAll(".hero-chapters span")) : [];
+let lastChapter = -1;
+
+/* 챕터 타임테이블(330svh 트랙) — 막1 카피 0–0.22 / 막2 정렬+비트1 0.26–0.46 /
+   막3 통과 줌+비트2 0.46–0.76 / 막4 브리지 0.74–0.94 / exit 0.92–1 */
 function syncHeroProgressVars() {
   if (!heroEl) return;
   const key = heroProgress.toFixed(4) + (pinEnabled ? "p" : "m");
@@ -117,92 +114,33 @@ function syncHeroProgressVars() {
   lastHs = key;
   if (pinEnabled) {
     const p = heroProgress;
-    heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.06, 0.3)).toFixed(4));
-    heroEl.style.setProperty("--hcue", remap(p, 0.04, 0.1).toFixed(4));
+    heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.05, 0.22)).toFixed(4));
+    heroEl.style.setProperty("--hcue", remap(p, 0.03, 0.08).toFixed(4));
 
-    const bridgeIn = easeOutCubic(remap(p, 0.68, 0.78));
-    const bridgeOut = 1 - easeInQuad(remap(p, 0.9, 0.98));
+    // 메시지 비트 — 비트1(문제 제기)은 정렬 구간, 비트2(정렬 선언)는 줌 초입에 머무름
+    const b1 = easeOutCubic(remap(p, 0.26, 0.33)) * (1 - easeInQuad(remap(p, 0.42, 0.49)));
+    const b2 = easeOutCubic(remap(p, 0.53, 0.6)) * (1 - easeInQuad(remap(p, 0.68, 0.74)));
+    heroEl.style.setProperty("--hb1", b1.toFixed(4));
+    heroEl.style.setProperty("--hb2", b2.toFixed(4));
+
+    const bridgeIn = easeOutCubic(remap(p, 0.74, 0.82));
+    const bridgeOut = 1 - easeInQuad(remap(p, 0.92, 0.98));
     heroEl.style.setProperty("--hbr", (bridgeIn * bridgeOut).toFixed(4));
-    heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.9, 1)).toFixed(4));
+    heroEl.style.setProperty("--hx", easeInOutCubic(remap(p, 0.92, 1)).toFixed(4));
 
-    const railIn = easeOutCubic(remap(p, 0.78, 0.94));
-    const railOut = 1 - easeInQuad(remap(p, 0.96, 1));
+    const railIn = easeOutCubic(remap(p, 0.82, 0.94));
+    const railOut = 1 - easeInQuad(remap(p, 0.97, 1));
     heroEl.style.setProperty("--hrl", railIn.toFixed(4));
     heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(4));
-    heroEl.classList.toggle("exiting", p > 0.86 && p < 1);
+    heroEl.classList.toggle("exiting", p > 0.88 && p < 1);
+
+    const chapter = p < 0.24 ? 0 : p < 0.5 ? 1 : p < 0.72 ? 2 : 3;
+    if (chapter !== lastChapter) {
+      heroChapterDots.forEach((dot, i) => dot.classList.toggle("on", i === chapter));
+      lastChapter = chapter;
+    }
   } else {
     heroEl.style.setProperty("--hs", heroProgress.toFixed(4));
-  }
-}
-
-function normalizeWheelDelta(event) {
-  if (event.deltaMode === 1) return event.deltaY * 38;
-  if (event.deltaMode === 2) return event.deltaY * window.innerHeight;
-  return event.deltaY;
-}
-
-function scrollToHeroY(y) {
-  window.scrollTo({ left: 0, top: y, behavior: "instant" });
-}
-
-function smoothHeroWheelFrame(frameNow) {
-  heroWheelRaf = null;
-
-  if (!shouldSmoothHeroProgress()) {
-    heroWheelLastTime = 0;
-    heroWheelVelocity = 0;
-    return;
-  }
-
-  const now = frameNow || performance.now();
-  const frameRatio = heroWheelLastTime ? clamp((now - heroWheelLastTime) / 16.67, 0.5, 2.5) : 1;
-  heroWheelLastTime = now;
-
-  const heroTrack = getHeroTrackLength();
-  const currentY = window.scrollY;
-  const nextY = clamp(currentY + heroWheelVelocity * frameRatio, 0, heroTrack);
-  const hitStart = nextY <= 0.5 && heroWheelVelocity < 0;
-  const hitEnd = nextY >= heroTrack - 0.5 && heroWheelVelocity > 0;
-
-  if (hitStart || hitEnd) {
-    scrollToHeroY(nextY);
-    heroWheelVelocity = 0;
-    heroWheelLastTime = 0;
-    return;
-  }
-
-  scrollToHeroY(nextY);
-  heroWheelVelocity *= Math.pow(0.88, frameRatio);
-
-  if (Math.abs(heroWheelVelocity) < 0.08) {
-    heroWheelVelocity = 0;
-    heroWheelLastTime = 0;
-    return;
-  }
-
-  heroWheelRaf = requestAnimationFrame(smoothHeroWheelFrame);
-}
-
-function onHeroWheel(event) {
-  if (!shouldSmoothHeroProgress() || event.ctrlKey) return;
-  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
-
-  const heroTrack = getHeroTrackLength();
-  const currentY = window.scrollY;
-  if (currentY < -1 || currentY > heroTrack + 1) return;
-
-  const deltaY = normalizeWheelDelta(event);
-  if (Math.abs(deltaY) < 0.5) return;
-
-  const atStart = currentY <= 0.5 && deltaY < 0;
-  const atEnd = currentY >= heroTrack - 0.5 && deltaY > 0;
-  if (atStart || atEnd) return;
-
-  event.preventDefault();
-  heroWheelVelocity = clamp(heroWheelVelocity + deltaY * 0.07, -30, 30);
-  if (!heroWheelRaf) {
-    heroWheelLastTime = 0;
-    heroWheelRaf = requestAnimationFrame(smoothHeroWheelFrame);
   }
 }
 
@@ -295,10 +233,6 @@ window.addEventListener(
   },
   { passive: true },
 );
-
-if (heroEl) {
-  window.addEventListener("wheel", onHeroWheel, { passive: false });
-}
 
 let measureTimer;
 window.addEventListener("resize", () => {
@@ -817,20 +751,20 @@ if (canvas && canvas.getContext) {
     // 막2 질서: 지터 감쇠 + 좌향 층류. 모바일은 시간 기반 자율 사이클(~14s 호흡)
     let alignK;
     if (pinEnabled) {
-      alignK = easeInOutCubic(remap(p9, 0.28, 0.44));
+      alignK = easeInOutCubic(remap(p9, 0.26, 0.42));
     } else {
       const s = 0.5 + 0.5 * Math.sin(((now - bootT) * Math.PI * 2) / 14000 - Math.PI / 2);
       alignK = s * s * (3 - 2 * s) * 0.85;
     }
     // 막3 진입: 방사 줌 마스터(초점 = 코어). 층류는 줌에 자리를 양보
-    const Zm = pinEnabled ? easeInQuad(remap(p9, 0.44, 0.78)) : 0;
-    const flowK = alignK * (1 - 0.8 * (pinEnabled ? remap(p9, 0.48, 0.62) : 0));
+    const Zm = pinEnabled ? easeInQuad(remap(p9, 0.46, 0.8)) : 0;
+    const flowK = alignK * (1 - 0.8 * (pinEnabled ? remap(p9, 0.5, 0.64) : 0));
     // 막1 카피 게이트 — 침강에 비례해 좌측 감쇠 해제
-    const sinkK = pinEnabled ? easeInQuad(remap(p9, 0.06, 0.3)) : 0;
+    const sinkK = pinEnabled ? easeInQuad(remap(p9, 0.05, 0.22)) : 0;
     const introK = easeOutCubic(clamp((now - bootT) / 1100, 0, 1)); // 로드 페이드-인
     context.globalAlpha =
       introK *
-      (pinEnabled ? 1 - easeInQuad(remap(p9, 0.54, 0.72)) : 1 - heroProgress * 0.85);
+      (pinEnabled ? 1 - easeInQuad(remap(p9, 0.58, 0.76)) : 1 - heroProgress * 0.85);
 
     // 오버랩에 가려진 종반 — 드로우 패스 생략(rAF만 유지)
     if (context.globalAlpha < 0.02) {
@@ -859,11 +793,11 @@ if (canvas && canvas.getContext) {
     const orbSpin = 1 + alignK * 0.8; // 정렬되면 시스템이 빨라짐
     const orbDraw = easeOutCubic(clamp((now - bootT - 250) / 1500, 0, 1)); // 로드 드로우-온
     const ORB_R = [0.16, 0.235, 0.315];
-    // 게이트 창(p): 외곽이 먼저 다가와 통과(0.50–0.64), 중간(0.58–0.72), 내곽(0.66–0.80)
+    // 게이트 창(p): 외곽이 먼저 다가와 통과(0.46–0.58), 중간(0.53–0.65), 내곽(0.60–0.72)
     const GATES = [
-      [0.56, 0.68],
-      [0.5, 0.62],
-      [0.44, 0.56],
+      [0.6, 0.72],
+      [0.53, 0.65],
+      [0.46, 0.58],
     ];
     const ringS = [1, 1, 1];
     const ringA = [1, 1, 1];
@@ -889,7 +823,7 @@ if (canvas && canvas.getContext) {
     }
     context.lineWidth = 1;
     // 외곽 링 계기 틱 24개 — 줌 시작 전 조기 소등(확대 중 지터 방지)
-    const tickFade = pinEnabled ? 1 - remap(p9, 0.5, 0.58) : 1;
+    const tickFade = pinEnabled ? 1 - remap(p9, 0.52, 0.6) : 1;
     const tickR = ORB_R[2] * minDim * orbScale * ringS[2];
     if (tickFade > 0.01) {
       context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * tickFade * (compactHero ? 0.5 : 1)})`;
@@ -972,7 +906,7 @@ if (canvas && canvas.getContext) {
 
     // connections — 줌 진입과 함께 페이드아웃, 이후 루프 자체를 스킵(성능)
     const structK = alignK * 0.5;
-    const linkFade = pinEnabled ? 1 - remap(p9, 0.46, 0.6) : 1;
+    const linkFade = pinEnabled ? 1 - remap(p9, 0.48, 0.62) : 1;
     if (linkFade > 0.01) {
       const linkBoost = 1 + 1.1 * structK;
       const linkStep = isWindows ? 3 : motionLite ? 2 : 1;
@@ -1034,7 +968,7 @@ if (canvas && canvas.getContext) {
     context.lineWidth = 1;
 
     // 코어 → 근접 허브 인입선 — 줌 시작과 함께 페이드(신호를 읽는 시스템 은유)
-    const inflowFade = pinEnabled ? 1 - remap(p9, 0.44, 0.55) : 1;
+    const inflowFade = pinEnabled ? 1 - remap(p9, 0.46, 0.57) : 1;
     if (inflowFade > 0.01) {
       const baseTickR = ORB_R[2] * minDim * orbScale;
       const linkR2 = baseTickR * baseTickR * 1.3;
@@ -1071,8 +1005,8 @@ if (canvas && canvas.getContext) {
       context.fill();
       context.shadowBlur = 0;
     }
-    // 코어 — 펄스 글로우. 통과 순간(0.78–0.83) 플레어 후 레일 스트릭에 바통(0.84–0.90 페이드)
-    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.58, 0.64)) * (1 - remap(p9, 0.64, 0.72)) : 0;
+    // 코어 — 펄스 글로우. 통과 순간(0.62–0.68) 플레어 후 레일 스트릭에 바통
+    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.62, 0.68)) * (1 - remap(p9, 0.68, 0.76)) : 0;
     if (flare > 0.01) {
       const fr = 90 + 60 * flare;
       const fg = context.createRadialGradient(orbCx, orbCy, 0, orbCx, orbCy, fr);
@@ -1081,10 +1015,10 @@ if (canvas && canvas.getContext) {
       context.fillStyle = fg;
       context.fillRect(orbCx - fr, orbCy - fr, fr * 2, fr * 2);
     }
-    const coreFade = pinEnabled ? 1 - remap(p9, 0.54, 0.72) : 1;
+    const coreFade = pinEnabled ? 1 - remap(p9, 0.58, 0.76) : 1;
     if (coreFade > 0.01) {
       const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
-      const glowR = (10 + 3 * pulse) * (1 + 1.2 * (pinEnabled ? remap(p9, 0.6, 0.8) : 0));
+      const glowR = (10 + 3 * pulse) * (1 + 1.2 * (pinEnabled ? remap(p9, 0.64, 0.84) : 0));
       context.shadowBlur = 14 * pulse;
       context.shadowColor = "rgba(46, 211, 255, 0.85)";
       context.fillStyle = `rgba(255, 255, 255, ${0.95 * orbDraw * coreFade})`;
@@ -1100,7 +1034,7 @@ if (canvas && canvas.getContext) {
     }
 
     // AQ Growth OS 원형 메시지 — 네 운영 원칙을 궤도 점에 고정하고 중앙에 시스템명을 둠
-    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.52, 0.68)) : 0;
+    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.54, 0.68)) : 0;
     const labelFade = compactHero ? 0 : orbDraw * (1 - labelExit);
     if (labelFade > 0.01) {
       const baseAlpha = context.globalAlpha;

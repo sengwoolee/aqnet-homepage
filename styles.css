@@ -498,6 +498,12 @@ body.menu-open .site-header {
   display: none;
 }
 
+/* 스크럽 메시지 비트 · 챕터 도트 — 데스크탑 핀 전용(미디어쿼리에서 활성화) */
+.hero-beats,
+.hero-chapters {
+  display: none;
+}
+
 .hero-noise {
   z-index: -1;
   opacity: 0.2;
@@ -718,12 +724,13 @@ body.menu-open .site-header {
   animation: heroIn 640ms var(--ease-emphasized) 480ms backwards;
 }
 
-/* 데스크탑 핀 스크럽 — 히어로 260svh 트랙 + sticky 무대
-   (카피 침강 → 파티클 4레인 정렬·좌향 동기화 → exit 핸드오프: 레일 융합 + Signal Strip 오버랩) */
+/* 데스크탑 핀 스크럽 — 히어로 330svh 트랙 + sticky 무대
+   (막1 카피 침강 → 막2 정렬+비트1 → 막3 통과 줌+비트2 → 막4 브리지·레일 → exit 오버랩)
+   휠 하이재킹 없음 — 네이티브 스크롤 + 시각 진행도 lerp(애플 방식) */
 @media (min-width: 1025px) {
   .hero {
-    height: 260vh;
-    height: 260svh;
+    height: 330vh;
+    height: 330svh;
     --hero-drift: -56px;
   }
 
@@ -776,8 +783,8 @@ body.menu-open .site-header {
     pointer-events: none;
   }
 
-  /* 트랙 연장분(+60svh)과 정확히 상쇄 — 페이지 총 스크롤 길이 불변.
-     후행 섹션이 핀 무대 위로 슬라이드 인(오버랩)하며 레일과 바통터치 */
+  /* 60svh 오버랩 — 후행 섹션이 핀 무대 위로 슬라이드 인하며 레일과 바통터치.
+     p=1 시점 strip border-top = 무대높이 100 − 60 = 40svh(레일 42% − 이탈 2vh)로 트랙 길이와 무관하게 정합 */
   .signal-strip {
     margin-top: -60vh;
     margin-top: -60svh;
@@ -795,16 +802,95 @@ body.menu-open .site-header {
     opacity: calc(1 - var(--hs, 0));
   }
 
-  /* 브리지 캡션 — 통과 직후(막 4) 레일 위에서 서사의 결론으로 등장 */
+  /* 스크럽 메시지 비트 — 막2·막3 중반의 서사 공백을 채우는 챕터 카피(카피 자리 승계) */
+  .hero-beats {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-beat {
+    position: absolute;
+    left: max(24px, calc((100% - var(--max)) / 2));
+    top: 50%;
+    margin: 0;
+    max-width: 620px;
+    font-size: clamp(28px, 3vw, 42px);
+    line-height: 1.34;
+    font-weight: 700;
+    color: var(--text-d-2);
+    word-break: keep-all;
+    opacity: var(--b, 0);
+    transform: translateY(calc(-50% + (1 - var(--b, 0)) * 44px));
+    will-change: transform, opacity;
+  }
+
+  .hero-beat strong {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--white);
+    font-weight: 900;
+  }
+
+  .hero-beat-1 {
+    --b: var(--hb1, 0);
+  }
+
+  .hero-beat-2 {
+    --b: var(--hb2, 0);
+  }
+
+  /* 챕터 도트 — 우측 미드라인. 현재 막을 캡슐로 확장 표시, exit와 함께 소등 */
+  .hero-chapters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    opacity: calc(1 - var(--hx, 0) * 2);
+    pointer-events: none;
+  }
+
+  .hero-chapters span {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.22);
+    transition:
+      background 0.3s ease,
+      height 0.3s var(--ease-out);
+  }
+
+  .hero-chapters span.on {
+    height: 20px;
+    background: var(--cyan);
+    box-shadow: 0 0 10px rgba(46, 211, 255, 0.5);
+  }
+
+  /* 브리지 캡션 — 통과 직후(막 4) 레일 위에서 서사의 결론으로 등장.
+     비트와 동급 스케일 + 텍스트 하단을 레일 30px 위에 정박(크기 변경에도 정합 유지) */
   .hero-bridge {
     position: absolute;
     left: 50%;
-    top: calc(42% - 64px);
+    top: 42%;
     width: max-content;
-    max-width: 80vw;
+    max-width: 84vw;
     padding: 0;
+    font-size: clamp(26px, 2.6vw, 40px);
+    font-weight: 800;
+    color: var(--white);
     opacity: var(--hbr, 0);
-    transform: translate(-50%, calc(12px - var(--hbr, 0) * 12px));
+    transform: translate(-50%, calc(-100% - 30px + (1 - var(--hbr, 0)) * 18px));
+  }
+
+  .hero-bridge-core {
+    text-shadow: 0 0 26px rgba(46, 211, 255, 0.45);
   }
 
   .hero-scrollcue {
