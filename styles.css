@@ -1262,6 +1262,89 @@ body.menu-open .site-header {
 }
 
 /* =========================================================
+   WHY AQNET — 데스크탑 2열 재구성 (모바일 ≤1024px는 위 기본형 그대로)
+   ========================================================= */
+@media (min-width: 1025px) {
+  /* 콘텐츠 밴드: contact-section과 동일한 패딩 밴드 + 2열 그리드
+     (좌: 변화 로그 / 우: 정의 카드 — HTML 순서대로 자동 배치) */
+  .why-section {
+    padding: var(--section-y) max(24px, calc((100% - var(--max)) / 2));
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+    column-gap: clamp(40px, 6vw, 88px);
+    align-items: start;
+    /* 섹션 연속성: 히어로 계열 78px 그리드 텍스처를 기존 메시 위에 재선언 */
+    background-image:
+      var(--mesh-cyan),
+      var(--mesh-blue),
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: auto, auto, 78px 78px, 78px 78px;
+    /* 스냅샷과 통일된 섹션 경계 */
+    border-bottom: 1px solid var(--border-1);
+  }
+
+  /* 기본형의 중앙 밴드 정렬 해제 — 폭·배치는 그리드가 담당 */
+  .why-section > .section-heading,
+  .why-section > .why-log,
+  .why-section > .why-define {
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* 헤딩은 2열 위 풀폭 유지 */
+  .why-section > .section-heading {
+    grid-column: 1 / -1;
+  }
+
+  /* 정의 블록: 로그와 상단 정렬 + 다크 글래스 카드로 승격 */
+  .why-define {
+    margin-top: 0;
+    position: relative;
+    padding: clamp(28px, 3vw, 40px);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-lg);
+    background: linear-gradient(160deg, rgba(18, 32, 58, 0.85), rgba(8, 14, 28, 0.92));
+    box-shadow: var(--e-dark-1);
+    overflow: hidden; /* ::after 궤도 모티프를 카드 밖으로 클리핑 */
+  }
+
+  /* 우상단 히어로 궤도 모티프 — 동심원 2개(반경·알파 상이), 텍스트 뒤(z-index:0) */
+  .why-define::after {
+    content: "";
+    position: absolute;
+    top: -70px;
+    right: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      circle,
+      transparent 0 70px,
+      rgba(122, 183, 255, 0.1) 70px 71px,
+      transparent 71px 108px,
+      rgba(122, 183, 255, 0.18) 108px 109px,
+      transparent 109px
+    );
+  }
+
+  /* 카드 텍스트는 궤도 모티프 위로 (약속 좌측 시안 바 ::before와 독립) */
+  .why-def,
+  .why-promise {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 정의 타입을 카드 폭에 맞춰 축소 (모바일 크기는 기본형 유지) */
+  .why-def {
+    font-size: clamp(22px, 2.3vw, 32px);
+  }
+}
+
+/* =========================================================
    ABOUT
    ========================================================= */
 .about-section {
@@ -3535,15 +3618,17 @@ body.menu-open .site-header {
     --r: clamp(0, calc((var(--sp) - 0.32) / 0.12), 1);
   }
 
+  /* 2열에서 카드가 로그 옆에 서므로 등장 창을 앞당김(0.42~0.62 → 0.3~0.5) */
   .why-define {
-    --d: clamp(0, calc((var(--sp) - 0.42) / 0.2), 1);
+    --d: clamp(0, calc((var(--sp) - 0.3) / 0.2), 1);
     opacity: calc(0.15 + 0.85 * var(--d, 0));
     transform: translateY(calc((1 - var(--d, 0)) * 28px));
     will-change: transform, opacity;
   }
 
+  /* 약속도 카드 등장에 맞춰 앞당김(0.52~0.7 → 0.44~0.62) */
   .why-promise {
-    --pr: clamp(0, calc((var(--sp) - 0.52) / 0.18), 1);
+    --pr: clamp(0, calc((var(--sp) - 0.44) / 0.18), 1);
     position: relative;
     border-left-color: transparent; /* 좌측 바는 ::before로 대체해 scaleY 구동 */
     opacity: calc(0.15 + 0.85 * var(--pr, 0));
