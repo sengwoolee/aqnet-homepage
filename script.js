@@ -50,6 +50,15 @@ let lastFwp = "";
 let lastHs = "";
 let loopScrollSync = null; // Solution 루프 블록에서 주입
 
+/* 범용 --sp 스크럽 — data-scrub 요소를 fwp와 동일한 변경 가드로 일반화.
+   top은 getBoundingClientRect 기준(offsetParent 함정 회피, 측정은 load/resize뿐) */
+const scrubEls = Array.from(document.querySelectorAll("[data-scrub]")).map((el) => ({
+  el,
+  top: 0,
+  height: 1,
+  last: "",
+}));
+
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
@@ -57,6 +66,11 @@ function measureSections() {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
   }
+  scrubEls.forEach((item) => {
+    const rect = item.el.getBoundingClientRect();
+    item.top = rect.top + window.scrollY;
+    item.height = item.el.offsetHeight;
+  });
 }
 
 /* 채널띠 가속 — 스크롤 속도에 비례해 재생 배율 상승, 멈추면 자연 감쇠 */
@@ -217,6 +231,19 @@ function onScrollFrame() {
     }
   }
 
+  if (scrubEls.length) {
+    const vh = window.innerHeight;
+    for (let i = 0; i < scrubEls.length; i += 1) {
+      const item = scrubEls[i];
+      const sp = clamp((y + vh - item.top) / (vh + item.height), 0, 1).toFixed(3);
+      // 변경 가드 — 뷰포트 밖(0/1 고정) 재설정 스킵
+      if (sp !== item.last) {
+        item.el.style.setProperty("--sp", sp);
+        item.last = sp;
+      }
+    }
+  }
+
   if (loopScrollSync) loopScrollSync(y);
   stripBoost();
 
@@ -346,6 +373,9 @@ filterButtons.forEach((button) => {
     if (workStatus) {
       workStatus.textContent = `${filterLabels[filter] || filter} 사례 ${visibleCount}건을 표시합니다.`;
     }
+
+    // 필터로 후행 섹션 오프셋이 바뀜 — 스크럽(--sp)·프레임워크 캐시 재측정
+    measureSections();
   });
 });
 

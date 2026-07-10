@@ -3502,6 +3502,231 @@ body.menu-open .site-header {
    무관하게 항상 재생합니다. (prefers-reduced-motion 비활성화 블록 제거) */
 
 /* =========================================================
+   전반부 스크럽 연출 (--sp) — 데스크탑 전용
+   범용 data-scrub가 주입한 --sp의 순수 함수(역스크롤 자연 복원).
+   ★스크럽 요소는 기존 data-reveal/data-stagger 원샷을 무효화해 한 시스템만 구동.
+   모바일은 기존 원샷 리빌 유지(이 블록 밖).
+   ========================================================= */
+@media (min-width: 1025px) {
+  /* --- WHY — 서사 스크럽: 레일이 그려지고 3줄이 순차 등장 --- */
+  .why-log::before {
+    transform: scaleY(clamp(0, calc((var(--sp) - 0.12) / 0.38), 1));
+    transform-origin: top;
+  }
+
+  /* 3줄 — data-stagger cardIn 원샷 무효화 후 --sp 창으로 구동
+     ([data-scrub] 부여로 (0,3,1) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
+  .why-section[data-scrub] .why-log > .why-line {
+    animation: none;
+    opacity: calc(0.25 + 0.75 * var(--r, 0));
+    transform: translateY(calc((1 - var(--r, 0)) * 18px));
+    will-change: transform, opacity;
+  }
+
+  .why-line:nth-child(1) {
+    --r: clamp(0, calc((var(--sp) - 0.16) / 0.12), 1);
+  }
+
+  .why-line:nth-child(2) {
+    --r: clamp(0, calc((var(--sp) - 0.24) / 0.12), 1);
+  }
+
+  .why-line:nth-child(3) {
+    --r: clamp(0, calc((var(--sp) - 0.32) / 0.12), 1);
+  }
+
+  .why-define {
+    --d: clamp(0, calc((var(--sp) - 0.42) / 0.2), 1);
+    opacity: calc(0.15 + 0.85 * var(--d, 0));
+    transform: translateY(calc((1 - var(--d, 0)) * 28px));
+    will-change: transform, opacity;
+  }
+
+  .why-promise {
+    --pr: clamp(0, calc((var(--sp) - 0.52) / 0.18), 1);
+    position: relative;
+    border-left-color: transparent; /* 좌측 바는 ::before로 대체해 scaleY 구동 */
+    opacity: calc(0.15 + 0.85 * var(--pr, 0));
+    transform: translateY(calc((1 - var(--pr, 0)) * 24px));
+    will-change: transform, opacity;
+  }
+
+  .why-promise::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--cyan);
+    transform: scaleY(var(--pr, 0));
+    transform-origin: top;
+  }
+
+  /* --- 스냅샷 — 카드별 미세 패럴랙스 드리프트(카운트업과 독립) --- */
+  .snapshot-inner article {
+    --spar: clamp(0, calc(var(--sp) / 0.6), 1);
+    transform: translateY(calc((1 - var(--spar)) * var(--drift, 18px)));
+    will-change: transform;
+  }
+
+  .snapshot-inner article:nth-child(1) {
+    --drift: 18px;
+  }
+
+  .snapshot-inner article:nth-child(2) {
+    --drift: 26px;
+  }
+
+  .snapshot-inner article:nth-child(3) {
+    --drift: 34px;
+  }
+
+  .snapshot-inner article:nth-child(4) {
+    --drift: 42px;
+  }
+
+  /* --- 어바웃 — 스테이트먼트 미세 패럴랙스 + 타임라인 순차 등장 --- */
+  .about-statement {
+    --sst: clamp(0, calc(var(--sp) / 0.7), 1);
+    transform: translateY(calc((0.5 - var(--sst)) * 32px));
+    will-change: transform;
+  }
+
+  /* 4스텝 — data-stagger cardIn 원샷 무효화 후 --sp 창으로 opacity 구동
+     ([data-scrub] 부여로 (0,3,1) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
+  .about-section[data-scrub] .timeline > .t-step {
+    animation: none;
+    opacity: calc(0.35 + 0.65 * var(--ts, 0));
+    will-change: opacity;
+  }
+
+  .t-step:nth-child(1) {
+    --ts: clamp(0, calc((var(--sp) - 0.3) / 0.12), 1);
+  }
+
+  .t-step:nth-child(2) {
+    --ts: clamp(0, calc((var(--sp) - 0.38) / 0.12), 1);
+  }
+
+  .t-step:nth-child(3) {
+    --ts: clamp(0, calc((var(--sp) - 0.46) / 0.12), 1);
+  }
+
+  .t-step:nth-child(4) {
+    --ts: clamp(0, calc((var(--sp) - 0.54) / 0.12), 1);
+  }
+
+  /* --- 서비스 — 카드 인덱스별 순차 페이드
+     (hover translateY·transform transition 보존을 위해 opacity만 스크럽.
+      [data-scrub] (0,3,1)로 stagger 원샷 (0,3,0)을 무효화) --- */
+  .service-section[data-scrub] .service-grid > .service-card,
+  .service-section[data-scrub] .mp-grid > .mp-card {
+    animation: none;
+    opacity: calc(0.15 + 0.85 * var(--cv, 0));
+  }
+
+  .service-grid > .service-card:nth-child(1) {
+    --cv: clamp(0, calc((var(--sp) - 0.05) / 0.16), 1);
+  }
+
+  .service-grid > .service-card:nth-child(2) {
+    --cv: clamp(0, calc((var(--sp) - 0.09) / 0.16), 1);
+  }
+
+  .service-grid > .service-card:nth-child(3) {
+    --cv: clamp(0, calc((var(--sp) - 0.13) / 0.16), 1);
+  }
+
+  .service-grid > .service-card:nth-child(4) {
+    --cv: clamp(0, calc((var(--sp) - 0.17) / 0.16), 1);
+  }
+
+  .service-grid > .service-card:nth-child(5) {
+    --cv: clamp(0, calc((var(--sp) - 0.21) / 0.16), 1);
+  }
+
+  .service-grid > .service-card:nth-child(6) {
+    --cv: clamp(0, calc((var(--sp) - 0.25) / 0.16), 1);
+  }
+
+  /* 미디어 카드 4장 — 같은 섹션 하단이므로 창을 뒤로 배치 */
+  .mp-grid > .mp-card:nth-child(1) {
+    --cv: clamp(0, calc((var(--sp) - 0.46) / 0.14), 1);
+  }
+
+  .mp-grid > .mp-card:nth-child(2) {
+    --cv: clamp(0, calc((var(--sp) - 0.5) / 0.14), 1);
+  }
+
+  .mp-grid > .mp-card:nth-child(3) {
+    --cv: clamp(0, calc((var(--sp) - 0.54) / 0.14), 1);
+  }
+
+  .mp-grid > .mp-card:nth-child(4) {
+    --cv: clamp(0, calc((var(--sp) - 0.58) / 0.14), 1);
+  }
+
+  /* --- Works — 카드 순차 페이드(opacity만 — hover translateY 보존).
+     필터의 .stagger-done(opacity:1, (0,3,0))보다 우선하도록 (0,3,1) --- */
+  .works-section[data-scrub] .work-grid > .work-card {
+    animation: none;
+    opacity: calc(0.15 + 0.85 * var(--wv, 0));
+  }
+
+  .work-grid > .work-card:nth-child(1) {
+    --wv: clamp(0, calc((var(--sp) - 0.08) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(2) {
+    --wv: clamp(0, calc((var(--sp) - 0.13) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(3) {
+    --wv: clamp(0, calc((var(--sp) - 0.18) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(4) {
+    --wv: clamp(0, calc((var(--sp) - 0.23) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(5) {
+    --wv: clamp(0, calc((var(--sp) - 0.28) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(n + 6) {
+    --wv: clamp(0, calc((var(--sp) - 0.33) / 0.18), 1);
+  }
+
+  /* --- 인사이트 — 행별 좌측 슬라이드 인(hover transform 없음 — 이동 연출 안전) --- */
+  .insight-section[data-scrub] .insight-list > article {
+    opacity: calc(0.2 + 0.8 * var(--iv, 0));
+    transform: translateX(calc((1 - var(--iv, 0)) * -28px));
+    will-change: transform, opacity;
+  }
+
+  .insight-list > article:nth-child(1) {
+    --iv: clamp(0, calc((var(--sp) - 0.14) / 0.2), 1);
+  }
+
+  .insight-list > article:nth-child(2) {
+    --iv: clamp(0, calc((var(--sp) - 0.22) / 0.2), 1);
+  }
+
+  .insight-list > article:nth-child(3) {
+    --iv: clamp(0, calc((var(--sp) - 0.3) / 0.2), 1);
+  }
+
+  /* --- 컨택트 — 폼 컬럼 미세 라이즈(카피 컬럼은 sticky라 제외.
+     .select-panel은 position:relative인 .select 기준이라 부모 transform 무해) --- */
+  .contact-section[data-scrub] .contact-form {
+    --cf: clamp(0, calc(var(--sp) / 0.5), 1);
+    transform: translateY(calc((1 - var(--cf)) * 28px));
+    will-change: transform;
+  }
+}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 @media (max-width: 1024px) {
