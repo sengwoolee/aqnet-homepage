@@ -978,6 +978,67 @@ body.menu-open .site-header {
   background: var(--cyan);
 }
 
+/* 아이콘 칩: dot를 단색 마스크 로고로 대체 (마퀴 가독성 위해 컬러 대신 currentColor=화이트 72%) */
+.strip-track span.has-ico::before {
+  width: 17px;
+  height: 17px;
+  border-radius: 0;
+  background: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.strip-track span.ico-googleads::before {
+  -webkit-mask-image: url("assets/logos/platforms/googleads.svg");
+  mask-image: url("assets/logos/platforms/googleads.svg");
+}
+.strip-track span.ico-meta::before {
+  -webkit-mask-image: url("assets/logos/platforms/meta.svg");
+  mask-image: url("assets/logos/platforms/meta.svg");
+}
+.strip-track span.ico-youtube::before {
+  -webkit-mask-image: url("assets/logos/platforms/youtube.svg");
+  mask-image: url("assets/logos/platforms/youtube.svg");
+}
+.strip-track span.ico-tiktok::before {
+  -webkit-mask-image: url("assets/logos/platforms/tiktok.svg");
+  mask-image: url("assets/logos/platforms/tiktok.svg");
+}
+.strip-track span.ico-naver::before {
+  -webkit-mask-image: url("assets/logos/platforms/naver.svg");
+  mask-image: url("assets/logos/platforms/naver.svg");
+}
+.strip-track span.ico-googleanalytics::before {
+  -webkit-mask-image: url("assets/logos/platforms/googleanalytics.svg");
+  mask-image: url("assets/logos/platforms/googleanalytics.svg");
+}
+.strip-track span.ico-googlebigquery::before {
+  -webkit-mask-image: url("assets/logos/platforms/googlebigquery.svg");
+  mask-image: url("assets/logos/platforms/googlebigquery.svg");
+}
+/* 로고 사용 승인 완료(2026-07) — 카카오 심볼 + 데이터 스택 3종 추가 */
+.strip-track span.ico-kakao::before {
+  -webkit-mask-image: url("assets/logos/platforms/kakao.svg");
+  mask-image: url("assets/logos/platforms/kakao.svg");
+}
+.strip-track span.ico-appsflyer::before {
+  -webkit-mask-image: url("assets/logos/platforms/appsflyer.svg");
+  mask-image: url("assets/logos/platforms/appsflyer.svg");
+}
+.strip-track span.ico-airbridge::before {
+  /* 공식 SVG 심볼 미제공 → 앱 아이콘 기반 투명 마스크 PNG(알파) 사용 */
+  -webkit-mask-image: url("assets/logos/platforms/airbridge.png");
+  mask-image: url("assets/logos/platforms/airbridge.png");
+}
+.strip-track span.ico-amplitude::before {
+  -webkit-mask-image: url("assets/logos/platforms/amplitude.svg");
+  mask-image: url("assets/logos/platforms/amplitude.svg");
+}
+
 @keyframes stripMove {
   from {
     transform: translateX(0);
@@ -1098,6 +1159,105 @@ body.menu-open .site-header {
 }
 
 /* =========================================================
+   WHY AQNET (풀블리드 다크 매니페스토)
+   ========================================================= */
+.why-section {
+  width: 100%;
+  max-width: none;
+  background: var(--surface-0);
+  background-image: var(--mesh-cyan), var(--mesh-blue);
+  color: var(--white);
+}
+
+.why-section > .section-heading,
+.why-section > .why-log,
+.why-section > .why-define {
+  width: min(100%, var(--max));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.why-section > .section-heading {
+  max-width: var(--max);
+}
+
+/* 다크 배경 — 헤딩 화이트(라인마스크는 .h-line 공통 규칙이 자동 적용) */
+.why-section .section-heading h2 {
+  max-width: 940px;
+  color: var(--white);
+}
+
+/* 변화 로그 — 좌측 시안 레일 위 3줄 순차 등장(cell-mark·timeline 패턴 계열) */
+.why-log {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0 6px 34px;
+  display: grid;
+  gap: clamp(14px, 2vw, 24px);
+}
+
+.why-log::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(46, 211, 255, 0.7), rgba(34, 118, 255, 0.14));
+}
+
+.why-line {
+  position: relative;
+  color: var(--text-d-1);
+  font-size: clamp(20px, 3vw, 34px);
+  line-height: 1.32;
+  font-weight: 800;
+  word-break: keep-all;
+}
+
+/* 레일 위 시안 틱 노드(다이아몬드) — 각 줄 좌측에 정박 */
+.why-tick {
+  position: absolute;
+  left: -34px;
+  top: 0.62em;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+  background: var(--cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+/* 정의 + 약속 — 대형 정의 타입 + 시안 인용바 클로징 */
+.why-define {
+  margin-top: clamp(40px, 6vw, 72px);
+  max-width: 900px;
+}
+
+.why-def {
+  margin: 0;
+  font-size: clamp(24px, 3.6vw, 42px);
+  line-height: 1.28;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  word-break: keep-all;
+}
+
+/* 클로징 약속 — 시안 인용바(다크 배경용) */
+.why-promise {
+  margin: clamp(20px, 2.6vw, 28px) 0 0;
+  padding-left: 18px;
+  border-left: 2px solid var(--cyan);
+  color: var(--text-d-2);
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.7;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+/* =========================================================
    ABOUT
    ========================================================= */
 .about-section {
@@ -1172,41 +1332,25 @@ body.menu-open .site-header {
   background: linear-gradient(90deg, var(--cyan), transparent);
 }
 
-.statement-lead {
-  margin: 0;
-  font-size: clamp(21px, 2.4vw, 28px);
-  line-height: 1.38;
-  font-weight: 800;
-  color: var(--white);
-  word-break: keep-all;
-}
-
-.why-lines {
-  margin: 20px 0 0;
-  color: var(--text-d-3);
-  font-size: 15px;
-  line-height: 1.7;
-  word-break: keep-all;
-}
-
-/* 클로징 선언 — 말미 배치 + 시안 인용 바 (리드와 성격 분리) */
-.why-close {
-  margin: 24px 0 0;
-  padding-left: 14px;
-  border-left: 2px solid var(--cyan);
-  color: var(--white);
-  font-size: 17px;
-  line-height: 1.55;
-  font-weight: 800;
-  word-break: keep-all;
-}
-
+/* 운영 요약 리드 — 무엇을 연결하는지(카드 상단 본문) */
 .statement-sub {
-  margin: 12px 0 0;
-  font-size: 15px;
+  margin: 0;
+  font-size: clamp(16px, 1.9vw, 19px);
   line-height: 1.7;
   font-weight: 600;
   color: var(--text-d-2);
+  word-break: keep-all;
+}
+
+/* 클로징 선언 — 운영 원칙 재해석 (리드와 성격 분리) */
+.statement-close {
+  margin: 20px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--cyan);
+  color: var(--white);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 700;
   word-break: keep-all;
 }
 
@@ -1807,6 +1951,43 @@ body.menu-open .site-header {
   font-weight: 700;
 }
 
+/* 매체 로고 행: 라이트 배경에선 잉크 회색, 카드 hover 시 브랜드 컬러 복원 */
+.mp-logos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.mp-logos + .mp-ch {
+  margin-top: 8px;
+}
+
+.mp-ico {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: var(--text-l-3);
+  -webkit-mask-image: var(--ico);
+  mask-image: var(--ico);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: background var(--dur) ease;
+}
+
+.mp-card:hover .mp-ico {
+  background: var(--brand);
+}
+
+/* 가로 워드마크형 로고(쿠팡 등): 높이는 유지하되 폭을 넓혀 비율 보존 */
+.mp-ico.wide {
+  width: 52px;
+}
+
 /* =========================================================
    SOLUTION — AQ Growth OS (dark signature)
    ========================================================= */
@@ -1987,7 +2168,7 @@ body.menu-open .site-header {
   color: var(--cyan);
 }
 
-/* Console panel — 제품 목업(통합 대시보드 v1.0 프리뷰 + 대화형 레포트 티저) */
+/* Console panel — 제품 목업(통합 대시보드 개발 중 프리뷰 + 대화형 레포트 티저) */
 .solution-panel {
   position: relative;
   padding: clamp(20px, 3vw, 28px);
@@ -2812,6 +2993,148 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
+/* ── 커스텀 드롭다운(디스클로저 버튼 + 스크롤 팝오버) ── */
+.select {
+  position: relative;
+}
+
+.select-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) ease,
+    background var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
+}
+
+.select-toggle:hover {
+  border-color: var(--border-3);
+}
+
+.select-toggle:focus-visible {
+  outline: none;
+  border-color: var(--border-3);
+  box-shadow: var(--e-focus);
+}
+
+/* 열림 상태 — 토글 강조 */
+.select.is-open .select-toggle {
+  border-color: var(--border-3);
+  box-shadow: var(--e-focus);
+}
+
+.select-value {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-d-4);
+}
+
+.select-value.is-filled {
+  color: var(--white);
+}
+
+.select-caret {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--text-d-3);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.select.is-open .select-caret {
+  transform: rotate(180deg);
+}
+
+.select-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 264px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  background: var(--surface-3);
+  box-shadow: var(--e-dark-2);
+  /* 다크 스크롤바 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-2) transparent;
+}
+
+.select-panel[hidden] {
+  display: none;
+}
+
+.select-panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+.select-panel::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--r-pill);
+}
+
+.select-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--border-3);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.select-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 리스트 안에서는 칩이 아니라 풀폭 행으로 보이도록 오버라이드 */
+.contact-form .select-list .check {
+  min-height: 44px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.contact-form .select-list .check:hover {
+  border-color: transparent;
+  background: var(--surface-2);
+}
+
+.contact-form .select-list .check:has(input:checked),
+.contact-form .select-list .check.checked {
+  border-color: transparent;
+  background: rgba(46, 211, 255, 0.08);
+  color: var(--white);
+}
+
+/* 모션 줄이기 — 새 드롭다운의 캐럿/토글 전환만 즉시 처리(히어로 정책과 무관) */
+@media (prefers-reduced-motion: reduce) {
+  .select-caret,
+  .select-toggle {
+    transition: none;
+  }
+}
+
 .contact-form input:not([type="checkbox"]):not([type="radio"]),
 .contact-form textarea {
   width: 100%;
@@ -3348,8 +3671,8 @@ body.menu-open .site-header {
     min-height: 360px;
   }
 
-  .why-close {
-    font-size: 16px;
+  .statement-close {
+    font-size: 15px;
     padding-left: 12px;
   }
 

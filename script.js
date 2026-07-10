@@ -296,7 +296,7 @@ if (navLinks.length && "IntersectionObserver" in window) {
   });
 
   // 내비에 없는 섹션은 인접 메뉴로 매핑(스파이 사각지대 제거)
-  const proxyMap = { framework: "about", reference: "works" };
+  const proxyMap = { why: "about", framework: "about", reference: "works" };
   Object.entries(proxyMap).forEach(([sectionId, navId]) => {
     const section = document.getElementById(sectionId);
     const link = Array.from(navLinks).find((l) => l.getAttribute("href") === `#${navId}`);
@@ -363,6 +363,92 @@ document.querySelectorAll(".check input").forEach((input) => {
   input.addEventListener("change", sync);
 });
 
+/* 커스텀 드롭다운 — 디스클로저 버튼 + 스크롤 팝오버, 내부는 native input 유지 */
+let requestSelectOpen = null; // 제출 검증에서 예산 드롭다운을 열기 위해 주입
+const selects = document.querySelectorAll(".select");
+if (selects.length) {
+  let openSelect = null;
+
+  const closeSelect = (select, focusToggle) => {
+    select.classList.remove("is-open");
+    select.querySelector(".select-toggle").setAttribute("aria-expanded", "false");
+    select.querySelector(".select-panel").hidden = true;
+    if (openSelect === select) openSelect = null;
+    if (focusToggle) select.querySelector(".select-toggle").focus();
+  };
+
+  const openSelectEl = (select) => {
+    if (openSelect && openSelect !== select) closeSelect(openSelect, false); // 다른 드롭다운은 닫기
+    select.classList.add("is-open");
+    select.querySelector(".select-toggle").setAttribute("aria-expanded", "true");
+    select.querySelector(".select-panel").hidden = false;
+    openSelect = select;
+  };
+  requestSelectOpen = openSelectEl;
+
+  // 선택 요약 갱신 — multi는 "검색광고 외 2개" 형식, single은 선택 라벨
+  const updateSummary = (select) => {
+    const valueEl = select.querySelector("[data-select-value]");
+    const checked = Array.from(select.querySelectorAll(".select-list input")).filter((i) => i.checked);
+    const labelOf = (input) => input.closest(".check").querySelector("span").textContent;
+    let text;
+    if (!checked.length) {
+      text = "선택해주세요";
+    } else if (select.dataset.select === "multi" && checked.length > 1) {
+      text = `${labelOf(checked[0])} 외 ${checked.length - 1}개`;
+    } else {
+      text = labelOf(checked[0]);
+    }
+    valueEl.textContent = text;
+    valueEl.classList.toggle("is-filled", checked.length > 0);
+  };
+
+  selects.forEach((select) => {
+    const toggle = select.querySelector(".select-toggle");
+    const inputs = Array.from(select.querySelectorAll(".select-list input"));
+
+    toggle.addEventListener("click", () => {
+      if (select.classList.contains("is-open")) closeSelect(select, false);
+      else openSelectEl(select);
+    });
+
+    inputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        updateSummary(select);
+        if (select.dataset.select === "single") closeSelect(select, true); // single은 선택 즉시 닫힘
+      });
+    });
+
+    // ArrowUp/Down — 토글/옵션 어디서든 옵션 포커스 이동(닫혀 있으면 먼저 열기)
+    select.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      event.preventDefault();
+      if (!select.classList.contains("is-open")) openSelectEl(select);
+      const active = inputs.indexOf(document.activeElement);
+      let next;
+      if (active === -1) {
+        next = event.key === "ArrowDown" ? 0 : inputs.length - 1;
+      } else {
+        next =
+          event.key === "ArrowDown"
+            ? Math.min(inputs.length - 1, active + 1)
+            : Math.max(0, active - 1);
+      }
+      inputs[next].focus();
+    });
+
+    updateSummary(select); // 초기 요약(뒤로가기 복원값 대비)
+  });
+
+  // 바깥 클릭 / Escape로 닫기 — 문서에 각 1회만 위임(누수 없음)
+  document.addEventListener("click", (event) => {
+    if (openSelect && !openSelect.contains(event.target)) closeSelect(openSelect, false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && openSelect) closeSelect(openSelect, true); // Escape는 토글로 포커스 복귀
+  });
+}
+
 /* Contact 폼 (mailto) */
 if (contactForm) {
   contactForm.addEventListener("submit", (event) => {
@@ -371,6 +457,15 @@ if (contactForm) {
     if (!contactForm.checkValidity()) {
       contactForm.reportValidity();
       if (formNote) formNote.textContent = "필수 항목과 개인정보 동의를 확인해주세요.";
+      return;
+    }
+
+    // 예산 수동 검증 — 라디오 required를 제거했으므로 미선택 시 드롭다운을 열고 안내
+    const budgetSelect = contactForm.querySelector('.select[data-select="single"]');
+    if (budgetSelect && !budgetSelect.querySelector("input:checked")) {
+      if (requestSelectOpen) requestSelectOpen(budgetSelect);
+      budgetSelect.querySelector(".select-toggle").focus();
+      if (formNote) formNote.textContent = "월 평균 마케팅 예산을 선택해주세요.";
       return;
     }
 

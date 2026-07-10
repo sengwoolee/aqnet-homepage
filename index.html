@@ -139,18 +139,20 @@
         <section class="signal-strip" aria-label="운영 채널 및 데이터 스택">
           <span class="strip-label" aria-hidden="true">Operating Channels &amp; Data Stack</span>
           <div class="strip-mask">
-            <div class="strip-track" data-strip>
-              <span class="ch">Google Ads</span>
-              <span class="ch">Meta</span>
-              <span class="ch">YouTube</span>
-              <span class="ch">TikTok</span>
-              <span class="ch">Naver GFA</span>
-              <span class="ch">Kakao Moment</span>
-              <span class="ds">Google Analytics 4</span>
-              <span class="ds">Appsflyer</span>
-              <span class="ds">Airbridge</span>
-              <span class="ds">Amplitude</span>
-              <span class="ds">BigQuery</span>
+            <!-- has-ico: dot 대신 단색 마스크 로고. 전 플랫폼(카카오 포함) 로고 사용 승인 완료(2026-07). -->
+          <!-- CRM Automation은 특정 브랜드가 아니므로 dot 칩 유지. -->
+          <div class="strip-track" data-strip>
+              <span class="ch has-ico ico-googleads">Google Ads</span>
+              <span class="ch has-ico ico-meta">Meta</span>
+              <span class="ch has-ico ico-youtube">YouTube</span>
+              <span class="ch has-ico ico-tiktok">TikTok</span>
+              <span class="ch has-ico ico-naver">Naver GFA</span>
+              <span class="ch has-ico ico-kakao">Kakao Moment</span>
+              <span class="ds has-ico ico-googleanalytics">Google Analytics 4</span>
+              <span class="ds has-ico ico-appsflyer">Appsflyer</span>
+              <span class="ds has-ico ico-airbridge">Airbridge</span>
+              <span class="ds has-ico ico-amplitude">Amplitude</span>
+              <span class="ds has-ico ico-googlebigquery">BigQuery</span>
               <span class="ds">CRM Automation</span>
             </div>
           </div>
@@ -162,7 +164,7 @@
             <article>
               <i class="cell-mark" aria-hidden="true"></i>
               <strong class="grad" data-count="70" data-suffix="+">0</strong>
-              <span>운영 브랜드</span>
+              <span>핵심 인력 누적 <span class="nowrap">운영 브랜드</span></span>
             </article>
             <article>
               <i class="cell-mark" aria-hidden="true"></i>
@@ -182,6 +184,28 @@
           </div>
         </section>
 
+        <!-- ===================== WHY AQNET ===================== -->
+        <section class="section why-section" id="why" data-reveal>
+          <div class="section-heading">
+            <p class="eyebrow eyebrow-signal">WHY AQNET?</p>
+            <h2>변화가 멈추지 않는 시장에서<br />가장 중요한 성과 역량은 <span class="grad">적응력</span>입니다.</h2>
+          </div>
+
+          <!-- 변화 로그 — 좌측 시안 레일 위에 3줄 순차 등장 -->
+          <ul class="why-log" aria-label="AQNET이 대응하는 변화" data-stagger>
+            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>광고 플랫폼은 변합니다.</span></li>
+            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>고객 행동은 변합니다.</span></li>
+            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span><span class="nowrap">AI는</span> 운영 방식 자체를 바꾸고 있습니다.</span></li>
+          </ul>
+
+          <div class="why-define">
+            <p class="why-def">AQNET의 AQ는 <span class="grad">Adaptability Quotient</span>에서 출발합니다.</p>
+            <p class="why-promise">
+              우리는 변화에 반응하는 것을 넘어, 성과가 계속 학습하고 확장되는 <span class="nowrap">구조를 설계합니다.</span>
+            </p>
+          </div>
+        </section>
+
         <!-- ===================== ABOUT ===================== -->
         <section class="section about-section" id="about" data-reveal>
           <div class="section-heading">
@@ -191,16 +215,15 @@
           <div class="about-grid">
             <div class="about-statement">
               <div class="statement-body">
-                <p class="why-label">Why AQNET?</p>
-                <p class="statement-lead">
-                  AQ는 <span class="grad nowrap">Adaptability Quotient</span>,<br />변화에 적응하는 능력입니다.
-                </p>
-                <p class="why-lines">광고는 계속 변합니다. AI도 변합니다. 플랫폼도 변합니다.</p>
+                <p class="why-label">Operating Principle</p>
                 <p class="statement-sub">
                   AQNET은 고객 행동 데이터와 매체 성과, 콘텐츠 반응, <span class="nowrap">CRM 신호</span>를 함께 읽어
                   변화를 반복 가능한 성장 구조로 전환합니다.
                 </p>
-                <p class="why-close">우리는 변화에 적응하는 능력 자체를 <span class="nowrap">설계합니다.</span></p>
+                <p class="statement-close">
+                  AQNET은 빠르게 변화하는 마케팅 환경에 대응하는 적응력을 <span class="nowrap">자체적인 비즈니스 운영 원칙</span>으로
+                  재해석합니다.
+                </p>
               </div>
               <div class="proof">
                 <p class="proof-label">Capabilities</p>
@@ -249,11 +272,12 @@
         <!-- ===================== AQ FRAMEWORK ===================== -->
         <section class="section framework-section" id="framework">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow eyebrow-signal">AQ FRAMEWORK</p>
+            <p class="eyebrow eyebrow-signal">AQNET C.O.R.E FRAMEWORK</p>
             <h2>Every Growth Starts<br />with <span class="grad">Adaptability.</span></h2>
             <p>
-              AQNET의 성장 운영은 통제(Control), 책임(Ownership), 확장(Reach), 지속(Endurance) —
-              <span class="nowrap">네 가지 적응 축(C·O·R·E)</span> 위에서 설계됩니다.
+              통제(Control) · 책임(Ownership) · 확장(Reach) · 지속(Endurance).
+              <span class="nowrap">C.O.R.E</span>는 AQNET이 마케팅 성과 운영을 위해 정의한
+              <span class="nowrap">실행 프레임워크입니다.</span>
             </p>
           </div>
 
@@ -407,21 +431,41 @@
               <article class="mp-card">
                 <h4>검색광고</h4>
                 <p>구매 의도가 가장 명확한 검색 수요를 전환으로 연결합니다.</p>
+                <span class="mp-logos" aria-hidden="true">
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/googleads.svg'); --brand: #4285F4;"></i>
+                </span>
                 <span class="mp-ch">네이버 SA · Google Ads</span>
               </article>
               <article class="mp-card">
                 <h4>디스플레이·배너광고</h4>
                 <p>잠재 고객 도달과 리타겟팅으로 퍼널 상단을 넓힙니다.</p>
+                <!-- 카카오 로고 사용 승인 완료(2026-07). 카카오 심볼은 브라운(#3C1E1E) — 옐로우(#FEE500)는 라이트 배경 대비 부족으로 호버 컬러 부적합 -->
+                <span class="mp-logos" aria-hidden="true">
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/googleads.svg'); --brand: #4285F4;"></i>
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/kakao.svg'); --brand: #3C1E1E;"></i>
+                </span>
                 <span class="mp-ch">네이버 GFA · GDN · 카카오모먼트</span>
               </article>
               <article class="mp-card">
                 <h4>SNS·영상광고</h4>
                 <p>콘텐츠 반응 데이터로 소재를 검증하며 전환을 만듭니다.</p>
+                <span class="mp-logos" aria-hidden="true">
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/meta.svg'); --brand: #0866FF;"></i>
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/youtube.svg'); --brand: #FF0000;"></i>
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/tiktok.svg'); --brand: #010101;"></i>
+                </span>
                 <span class="mp-ch">Meta · YouTube · TikTok</span>
               </article>
               <article class="mp-card">
                 <h4>오픈마켓·쇼핑광고</h4>
                 <p>구매 직전 트래픽을 상품 단위로 최적화합니다.</p>
+                <!-- 쿠팡 로고 사용 승인 완료(2026-07). 가로 워드마크형 → .wide로 비율 유지 -->
+                <span class="mp-logos" aria-hidden="true">
+                  <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                  <i class="mp-ico wide" style="--ico: url('assets/logos/platforms/coupang.svg'); --brand: #E4002B;"></i>
+                </span>
                 <span class="mp-ch">네이버쇼핑 · 쿠팡</span>
               </article>
             </div>
@@ -435,8 +479,8 @@
             <h2>AQ Growth OS</h2>
             <p>
               광고, CRM, 커머스, 콘텐츠 데이터를 연결해 다음 액션을 결정하고<br />실행 결과를 다시 학습하는
-              AQNET의 성장 운영 프레임입니다. 이 운영 루프는 <span class="nowrap">통합 대시보드 v1.0</span>과
-              <span class="nowrap">대화형 레포트 v2.0</span>으로 제품화됩니다.
+              AQNET의 성장 운영 프레임입니다. 이 운영 루프는 현재 <span class="nowrap">통합 대시보드</span>와
+              <span class="nowrap">대화형 레포트</span>로 제품화를 진행하고 있습니다.
             </p>
           </div>
 
@@ -481,7 +525,7 @@
               <div class="panel-chrome" aria-hidden="true">
                 <span class="chrome-dots"><i></i><i></i><i></i></span>
                 <span class="chrome-url">AQ Growth OS · Dashboard</span>
-                <span class="preview-badge">v1.0 PREVIEW</span>
+                <span class="preview-badge">IN DEVELOPMENT</span>
               </div>
 
               <div class="panel-kpis" data-sync="0">
@@ -517,7 +561,7 @@
               </div>
 
               <div class="panel-chat">
-                <span class="panel-cap">CONVERSATIONAL REPORT · v2.0</span>
+                <span class="panel-cap">CONVERSATIONAL REPORT · IN DEVELOPMENT</span>
                 <p class="chat-q" data-sync="2">지난 7일 ROAS 상위 캠페인 3개 보여줘</p>
                 <p class="chat-a" data-sync="3">Meta 리타게팅 612%가 가장 높았습니다. 예산 +20% 적용 시 전환 +14~18% 예상됩니다.</p>
               </div>
@@ -760,20 +804,51 @@
             </label>
             <fieldset class="form-group">
               <legend>광고 종류 <em>(복수 선택 가능)</em></legend>
-              <div class="check-grid">
-                <label class="check"><input type="checkbox" name="adtype" value="검색광고" /><span>검색광고</span></label>
-                <label class="check"><input type="checkbox" name="adtype" value="배너광고" /><span>배너광고</span></label>
-                <label class="check"><input type="checkbox" name="adtype" value="오픈마켓광고" /><span>오픈마켓광고</span></label>
-                <label class="check"><input type="checkbox" name="adtype" value="SNS광고" /><span>SNS광고</span></label>
+              <div class="select" data-select="multi">
+                <button
+                  type="button"
+                  class="select-toggle"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="adtype-panel"
+                >
+                  <span class="select-value" data-select-value>선택해주세요</span>
+                  <svg class="select-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="select-panel" id="adtype-panel" role="group" aria-label="광고 종류 선택" hidden>
+                  <ul class="select-list">
+                    <li><label class="check"><input type="checkbox" name="adtype" value="검색광고" /><span>검색광고</span></label></li>
+                    <li><label class="check"><input type="checkbox" name="adtype" value="배너광고" /><span>배너광고</span></label></li>
+                    <li><label class="check"><input type="checkbox" name="adtype" value="오픈마켓광고" /><span>오픈마켓광고</span></label></li>
+                    <li><label class="check"><input type="checkbox" name="adtype" value="SNS광고" /><span>SNS광고</span></label></li>
+                    <li><label class="check"><input type="checkbox" name="adtype" value="바이럴광고" /><span>바이럴광고</span></label></li>
+                    <li><label class="check"><input type="checkbox" name="adtype" value="기타광고" /><span>기타광고</span></label></li>
+                  </ul>
+                </div>
               </div>
             </fieldset>
             <fieldset class="form-group">
               <legend>월 평균 마케팅 예산</legend>
-              <div class="check-grid">
-                <label class="check"><input type="radio" name="budget" value="500만원 미만" required /><span>500만원 미만</span></label>
-                <label class="check"><input type="radio" name="budget" value="500만원~2,000만원" /><span>500만~2,000만원</span></label>
-                <label class="check"><input type="radio" name="budget" value="2,000만원~5,000만원" /><span>2,000만~5,000만원</span></label>
-                <label class="check"><input type="radio" name="budget" value="5,000만원 이상" /><span>5,000만원 이상</span></label>
+              <!-- 라디오 required는 hidden 패널 안에서 "not focusable" 검증 오류를 유발 → JS 수동 검증으로 대체 -->
+              <div class="select" data-select="single">
+                <button
+                  type="button"
+                  class="select-toggle"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="budget-panel"
+                >
+                  <span class="select-value" data-select-value>선택해주세요</span>
+                  <svg class="select-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="select-panel" id="budget-panel" role="group" aria-label="월 평균 마케팅 예산 선택" hidden>
+                  <ul class="select-list">
+                    <li><label class="check"><input type="radio" name="budget" value="500만원 미만" /><span>500만원 미만</span></label></li>
+                    <li><label class="check"><input type="radio" name="budget" value="500만원~2,000만원" /><span>500만~2,000만원</span></label></li>
+                    <li><label class="check"><input type="radio" name="budget" value="2,000만원~5,000만원" /><span>2,000만~5,000만원</span></label></li>
+                    <li><label class="check"><input type="radio" name="budget" value="5,000만원 이상" /><span>5,000만원 이상</span></label></li>
+                  </ul>
+                </div>
               </div>
             </fieldset>
             <label>
