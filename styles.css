@@ -1185,11 +1185,6 @@ body.menu-open .site-header {
   max-width: var(--max);
 }
 
-/* 적응 곡선 캔버스 — 모바일/스택형에선 숨김(데스크탑 블록에서만 표시) */
-.why-canvas {
-  display: none;
-}
-
 /* 다크 배경 — 헤딩 화이트(라인마스크는 .h-line 공통 규칙이 자동 적용) */
 .why-section .section-heading h2 {
   max-width: 940px;
@@ -1273,14 +1268,13 @@ body.menu-open .site-header {
 }
 
 /* =========================================================
-   WHY AQNET — 데스크탑 적응 곡선 무대 (핀 없음 — 자연 스크롤)
-   히어로와 달리 스크롤을 붙잡지 않는다: --wp(0~1)는 뷰포트 통과 진행도이며
-   곡선 충격·모프·코어 점화가 지나가는 스크롤 위에서 은은하게 재생된다.
-   3비트는 각자의 충격 x좌표 위에 상주하며 순차 점등(딤→화이트).
-   모바일 ≤1024px는 위 기본형 그대로(회귀 방지).
+   WHY AQNET — 데스크탑 리디자인 (첫 버전 레이아웃 유지)
+   배치는 v1 세로 스택(헤딩 → 레일 로그 → 정의) 그대로.
+   시각 보강만 추가: 히어로 계열 텍스처·경계, 우측 궤도 워터마크 데코(의사요소),
+   --sp 스크럽(레일 드로우 + 순차 등장). 모바일 ≤1024px는 기본형 그대로.
    ========================================================= */
 @media (min-width: 1025px) {
-  /* 섹션 — 일반 흐름 + 풀블리드 다크. 78px 그리드 텍스처·섹션 경계 계승 */
+  /* 섹션 연속성 — 78px 그리드 텍스처 + 하단 헤어라인(검증된 처리 유지) */
   .why-section {
     background-image:
       var(--mesh-cyan),
@@ -1291,132 +1285,100 @@ body.menu-open .site-header {
     border-bottom: 1px solid var(--border-1);
   }
 
-  /* 무대 — 헤딩 / 곡선 밴드(캔버스+비트 겹침 셀) / 정의 3행 그리드 */
+  /* 데코 앵커 — 의사요소 z:-1이 무대 배경 위·콘텐츠 아래에 깔리도록 */
   .why-stage {
-    display: grid;
-    grid-template-rows: auto clamp(380px, 48vh, 560px) auto;
-    row-gap: clamp(28px, 4vh, 48px);
-  }
-
-  .why-section .section-heading {
-    grid-row: 1;
-    grid-column: 1;
-  }
-
-  /* 적응 곡선 캔버스 — 밴드 셀 채움(비트 라벨과 같은 좌표계) */
-  .why-canvas {
-    display: block;
-    grid-row: 2;
-    grid-column: 1;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 변화 로그 — 캔버스 위 오버레이(같은 셀). 라벨 x = 캔버스 충격 x와 정합 */
-  .why-section .why-log {
-    grid-row: 2;
-    grid-column: 1;
     position: relative;
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    display: block;
-    border: 0;
-    z-index: 1;
+    isolation: isolate;
   }
 
-  .why-log::before {
-    display: none;
-  }
-
-  /* 비트 라벨 — 충격 지점 위에 상주, 점등 시 딤(0.35)→화이트 + 시안 언더라인 스윕 */
-  .why-section .why-line {
-    position: absolute;
-    top: 16%;
-    transform: translateX(-50%);
-    display: block;
-    width: max-content;
-    max-width: min(24vw, 330px);
-    padding: 0;
-    border: 0;
-    text-align: center;
-    color: var(--white);
-    font-size: clamp(17px, 1.35vw, 21px);
-    font-weight: 800;
-    line-height: 1.5;
-    word-break: keep-all;
-    opacity: calc(0.35 + 0.65 * var(--lit, 0));
-    will-change: opacity;
-  }
-
-  .why-section .why-line::after {
+  /* 우측 궤도 워터마크 — 히어로 코어 DNA. 콘텐츠 배치는 그대로, 우측 공백만 채우는 장식.
+     동심 링 3개 + 중심 코어 글로우(라디얼 링 패턴, 저알파) */
+  .why-stage::after {
     content: "";
-    display: block;
-    margin: 10px auto 0;
-    width: 36px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--cyan), var(--blue));
-    transform: scaleX(var(--lit, 0));
+    position: absolute;
+    top: 4%;
+    right: calc(-1 * clamp(40px, 6vw, 120px));
+    width: clamp(440px, 42vw, 640px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(circle, rgba(46, 211, 255, 0.5) 0 2.5px, rgba(46, 211, 255, 0.12) 2.5px 9px, transparent 10px),
+      radial-gradient(circle, rgba(46, 211, 255, 0.045), transparent 60%),
+      radial-gradient(
+        circle,
+        transparent 0 31.5%,
+        rgba(122, 183, 255, 0.16) 31.5% 32%,
+        transparent 32% 45.5%,
+        rgba(122, 183, 255, 0.11) 45.5% 46%,
+        transparent 46% 61.5%,
+        rgba(122, 183, 255, 0.07) 61.5% 62%,
+        transparent 62%
+      );
   }
 
-  /* 데스크탑 틱 숨김 — 다이아 마커는 캔버스가 곡선 위에 그림 */
-  .why-section .why-line .why-tick {
-    display: none;
+  /* 위성 도트 — 중간 링 궤도를 저속 공전(장식 레이어에 미세한 생명감) */
+  .why-stage::before {
+    content: "";
+    position: absolute;
+    top: 4%;
+    right: calc(-1 * clamp(40px, 6vw, 120px));
+    width: clamp(440px, 42vw, 640px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 17.5%, rgba(46, 211, 255, 0.75) 0 2.5px, transparent 4px);
+    animation: whyOrbitSpin 52s linear infinite;
   }
 
-  /* data-stagger cardIn 원샷 무효화 — --wp 점등 한 시스템만 구동 (특이도 0,4,0) */
+  /* 스크럽 — 레일이 스크롤을 따라 그려지고(원조 페이지 스크럽 값 복원) */
+  .why-log::before {
+    transform: scaleY(clamp(0, calc((var(--sp, 0) - 0.12) / 0.38), 1));
+    transform-origin: top;
+  }
+
+  /* 3줄 순차 등장 — data-stagger cardIn 무효화(0,4,0), --sp 창 한 시스템만 구동.
+     한 번 켜지면 유지(퇴장 없음 — 스크롤 힘 뺀 버전) */
   .why-section[data-scrub] .why-log > .why-line {
     animation: none;
+    opacity: calc(0.25 + 0.75 * var(--r, 0));
+    transform: translateY(calc((1 - var(--r, 0)) * 18px));
+    will-change: transform, opacity;
   }
 
-  /* 점등 창 — 캔버스 충격(0.25/0.35/0.45)과 동기. 한 번 켜지면 유지(퇴장 없음) */
   .why-line:nth-child(1) {
-    left: 28%;
-    --lit: clamp(0, calc((var(--wp, 0) - 0.22) / 0.08), 1);
+    --r: clamp(0, calc((var(--sp, 0) - 0.16) / 0.12), 1);
   }
 
   .why-line:nth-child(2) {
-    left: 50%;
-    --lit: clamp(0, calc((var(--wp, 0) - 0.32) / 0.08), 1);
+    --r: clamp(0, calc((var(--sp, 0) - 0.24) / 0.12), 1);
   }
 
   .why-line:nth-child(3) {
-    left: 72%;
-    --lit: clamp(0, calc((var(--wp, 0) - 0.42) / 0.08), 1);
+    --r: clamp(0, calc((var(--sp, 0) - 0.32) / 0.12), 1);
   }
 
-  /* 정의 블록 — 곡선 정점(우측) 아래로 자연 착지. base 밴드폭 유지 + 우측 정렬 */
-  .why-section .why-define {
-    grid-row: 3;
-    grid-column: 1;
-    margin-top: 0;
-    display: grid;
-    justify-content: end;
-  }
-
-  .why-def,
-  .why-section .why-promise {
-    max-width: 620px;
-    text-align: left;
-  }
-
-  /* 정의 — in 0.52-0.62 창 (곡선 모프 완료와 동기) */
+  /* 정의·약속 — 부드러운 착지 창 */
   .why-def {
-    margin: 0;
-    font-size: clamp(22px, 2vw, 30px);
-    --din: clamp(0, calc((var(--wp, 0) - 0.52) / 0.1), 1);
-    opacity: var(--din);
-    transform: translateY(calc((1 - var(--din)) * 18px));
+    --d: clamp(0, calc((var(--sp, 0) - 0.42) / 0.14), 1);
+    opacity: calc(0.15 + 0.85 * var(--d));
+    transform: translateY(calc((1 - var(--d)) * 20px));
     will-change: transform, opacity;
   }
 
-  /* 약속 — base 시안 인용바 유지, in 0.58-0.7 창 (코어 점화와 동기) */
-  .why-section .why-promise {
-    --prin: clamp(0, calc((var(--wp, 0) - 0.58) / 0.12), 1);
-    opacity: var(--prin);
-    transform: translateY(calc((1 - var(--prin)) * 18px));
+  .why-promise {
+    --pr: clamp(0, calc((var(--sp, 0) - 0.5) / 0.14), 1);
+    opacity: calc(0.15 + 0.85 * var(--pr));
+    transform: translateY(calc((1 - var(--pr)) * 18px));
     will-change: transform, opacity;
+  }
+}
+
+@keyframes whyOrbitSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
