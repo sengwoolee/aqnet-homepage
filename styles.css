@@ -790,7 +790,7 @@ body.menu-open .site-header {
     margin-top: -60svh;
   }
 
-  .reference-snapshot,
+  /* 오버랩 구간의 후행 섹션은 핀 무대 위에 페인트 — WHY는 자체 base에서 relative 처리 */
   .about-section {
     position: relative;
   }
@@ -1051,15 +1051,30 @@ body.menu-open .site-header {
 /* =========================================================
    SNAPSHOT
    ========================================================= */
+/* 증거 밴드 — Solution(라이트)과 Works(라이트) 사이 다크 구두점 */
 .reference-snapshot {
   background: var(--surface-0);
+  border-top: 1px solid var(--border-1);
   border-bottom: 1px solid var(--border-1);
   background-image: var(--mesh-blue);
 }
 
+/* 맥락 캡션 — 맨숫자 고아 방지: 직전 Solution의 시스템을 결과 요약으로 인계 */
+.snapshot-head {
+  padding: 52px max(24px, calc((100% - var(--max)) / 2)) 0;
+}
+
+.snapshot-lead {
+  margin: 14px 0 0;
+  color: var(--text-d-2);
+  font-size: clamp(16px, 1.9vw, 19px);
+  font-weight: 600;
+  word-break: keep-all;
+}
+
 .snapshot-inner {
   width: 100%;
-  padding: 36px max(24px, calc((100% - var(--max)) / 2));
+  padding: 26px max(24px, calc((100% - var(--max)) / 2)) 52px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
@@ -1309,7 +1324,7 @@ body.menu-open .site-header {
     position: absolute;
     top: 4%;
     right: calc(-1 * clamp(40px, 6vw, 120px));
-    width: clamp(440px, 42vw, 640px);
+    width: clamp(410px, 40vw, 600px);
     aspect-ratio: 1;
     border-radius: 50%;
     pointer-events: none;
@@ -1335,7 +1350,7 @@ body.menu-open .site-header {
     position: absolute;
     top: 4%;
     right: calc(-1 * clamp(40px, 6vw, 120px));
-    width: clamp(440px, 42vw, 640px);
+    width: clamp(410px, 40vw, 600px);
     aspect-ratio: 1;
     border-radius: 50%;
     pointer-events: none;
@@ -1348,8 +1363,8 @@ body.menu-open .site-header {
   .why-log {
     counter-reset: whyidx;
     padding: 0;
-    gap: clamp(18px, 2.4vw, 32px);
-    font-size: clamp(24px, 3.4vw, 40px);
+    gap: clamp(18px, 2.3vw, 30px);
+    font-size: clamp(23px, 3.1vw, 37px);
   }
 
   /* 세로 레일 오프 — 고스트 인덱스가 리듬을 대신함 */
@@ -1364,8 +1379,8 @@ body.menu-open .site-header {
   /* 한 줄 = [고스트 인덱스 | 문장] 2열. 상단 정렬(문장 줄바꿈 대비) */
   .why-section .why-line {
     display: grid;
-    grid-template-columns: clamp(76px, 7vw, 116px) 1fr;
-    column-gap: clamp(18px, 2vw, 30px);
+    grid-template-columns: clamp(68px, 5.8vw, 104px) 1fr;
+    column-gap: clamp(16px, 1.8vw, 26px);
     align-items: start;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -1376,14 +1391,14 @@ body.menu-open .site-header {
   .why-line::before {
     counter-increment: whyidx;
     content: counter(whyidx, decimal-leading-zero);
-    margin-top: 0.08em;
-    font-size: clamp(58px, 6.4vw, 96px);
+    margin-top: 0.1em;
+    font-size: clamp(52px, 5.6vw, 84px);
     font-weight: 900;
     line-height: 0.82;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
-    color: rgba(46, 211, 255, 0.14);
-    -webkit-text-stroke: 1.5px rgba(46, 211, 255, 0.22);
+    color: rgba(46, 211, 255, 0.13);
+    -webkit-text-stroke: 1.5px rgba(46, 211, 255, 0.25);
     -webkit-text-fill-color: transparent;
   }
 
@@ -1432,6 +1447,11 @@ body.menu-open .site-header {
 
   .why-line:nth-child(3) {
     --r: clamp(0, calc((var(--sp, 0) - 0.32) / 0.12), 1);
+  }
+
+  /* 정의 블록 — 로그 축소분만큼 클라이맥스 진입 여백을 늘려 위계 계단 강화(데스크탑 한정) */
+  .why-define {
+    margin-top: clamp(44px, 6vw, 80px);
   }
 
   /* 정의·약속 — 부드러운 착지 창 */
