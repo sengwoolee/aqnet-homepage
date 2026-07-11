@@ -2979,10 +2979,11 @@ body.menu-open .site-header {
 
 .insight-list {
   display: grid;
-  border-top: 1px solid var(--border-l2);
+  gap: 14px;
 }
 
-/* 행 = [태그 | 제목/요약 | 날짜/상태] 3열 2행 — 요약문으로 행 밀도 강화 */
+/* 행 카드 = [태그 | 제목/요약 | 날짜/상태] 3열 2행 — 헤어라인 대신
+   사이트 라이트 섹션 공통 카드 서피스(보더+라운드+섀도)로 행 구조 강화 */
 .insight-list article {
   position: relative;
   display: grid;
@@ -2995,8 +2996,11 @@ body.menu-open .site-header {
   align-items: center;
   align-content: center;
   min-height: 112px;
-  padding: 26px 20px;
-  border-bottom: 1px solid var(--border-l2);
+  padding: 26px 28px;
+  border: 1px solid var(--border-l2);
+  border-radius: var(--r-md);
+  background: var(--surface-l0);
+  box-shadow: var(--e-1);
 }
 
 .i-tag {
@@ -3073,14 +3077,19 @@ body.menu-open .site-header {
   white-space: nowrap;
 }
 
-/* 절제된 hover — 아직 링크가 아니므로 배경 워시만(transform은 스크럽과 충돌 금지) */
+/* 절제된 hover — 아직 링크가 아니므로 서피스 강조만(transform은 스크럽과 충돌 금지) */
 @media (hover: hover) {
   .insight-list article {
-    transition: background-color var(--dur) var(--ease-out);
+    transition:
+      background-color var(--dur) var(--ease-out),
+      border-color var(--dur) ease,
+      box-shadow var(--dur) ease;
   }
 
   .insight-list article:hover {
     background-color: var(--surface-l1);
+    border-color: var(--border-l3);
+    box-shadow: var(--e-2);
   }
 }
 
