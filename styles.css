@@ -1344,10 +1344,73 @@ body.menu-open .site-header {
     animation: whyOrbitSpin 52s linear infinite;
   }
 
-  /* 스크럽 — 레일이 스크롤을 따라 그려지고(원조 페이지 스크럽 값 복원) */
+  /* 변화 로그 — 고스트 인덱스 + 주어 앵커(레일·틱 대체, 순수 타이포 레이어링) */
+  .why-log {
+    counter-reset: whyidx;
+    padding: 0;
+    gap: clamp(18px, 2.4vw, 32px);
+    font-size: clamp(24px, 3.4vw, 40px);
+  }
+
+  /* 세로 레일 오프 — 고스트 인덱스가 리듬을 대신함 */
   .why-log::before {
-    transform: scaleY(clamp(0, calc((var(--sp, 0) - 0.12) / 0.38), 1));
-    transform-origin: top;
+    display: none;
+  }
+
+  .why-line > .why-tick {
+    display: none;
+  }
+
+  /* 한 줄 = [고스트 인덱스 | 문장] 2열. 상단 정렬(문장 줄바꿈 대비) */
+  .why-section .why-line {
+    display: grid;
+    grid-template-columns: clamp(76px, 7vw, 116px) 1fr;
+    column-gap: clamp(18px, 2vw, 30px);
+    align-items: start;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* 고스트 인덱스 01·02·03 — About 타임라인 넘버와 표기 라임(decimal-leading-zero).
+     text-stroke 미지원 폴백: 저알파 fill 선(先)선언 후 stroke+투명 fill이 덮음 */
+  .why-line::before {
+    counter-increment: whyidx;
+    content: counter(whyidx, decimal-leading-zero);
+    margin-top: 0.08em;
+    font-size: clamp(58px, 6.4vw, 96px);
+    font-weight: 900;
+    line-height: 0.82;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: rgba(46, 211, 255, 0.14);
+    -webkit-text-stroke: 1.5px rgba(46, 211, 255, 0.22);
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 주어 앵커 — 그라디언트 텍스트(술어는 뮤트 유지). 언더라인은 단색 시안으로 눌러
+     정의 블록의 그라디언트 대시(클라이맥스)가 우위를 갖게 함 */
+  .why-subj {
+    position: relative;
+    font-weight: 900;
+    letter-spacing: -0.015em;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 주어 밑줄 스윕 — 각 줄의 --r 창을 상속받아 좌→우로 그려짐 */
+  .why-subj::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.12em;
+    height: 2px;
+    background: rgba(46, 211, 255, 0.75);
+    box-shadow: 0 0 6px rgba(46, 211, 255, 0.3);
+    transform: scaleX(var(--r, 1));
+    transform-origin: left;
   }
 
   /* 3줄 순차 등장 — data-stagger cardIn 무효화(0,4,0), --sp 창 한 시스템만 구동.
