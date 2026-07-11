@@ -1189,7 +1189,8 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
-/* 변화 로그 — 좌측 시안 레일 위 3줄 순차 등장(cell-mark·timeline 패턴 계열) */
+/* 변화 로그 — 좌측 시안 레일 위 3줄 순차 등장(cell-mark·timeline 패턴 계열)
+   폰트를 로그 컨테이너에 선언 — ::before 레일의 em 기준을 라인·틱과 공유(끝점 정박용) */
 .why-log {
   position: relative;
   list-style: none;
@@ -1197,22 +1198,25 @@ body.menu-open .site-header {
   padding: 6px 0 6px 34px;
   display: grid;
   gap: clamp(14px, 2vw, 24px);
+  font-size: clamp(20px, 3vw, 34px);
 }
 
+/* 레일 — 첫 틱 중심(6px + 0.62em)에서 시작해 마지막 틱 중심(라인박스 1.32em − 0.62em)에서 종료.
+   left 4px = 틱 중심 x(5px)와 2px 레일의 중심 일치 */
 .why-log::before {
   content: "";
   position: absolute;
-  left: 5px;
-  top: 14px;
-  bottom: 14px;
+  left: 4px;
+  top: calc(6px + 0.62em);
+  bottom: calc(6px + 0.7em);
   width: 2px;
-  background: linear-gradient(180deg, rgba(46, 211, 255, 0.7), rgba(34, 118, 255, 0.14));
+  background: linear-gradient(180deg, rgba(46, 211, 255, 0.7), rgba(34, 118, 255, 0.3));
 }
 
 .why-line {
   position: relative;
   color: var(--text-d-1);
-  font-size: clamp(20px, 3vw, 34px);
+  font-size: inherit;
   line-height: 1.32;
   font-weight: 800;
   word-break: keep-all;
