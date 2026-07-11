@@ -1266,17 +1266,14 @@ body.menu-open .site-header {
 }
 
 /* =========================================================
-   WHY AQNET — 데스크탑 2열 재구성 (모바일 ≤1024px는 위 기본형 그대로)
+   WHY AQNET — 데스크탑 v3 (세로 서사 순서 복원 + 가로 3열 카드)
+   모바일 ≤1024px는 위 기본형 그대로 (클라이언트 만족 상태)
    ========================================================= */
 @media (min-width: 1025px) {
-  /* 콘텐츠 밴드: contact-section과 동일한 패딩 밴드 + 2열 그리드
-     (좌: 변화 로그 / 우: 정의 카드 — HTML 순서대로 자동 배치) */
+  /* 콘텐츠 밴드: 일반 블록 흐름 복원(2열 그리드 해제) — 세로 서사 순서 유지.
+     패딩 밴드·78px 그리드 텍스처·섹션 경계는 그대로 계승 */
   .why-section {
     padding: var(--section-y) max(24px, calc((100% - var(--max)) / 2));
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-    column-gap: clamp(40px, 6vw, 88px);
-    align-items: start;
     /* 섹션 연속성: 히어로 계열 78px 그리드 텍스처를 기존 메시 위에 재선언 */
     background-image:
       var(--mesh-cyan),
@@ -1288,7 +1285,7 @@ body.menu-open .site-header {
     border-bottom: 1px solid var(--border-1);
   }
 
-  /* 기본형의 중앙 밴드 정렬 해제 — 폭·배치는 그리드가 담당 */
+  /* 기본형의 중앙 밴드 정렬 해제 — 폭은 패딩 밴드가 담당(자식은 밴드 풀폭) */
   .why-section > .section-heading,
   .why-section > .why-log,
   .why-section > .why-define {
@@ -1297,14 +1294,45 @@ body.menu-open .site-header {
     margin-right: 0;
   }
 
-  /* 헤딩은 2열 위 풀폭 유지 */
-  .why-section > .section-heading {
-    grid-column: 1 / -1;
+  /* 변화 로그 — 세로 레일 서사를 가로 3열 카드 그리드로(가로 공백 해소) */
+  .why-log {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 0;
+    /* 카드 폭에 맞춘 재선언(기본형 34px 오버라이드) */
+    font-size: clamp(19px, 1.45vw, 23px);
   }
 
-  /* 정의 블록: 로그와 상단 정렬 + 다크 글래스 카드로 승격 */
+  /* 카드 그리드에선 세로 레일이 무의미 — 숨김 */
+  .why-log::before {
+    display: none;
+  }
+
+  /* 각 로그 라인을 서사 비트 카드로 (정보 카드 아님 — hover 효과 없음) */
+  .why-line {
+    background: var(--surface-2);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-md);
+    padding: 26px 28px 28px;
+    min-height: 132px;
+    box-shadow: var(--e-dark-1);
+    line-height: 1.45;
+  }
+
+  /* 틱 — absolute 정박 해제 후 카드 상단 액센트 다이아몬드로 */
+  .why-tick {
+    position: static;
+    left: auto;
+    top: auto;
+    display: block;
+    margin: 0 0 16px;
+    transform: rotate(45deg);
+  }
+
+  /* 정의 블록: 하단 풀폭 밴드 카드(글래스 + 궤도 모티프 유지, 내부 2열) */
   .why-define {
-    margin-top: 0;
+    margin-top: clamp(28px, 4vw, 48px);
     position: relative;
     padding: clamp(28px, 3vw, 40px);
     border: 1px solid var(--border-1);
@@ -1312,26 +1340,33 @@ body.menu-open .site-header {
     background: linear-gradient(160deg, rgba(18, 32, 58, 0.85), rgba(8, 14, 28, 0.92));
     box-shadow: var(--e-dark-1);
     overflow: hidden; /* ::after 궤도 모티프를 카드 밖으로 클리핑 */
+    /* 정의(좌) + 약속(우) 2열 — HTML 순서대로 자동 배치.
+       stretch: 약속 컬럼의 시안 바(::before)가 카드 콘텐츠 전고를 타는 구분선이 되도록 */
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: stretch;
   }
 
-  /* 우상단 히어로 궤도 모티프 — 동심원 2개(반경·알파 상이), 텍스트 뒤(z-index:0) */
+  /* 우상단 히어로 궤도 모티프 — 풀폭 밴드 비례로 확대(v2 좁은 카드 기준값 재조정),
+     우측 약속 컬럼 텍스트 뒤에 깔리므로 알파는 낮게 */
   .why-define::after {
     content: "";
     position: absolute;
-    top: -70px;
-    right: -70px;
-    width: 240px;
-    height: 240px;
+    top: -110px;
+    right: -80px;
+    width: 340px;
+    height: 340px;
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
     background: radial-gradient(
       circle,
-      transparent 0 70px,
-      rgba(122, 183, 255, 0.1) 70px 71px,
-      transparent 71px 108px,
-      rgba(122, 183, 255, 0.18) 108px 109px,
-      transparent 109px
+      transparent 0 100px,
+      rgba(122, 183, 255, 0.09) 100px 101.5px,
+      transparent 101.5px 152px,
+      rgba(122, 183, 255, 0.16) 152px 153.5px,
+      transparent 153.5px
     );
   }
 
@@ -1342,9 +1377,21 @@ body.menu-open .site-header {
     z-index: 1;
   }
 
-  /* 정의 타입을 카드 폭에 맞춰 축소 (모바일 크기는 기본형 유지) */
+  /* 정의 타입을 카드 폭에 맞춰 축소 (모바일 크기는 기본형 유지)
+     — 폭 제한은 그리드 컬럼이 담당하므로 기본형 max-width 해제. stretch 그리드에서 세로 중앙 */
   .why-def {
+    max-width: none;
     font-size: clamp(22px, 2.3vw, 32px);
+    align-self: center;
+  }
+
+  /* 약속 — 2열 우측 컬럼(stretch): 텍스트는 내부에서 세로 중앙,
+     좌측 시안 바(::before)는 컬럼 전고를 스크롤로 그려 내려가는 구분선 역할 */
+  .why-promise {
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 
@@ -3595,14 +3642,11 @@ body.menu-open .site-header {
    모바일은 기존 원샷 리빌 유지(이 블록 밖).
    ========================================================= */
 @media (min-width: 1025px) {
-  /* --- WHY — 서사 스크럽: 레일이 그려지고 3줄이 순차 등장 --- */
-  .why-log::before {
-    transform: scaleY(clamp(0, calc((var(--sp) - 0.12) / 0.38), 1));
-    transform-origin: top;
-  }
+  /* --- WHY — 서사 스크럽: 3장 변화 카드가 순차 등장
+     (세로 레일은 데스크탑 v3에서 display:none — 스크럽 규칙 없음) --- */
 
-  /* 3줄 — data-stagger cardIn 원샷 무효화 후 --sp 창으로 구동
-     ([data-scrub] 부여로 (0,3,1) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
+  /* 카드 3장 — data-stagger cardIn 원샷 무효화 후 --sp 창으로 구동
+     ([data-scrub] 부여로 (0,4,0) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
   .why-section[data-scrub] .why-log > .why-line {
     animation: none;
     opacity: calc(0.25 + 0.75 * var(--r, 0));
@@ -3610,29 +3654,30 @@ body.menu-open .site-header {
     will-change: transform, opacity;
   }
 
+  /* v3: 가로 3열 카드 — 창 간격 축소(0.14/0.2/0.26, span 0.12) */
   .why-line:nth-child(1) {
-    --r: clamp(0, calc((var(--sp) - 0.16) / 0.12), 1);
+    --r: clamp(0, calc((var(--sp) - 0.14) / 0.12), 1);
   }
 
   .why-line:nth-child(2) {
-    --r: clamp(0, calc((var(--sp) - 0.24) / 0.12), 1);
+    --r: clamp(0, calc((var(--sp) - 0.2) / 0.12), 1);
   }
 
   .why-line:nth-child(3) {
-    --r: clamp(0, calc((var(--sp) - 0.32) / 0.12), 1);
+    --r: clamp(0, calc((var(--sp) - 0.26) / 0.12), 1);
   }
 
-  /* 2열에서 카드가 로그 옆에 서므로 등장 창을 앞당김(0.42~0.62 → 0.3~0.5) */
+  /* v3: 카드 3장 뒤 하단 밴드 카드 등장(0.36~0.56) */
   .why-define {
-    --d: clamp(0, calc((var(--sp) - 0.3) / 0.2), 1);
+    --d: clamp(0, calc((var(--sp) - 0.36) / 0.2), 1);
     opacity: calc(0.15 + 0.85 * var(--d, 0));
     transform: translateY(calc((1 - var(--d, 0)) * 28px));
     will-change: transform, opacity;
   }
 
-  /* 약속도 카드 등장에 맞춰 앞당김(0.52~0.7 → 0.44~0.62) */
+  /* v3: 약속은 정의 밴드에 이어 등장(0.46~0.64) */
   .why-promise {
-    --pr: clamp(0, calc((var(--sp) - 0.44) / 0.18), 1);
+    --pr: clamp(0, calc((var(--sp) - 0.46) / 0.18), 1);
     position: relative;
     border-left-color: transparent; /* 좌측 바는 ::before로 대체해 scaleY 구동 */
     opacity: calc(0.15 + 0.85 * var(--pr, 0));
@@ -3683,7 +3728,7 @@ body.menu-open .site-header {
   }
 
   /* 4스텝 — data-stagger cardIn 원샷 무효화 후 --sp 창으로 opacity 구동
-     ([data-scrub] 부여로 (0,3,1) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
+     ([data-scrub] 부여로 (0,4,0) — 리빌 규칙 (0,3,0)의 animation을 확실히 이김) */
   .about-section[data-scrub] .timeline > .t-step {
     animation: none;
     opacity: calc(0.35 + 0.65 * var(--ts, 0));
@@ -3708,7 +3753,7 @@ body.menu-open .site-header {
 
   /* --- 서비스 — 카드 인덱스별 순차 페이드
      (hover translateY·transform transition 보존을 위해 opacity만 스크럽.
-      [data-scrub] (0,3,1)로 stagger 원샷 (0,3,0)을 무효화) --- */
+      [data-scrub] (0,4,0)로 stagger 원샷 (0,3,0)을 무효화) --- */
   .service-section[data-scrub] .service-grid > .service-card,
   .service-section[data-scrub] .mp-grid > .mp-card {
     animation: none;
@@ -3757,7 +3802,7 @@ body.menu-open .site-header {
   }
 
   /* --- Works — 카드 순차 페이드(opacity만 — hover translateY 보존).
-     필터의 .stagger-done(opacity:1, (0,3,0))보다 우선하도록 (0,3,1) --- */
+     필터의 .stagger-done(opacity:1, (0,3,0))보다 우선하도록 (0,4,0) --- */
   .works-section[data-scrub] .work-grid > .work-card {
     animation: none;
     opacity: calc(0.15 + 0.85 * var(--wv, 0));
