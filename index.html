@@ -186,23 +186,33 @@
 
         <!-- ===================== WHY AQNET ===================== -->
         <section class="section why-section" id="why" data-reveal data-scrub>
-          <div class="section-heading">
-            <p class="eyebrow eyebrow-signal">WHY AQNET?</p>
-            <h2>변화가 멈추지 않는 시장에서<br />가장 중요한 성과 역량은 <span class="grad">적응력</span>입니다.</h2>
-          </div>
+          <!-- 핀 스크럽 무대: 캔버스(적응 곡선) + 기존 콘텐츠(DOM순서·카피·클래스 불변, 모바일 회귀 방지) + 챕터/축 라벨 -->
+          <div class="why-stage">
+            <canvas id="whyCanvas" class="why-canvas" aria-hidden="true"></canvas>
 
-          <!-- 변화 로그 — 좌측 시안 레일 위에 3줄 순차 등장 -->
-          <ul class="why-log" aria-label="AQNET이 대응하는 변화" data-stagger>
-            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>광고 플랫폼은 변합니다.</span></li>
-            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>고객 행동은 변합니다.</span></li>
-            <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span><span class="nowrap">AI는</span> 운영 방식 자체를 바꾸고 있습니다.</span></li>
-          </ul>
+            <div class="section-heading">
+              <p class="eyebrow eyebrow-signal">WHY AQNET?</p>
+              <h2>변화가 멈추지 않는 시장에서<br />가장 중요한 성과 역량은 <span class="grad">적응력</span>입니다.</h2>
+            </div>
 
-          <div class="why-define">
-            <p class="why-def">AQNET의 AQ는 <span class="grad">Adaptability Quotient</span>에서 출발합니다.</p>
-            <p class="why-promise">
-              우리는 변화에 반응하는 것을 넘어, 성과가 계속 학습하고 확장되는 <span class="nowrap">구조를 설계합니다.</span>
-            </p>
+            <!-- 변화 로그 — 좌측 시안 레일 위에 3줄 순차 등장 -->
+            <ul class="why-log" aria-label="AQNET이 대응하는 변화" data-stagger>
+              <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>광고 플랫폼은 변합니다.</span></li>
+              <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span>고객 행동은 변합니다.</span></li>
+              <li class="why-line"><i class="why-tick" aria-hidden="true"></i><span><span class="nowrap">AI는</span> 운영 방식 자체를 바꾸고 있습니다.</span></li>
+            </ul>
+
+            <div class="why-define">
+              <p class="why-def">AQNET의 AQ는 <span class="grad">Adaptability Quotient</span>에서 출발합니다.</p>
+              <p class="why-promise">
+                우리는 변화에 반응하는 것을 넘어, 성과가 계속 학습하고 확장되는 <span class="nowrap">구조를 설계합니다.</span>
+              </p>
+            </div>
+
+            <!-- 챕터 도트(비트 진행) + 축 라벨 — JS/CSS 제어, 스크린리더 제외 -->
+            <div class="why-chapters" aria-hidden="true"><span></span><span></span><span></span></div>
+            <span class="why-axis why-axis-y" aria-hidden="true">성과</span>
+            <span class="why-axis why-axis-x" aria-hidden="true">시간</span>
           </div>
         </section>
 

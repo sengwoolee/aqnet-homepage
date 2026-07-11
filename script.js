@@ -59,12 +59,27 @@ const scrubEls = Array.from(document.querySelectorAll("[data-scrub]")).map((el) 
   last: "",
 }));
 
+/* WHY 핀 스크럽 — 히어로 --hs·fwp 미러. --wp(0~1)를 .why-section 인라인에 주입,
+   캔버스 모듈이 whyProgress로 읽음. 챕터 도트는 활성 하나만 .on */
+const whyEl = document.querySelector(".why-section");
+const whyChapterDots = whyEl ? Array.from(whyEl.querySelectorAll(".why-chapters span")) : [];
+let whyTop = 0;
+let whyPinHeight = 1;
+let whyProgress = 0;
+let lastWp = "";
+let lastWhyChapter = -2; // -1(전체 해제)과 구분되는 초기값
+
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
   if (fwSection) {
     fwTop = fwSection.offsetTop;
     fwHeight = fwSection.offsetHeight;
+  }
+  if (whyEl) {
+    // getBoundingClientRect 기준(offsetParent 함정 회피) — 호출 시점은 load/resize/필터뿐이라 안전
+    whyTop = whyEl.getBoundingClientRect().top + window.scrollY;
+    whyPinHeight = whyEl.offsetHeight;
   }
   scrubEls.forEach((item) => {
     const rect = item.el.getBoundingClientRect();
@@ -241,6 +256,24 @@ function onScrollFrame() {
         item.el.style.setProperty("--sp", sp);
         item.last = sp;
       }
+    }
+  }
+
+  // WHY 핀 진행도 — 데스크탑만. 220svh 섹션 → 트랙 = 높이-vh(=120svh). 역스크롤 자연 복원
+  if (whyEl && pinEnabled) {
+    const vh = window.innerHeight;
+    const wp = clamp((y - whyTop) / Math.max(1, whyPinHeight - vh), 0, 1);
+    whyProgress = wp;
+    const wpKey = wp.toFixed(4);
+    if (wpKey !== lastWp) {
+      whyEl.style.setProperty("--wp", wpKey);
+      lastWp = wpKey;
+    }
+    // 챕터 도트 — 각 비트 등장 램프와 정합(인트로 미점등), RESOLVE 이후(-1) 전체 해제
+    const idx = wp < 0.1 ? -1 : wp < 0.26 ? 0 : wp < 0.44 ? 1 : wp < 0.6 ? 2 : -1;
+    if (idx !== lastWhyChapter) {
+      whyChapterDots.forEach((dot, i) => dot.classList.toggle("on", i === idx));
+      lastWhyChapter = idx;
     }
   }
 
@@ -1379,6 +1412,200 @@ if (canvas && canvas.getContext) {
       if (heroVisible && !document.hidden) {
         stopLoop();
         startLoop();
+      }
+    }, 150);
+  });
+}
+
+/* ---------------------------------------------------------
+   WHY — 적응 곡선(The Adaptation Line) 캔버스
+   - wp(=whyProgress) 순수 함수 폴리라인: 충격 → 흡수 → 상승, RESOLVE morph, AQ 코어 착지
+   - 좌표는 wp만의 함수(역스크롤 자연 복원). 시간은 셔머/펄스에만 사용
+   - 히어로 캔버스 구조 관례 계승(가시성 정지·visibilitychange·DPR 캡·resize 디바운스)
+   --------------------------------------------------------- */
+const whyCanvas = document.getElementById("whyCanvas");
+if (whyCanvas && whyCanvas.getContext) {
+  const wctx = whyCanvas.getContext("2d");
+  let wRaf = null;
+  let wRunning = false;
+  let wW = 0;
+  let wH = 0;
+
+  // 충격 시점(at)·x위치(폭 대비 비율) — 계약 고정값
+  const HITS = [
+    { x: 0.28, at: 0.14 },
+    { x: 0.5, at: 0.3 },
+    { x: 0.72, at: 0.48 },
+  ];
+  const N = 140; // 폴리라인 표본 수
+  const wBoot = performance.now(); // 셔머/펄스 시간 기준(좌표와 무관)
+
+  const bell = (v, c, w) => Math.exp(-(((v - c) / w) * ((v - c) / w))); // 순간 최대 후 감쇠
+  const smoothstep = (t) => t * t * (3 - 2 * t);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // wp 순수 함수 — 표본 u(0~1)의 y좌표. 마커·코어도 이 함수로 곡선 위 위치를 얻음
+  function sampleY(u, wp, m) {
+    let y = wH * 0.58; // 베이스라인 = 무대 높이 58%(축 라벨과 정합)
+    for (let k = 0; k < HITS.length; k += 1) {
+      const hit = HITS[k];
+      // 충격 반응 — bell(시간창) × 로컬 커널(위치 국한) × cos(1.5주기 들쭉함). 아래로 튐 = 성과 하락
+      const env = bell(wp, hit.at, 0.1);
+      const kernel = Math.exp(-Math.pow((u - hit.x) * 16, 2));
+      const osc = Math.cos((u - hit.x) * Math.PI * 3);
+      y += env * kernel * osc * wH * 0.05;
+      // 흡수 후 베이스 상승 — 충격을 흡수하며 성과선이 조금씩 올라감(적응 은유, y 감소=상승)
+      y -= smoothstep(remap(wp, hit.at + 0.03, hit.at + 0.12)) * wH * 0.022;
+    }
+    // 미세 지터 — 반응선의 생동감(morph 진행 시 소멸)
+    y += Math.sin(u * 43) * 1.5 * (1 - m);
+    // RESOLVE morph — 반응선을 매끈한 상승 곡선으로(좌하 → 우상)
+    const ySmooth = lerp(wH * 0.66, wH * 0.34, easeInOutCubic(u));
+    return lerp(y, ySmooth, m);
+  }
+
+  function whyResize() {
+    const dprCap = window.innerWidth < 720 ? 1.4 : isWindowsPlatform ? 1.1 : 2;
+    const ratio = Math.min(window.devicePixelRatio || 1, dprCap);
+    wW = whyCanvas.offsetWidth;
+    wH = whyCanvas.offsetHeight;
+    whyCanvas.width = Math.floor(wW * ratio);
+    whyCanvas.height = Math.floor(wH * ratio);
+    wctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  }
+
+  function whyDraw(frameNow) {
+    // 데스크탑 핀에서만 그림 — 모바일/스택은 캔버스 비표시(회귀 방지)
+    if (!pinEnabled) {
+      wctx.clearRect(0, 0, wW, wH);
+      if (wRunning) wRaf = requestAnimationFrame(whyDraw);
+      return;
+    }
+    const now = frameNow || performance.now();
+    const wp = whyProgress;
+    wctx.clearRect(0, 0, wW, wH);
+
+    // 인트로 페이드인 — wp 0~0.06
+    const fade = clamp(wp / 0.06, 0, 1);
+    if (fade < 0.01) {
+      if (wRunning) wRaf = requestAnimationFrame(whyDraw);
+      return;
+    }
+
+    const m = easeInOutCubic(remap(wp, 0.58, 0.74)); // RESOLVE morph
+    const ign = remap(wp, 0.74, 0.86); // AQ 코어 점화 — LANDING(정의 0.74·약속 0.78)과 동기
+
+    // 폴리라인 — 좌→우, 우측 화면 밖(W*1.03)까지 연장(확장 은유). 시안→블루 가로 그라디언트
+    const grad = wctx.createLinearGradient(0, 0, wW, 0);
+    grad.addColorStop(0, "#2ED3FF");
+    grad.addColorStop(1, "#2276FF");
+    wctx.globalAlpha = fade;
+    wctx.strokeStyle = grad;
+    wctx.lineWidth = 2 + m;
+    wctx.lineJoin = "round";
+    wctx.lineCap = "round";
+    // 미세 셔머 — 시간 기반 글로우 펄스(좌표 불변)
+    const shimmer = 0.85 + 0.15 * Math.sin((now - wBoot) * 0.002);
+    wctx.shadowBlur = (10 + 8 * ign) * shimmer;
+    wctx.shadowColor = "rgba(46, 211, 255, 0.9)";
+
+    wctx.beginPath();
+    for (let i = 0; i < N; i += 1) {
+      const u = i / (N - 1);
+      const x = u * wW * 1.03;
+      const y = sampleY(u, wp, m);
+      if (i === 0) wctx.moveTo(x, y);
+      else wctx.lineTo(x, y);
+    }
+    wctx.stroke();
+    wctx.shadowBlur = 0;
+
+    // 충격 마커 — 각 히트 x의 곡선 위 시안 다이아몬드(why-tick 조형), 발생 직후 페이드인
+    for (let k = 0; k < HITS.length; k += 1) {
+      const hit = HITS[k];
+      const a = remap(wp, hit.at + 0.02, hit.at + 0.08);
+      if (a < 0.01) continue;
+      wctx.save();
+      wctx.globalAlpha = fade * a;
+      wctx.translate(hit.x * wW, sampleY(hit.x, wp, m));
+      wctx.rotate(Math.PI / 4);
+      wctx.shadowBlur = 8;
+      wctx.shadowColor = "rgba(46, 211, 255, 0.9)";
+      wctx.fillStyle = "#2ED3FF";
+      wctx.fillRect(-5, -5, 10, 10); // 사방 5px 회전 사각
+      wctx.restore();
+    }
+
+    // AQ 코어 착지 — 곡선 상 x=0.86W에 코어 오브(히어로 코어와 동일 조형 언어)
+    if (ign > 0.01) {
+      const cx = 0.86 * wW;
+      const cy = sampleY(0.86, wp, m);
+      const cpulse = 0.5 + 0.5 * Math.sin((now - wBoot) * 0.0018); // 시간 기반 펄스
+      wctx.save();
+      wctx.globalAlpha = fade * ign;
+      // 외곽 얇은 링
+      wctx.strokeStyle = `rgba(46, 211, 255, ${0.35 + 0.25 * cpulse})`;
+      wctx.lineWidth = 1;
+      wctx.beginPath();
+      wctx.arc(cx, cy, lerp(14, 20, cpulse), 0, Math.PI * 2);
+      wctx.stroke();
+      // 화이트 코어 + 시안 글로우
+      wctx.shadowBlur = 14 + 6 * cpulse;
+      wctx.shadowColor = "rgba(46, 211, 255, 0.9)";
+      wctx.fillStyle = "rgba(255, 255, 255, 0.96)";
+      wctx.beginPath();
+      wctx.arc(cx, cy, 3.2, 0, Math.PI * 2);
+      wctx.fill();
+      wctx.restore();
+    }
+
+    wctx.globalAlpha = 1;
+    if (wRunning) wRaf = requestAnimationFrame(whyDraw);
+  }
+
+  function whyStart() {
+    if (wRunning) return;
+    wRunning = true;
+    wRaf = requestAnimationFrame(whyDraw);
+  }
+
+  function whyStop() {
+    wRunning = false;
+    if (wRaf) cancelAnimationFrame(wRaf);
+    wRaf = null;
+  }
+
+  // 가시성 정지 — 섹션 밖/탭 비활성 시 루프 중단(히어로 관례)
+  let whyVisible = true;
+  if ("IntersectionObserver" in window) {
+    const whyVis = new IntersectionObserver(
+      (entries) => {
+        whyVisible = entries[0].isIntersecting;
+        if (whyVisible && !document.hidden) whyStart();
+        else whyStop();
+      },
+      { threshold: 0 },
+    );
+    whyVis.observe(whyCanvas);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) whyStop();
+    else if (whyVisible) whyStart();
+  });
+
+  whyResize();
+  // IO 미지원 폴백에서 모바일 무한 rAF 방지 — 핀 활성일 때만 초기 기동(IO가 있으면 가시성으로 재기동)
+  if (pinEnabled) whyStart();
+
+  let whyResizeTimer;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(whyResizeTimer);
+    whyResizeTimer = window.setTimeout(() => {
+      whyResize();
+      if (whyVisible && !document.hidden) {
+        whyStop();
+        whyStart();
       }
     }, 150);
   });
