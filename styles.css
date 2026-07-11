@@ -1254,17 +1254,28 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
-/* 클로징 약속 — 시안 인용바(다크 배경용) */
+/* 클로징 약속 — 상단 그라디언트 대시(아이브로우 대시 언어, 좌측 바 대체) */
 .why-promise {
+  position: relative;
   margin: clamp(20px, 2.6vw, 28px) 0 0;
   max-width: 820px;
-  padding-left: 18px;
-  border-left: 2px solid var(--cyan);
+  padding-top: 16px;
   color: var(--text-d-2);
   font-size: clamp(16px, 2vw, 20px);
   line-height: 1.7;
   font-weight: 600;
   word-break: keep-all;
+}
+
+.why-promise::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--blue));
+  box-shadow: 0 0 12px rgba(46, 211, 255, 0.35);
 }
 
 /* =========================================================
@@ -1373,6 +1384,12 @@ body.menu-open .site-header {
     opacity: calc(0.15 + 0.85 * var(--pr));
     transform: translateY(calc((1 - var(--pr)) * 18px));
     will-change: transform, opacity;
+  }
+
+  /* 대시 — 착지와 함께 좌→우로 그려짐 */
+  .why-promise::before {
+    transform: scaleX(var(--pr, 1));
+    transform-origin: left;
   }
 }
 
