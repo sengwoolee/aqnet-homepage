@@ -1185,10 +1185,8 @@ body.menu-open .site-header {
   max-width: var(--max);
 }
 
-/* 핀 무대 전용 요소 — 모바일/핀 비활성 시 숨김(데스크탑 핀 블록에서만 표시) */
-.why-canvas,
-.why-chapters,
-.why-axis {
+/* 적응 곡선 캔버스 — 모바일/스택형에선 숨김(데스크탑 블록에서만 표시) */
+.why-canvas {
   display: none;
 }
 
@@ -1275,16 +1273,15 @@ body.menu-open .site-header {
 }
 
 /* =========================================================
-   WHY AQNET — 데스크탑 핀 스크럽 무대 (적응 곡선 + AQ 코어 착지)
-   --wp(0~1)는 JS가 .why-section 인라인에 주입. 220svh 섹션 → 100svh sticky 무대(트랙 120svh).
-   모든 텍스트 연출은 transform/opacity만. 모바일 ≤1024px는 위 기본형 그대로(회귀 방지).
+   WHY AQNET — 데스크탑 적응 곡선 무대 (핀 없음 — 자연 스크롤)
+   히어로와 달리 스크롤을 붙잡지 않는다: --wp(0~1)는 뷰포트 통과 진행도이며
+   곡선 충격·모프·코어 점화가 지나가는 스크롤 위에서 은은하게 재생된다.
+   3비트는 각자의 충격 x좌표 위에 상주하며 순차 점등(딤→화이트).
+   모바일 ≤1024px는 위 기본형 그대로(회귀 방지).
    ========================================================= */
 @media (min-width: 1025px) {
-  /* 섹션 — 핀 트랙(220svh) + 풀블리드 다크. 78px 그리드 텍스처·섹션 경계 계승 */
+  /* 섹션 — 일반 흐름 + 풀블리드 다크. 78px 그리드 텍스처·섹션 경계 계승 */
   .why-section {
-    padding: 0;
-    height: 220vh; /* 폴백 */
-    height: 220svh;
     background-image:
       var(--mesh-cyan),
       var(--mesh-blue),
@@ -1294,216 +1291,132 @@ body.menu-open .site-header {
     border-bottom: 1px solid var(--border-1);
   }
 
-  /* 핀 무대 — 뷰포트 고정. 모든 절대배치 자식의 컨테이닝 블록 */
+  /* 무대 — 헤딩 / 곡선 밴드(캔버스+비트 겹침 셀) / 정의 3행 그리드 */
   .why-stage {
-    position: sticky;
-    top: 0;
-    height: 100vh; /* 폴백 */
-    height: 100svh;
-    overflow: hidden;
-    isolation: isolate;
+    display: grid;
+    grid-template-rows: auto clamp(380px, 48vh, 560px) auto;
+    row-gap: clamp(28px, 4vh, 48px);
   }
 
-  /* 적응 곡선 캔버스 — 무대 배경 채움 */
+  .why-section .section-heading {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  /* 적응 곡선 캔버스 — 밴드 셀 채움(비트 라벨과 같은 좌표계) */
   .why-canvas {
     display: block;
-    position: absolute;
-    inset: 0;
+    grid-row: 2;
+    grid-column: 1;
     width: 100%;
     height: 100%;
-    z-index: 0;
   }
 
-  /* 헤딩 컨테이너 static화 — 아이브로우/h2를 각각 절대배치로 독립 제어 */
-  .why-section .section-heading {
-    position: static;
-    width: auto;
-    max-width: none;
-    margin: 0;
-    z-index: 3;
-  }
-
-  /* 아이브로우 — 밴드 좌상단 상시 노출 */
-  .why-section .section-heading .eyebrow {
-    position: absolute;
-    top: calc(var(--header-height) + 30px);
-    left: max(24px, calc((100% - var(--max)) / 2));
-    margin: 0;
-    z-index: 3;
-  }
-
-  /* h2 — 중앙 상단 착지(--wp 0.58-0.70 창). left/translateX로 수평 중앙 */
-  .why-section .section-heading h2 {
-    position: absolute;
-    top: 24%;
-    left: 50%;
-    max-width: 880px;
-    margin: 0;
-    text-align: center;
-    color: var(--white);
-    z-index: 3;
-    --hin: clamp(0, calc((var(--wp, 0) - 0.58) / 0.12), 1);
-    opacity: var(--hin);
-    transform: translateX(-50%) translateY(calc((1 - var(--hin)) * 22px));
-    will-change: transform, opacity;
-  }
-
-  /* 변화 로그 — 절대배치 풀폭. 3줄 전부 무대 중앙 38% 높이에 겹쳐 배치.
-     창으로 한 번에 하나만 노출(계약 타임테이블). 다이아 마커는 캔버스가 그림 */
+  /* 변화 로그 — 캔버스 위 오버레이(같은 셀). 라벨 x = 캔버스 충격 x와 정합 */
   .why-section .why-log {
-    position: absolute;
-    top: 38%;
-    left: 0;
-    right: 0;
-    width: auto;
+    grid-row: 2;
+    grid-column: 1;
+    position: relative;
+    width: 100%;
+    max-width: none;
     margin: 0;
     padding: 0;
     display: block;
     border: 0;
-    z-index: 2;
+    z-index: 1;
   }
 
   .why-log::before {
     display: none;
   }
 
+  /* 비트 라벨 — 충격 지점 위에 상주, 점등 시 딤(0.35)→화이트 + 시안 언더라인 스윕 */
   .why-section .why-line {
     position: absolute;
-    top: 0;
-    left: max(24px, calc((100% - var(--max)) / 2));
-    right: max(24px, calc((100% - var(--max)) / 2));
+    top: 16%;
+    transform: translateX(-50%);
     display: block;
+    width: max-content;
+    max-width: min(24vw, 330px);
     padding: 0;
     border: 0;
     text-align: center;
     color: var(--white);
-    font-size: clamp(30px, 3.4vw, 50px);
-    font-weight: 900;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
-    /* 계약 창: opacity = in*(1-out), translateY = (1 - in*(1-out)) * 22px */
-    opacity: calc(var(--in, 0) * (1 - var(--out, 0)));
-    transform: translateY(calc((1 - var(--in, 0) * (1 - var(--out, 0))) * 22px));
-    will-change: transform, opacity;
+    font-size: clamp(17px, 1.35vw, 21px);
+    font-weight: 800;
+    line-height: 1.5;
+    word-break: keep-all;
+    opacity: calc(0.35 + 0.65 * var(--lit, 0));
+    will-change: opacity;
   }
 
-  /* 데스크탑 틱 숨김 — 다이아 마커는 캔버스가 그림 */
+  .why-section .why-line::after {
+    content: "";
+    display: block;
+    margin: 10px auto 0;
+    width: 36px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    transform: scaleX(var(--lit, 0));
+  }
+
+  /* 데스크탑 틱 숨김 — 다이아 마커는 캔버스가 곡선 위에 그림 */
   .why-section .why-line .why-tick {
     display: none;
   }
 
-  /* data-stagger cardIn 원샷 무효화 — --wp 창 한 시스템만 구동 (특이도 0,4,0) */
+  /* data-stagger cardIn 원샷 무효화 — --wp 점등 한 시스템만 구동 (특이도 0,4,0) */
   .why-section[data-scrub] .why-log > .why-line {
     animation: none;
   }
 
-  /* 비트 창 — b1 in 0.10-0.14 / out 0.21-0.25 */
+  /* 점등 창 — 캔버스 충격(0.25/0.35/0.45)과 동기. 한 번 켜지면 유지(퇴장 없음) */
   .why-line:nth-child(1) {
-    --in: clamp(0, calc((var(--wp, 0) - 0.10) / 0.04), 1);
-    --out: clamp(0, calc((var(--wp, 0) - 0.21) / 0.04), 1);
+    left: 28%;
+    --lit: clamp(0, calc((var(--wp, 0) - 0.22) / 0.08), 1);
   }
 
-  /* b2 in 0.26-0.30 / out 0.37-0.41 */
   .why-line:nth-child(2) {
-    --in: clamp(0, calc((var(--wp, 0) - 0.26) / 0.04), 1);
-    --out: clamp(0, calc((var(--wp, 0) - 0.37) / 0.04), 1);
+    left: 50%;
+    --lit: clamp(0, calc((var(--wp, 0) - 0.32) / 0.08), 1);
   }
 
-  /* b3 in 0.44-0.48 / out 0.55-0.59 */
   .why-line:nth-child(3) {
-    --in: clamp(0, calc((var(--wp, 0) - 0.44) / 0.04), 1);
-    --out: clamp(0, calc((var(--wp, 0) - 0.55) / 0.04), 1);
+    left: 72%;
+    --lit: clamp(0, calc((var(--wp, 0) - 0.42) / 0.08), 1);
   }
 
-  /* 정의 블록 — 절대배치 우하단. base 카드/궤도 장식 제거 */
+  /* 정의 블록 — 곡선 정점(우측) 아래로 자연 착지. base 밴드폭 유지 + 우측 정렬 */
   .why-section .why-define {
-    position: absolute;
-    right: max(24px, calc((100% - var(--max)) / 2));
-    bottom: 12%;
-    left: auto;
-    width: auto;
-    max-width: 600px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    box-shadow: none;
-    display: block;
-    text-align: left;
-    z-index: 3;
+    grid-row: 3;
+    grid-column: 1;
+    margin-top: 0;
+    display: grid;
+    justify-content: end;
   }
 
-  /* 정의 — in 0.74-0.80 창 */
+  .why-def,
+  .why-section .why-promise {
+    max-width: 620px;
+    text-align: left;
+  }
+
+  /* 정의 — in 0.52-0.62 창 (곡선 모프 완료와 동기) */
   .why-def {
-    max-width: none;
     margin: 0;
     font-size: clamp(22px, 2vw, 30px);
-    --din: clamp(0, calc((var(--wp, 0) - 0.74) / 0.06), 1);
+    --din: clamp(0, calc((var(--wp, 0) - 0.52) / 0.1), 1);
     opacity: var(--din);
-    transform: translateY(calc((1 - var(--din)) * 22px));
+    transform: translateY(calc((1 - var(--din)) * 18px));
     will-change: transform, opacity;
   }
 
-  /* 약속 — base 시안 인용바 스타일 유지, in 0.78-0.86 창 */
-  .why-promise {
-    max-width: none;
-    --prin: clamp(0, calc((var(--wp, 0) - 0.78) / 0.08), 1);
+  /* 약속 — base 시안 인용바 유지, in 0.58-0.7 창 (코어 점화와 동기) */
+  .why-section .why-promise {
+    --prin: clamp(0, calc((var(--wp, 0) - 0.58) / 0.12), 1);
     opacity: var(--prin);
-    transform: translateY(calc((1 - var(--prin)) * 22px));
+    transform: translateY(calc((1 - var(--prin)) * 18px));
     will-change: transform, opacity;
-  }
-
-  /* 챕터 도트 — 밴드 우상단. hero-chapters 캡슐 스타일 복제. wp 0.62 이후 페이드아웃 */
-  .why-chapters {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    position: absolute;
-    top: calc(var(--header-height) + 30px);
-    right: max(24px, calc((100% - var(--max)) / 2));
-    z-index: 3;
-    pointer-events: none;
-    opacity: calc(1 - clamp(0, calc((var(--wp, 0) - 0.62) / 0.1), 1));
-  }
-
-  .why-chapters span {
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.22);
-    transition:
-      background 0.3s ease,
-      height 0.3s var(--ease-out);
-  }
-
-  .why-chapters span.on {
-    height: 20px;
-    background: var(--cyan);
-    box-shadow: 0 0 10px rgba(46, 211, 255, 0.5);
-  }
-
-  /* 축 라벨 — 마이크로 캡션. 인트로에서 페이드인(wp 0.02-0.08) */
-  .why-axis {
-    display: block;
-    position: absolute;
-    z-index: 2;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    color: var(--text-d-4);
-    pointer-events: none;
-    opacity: clamp(0, calc((var(--wp, 0) - 0.02) / 0.06), 1);
-  }
-
-  .why-axis-y {
-    left: max(24px, calc((100% - var(--max)) / 2));
-    top: calc(58% - 26px);
-  }
-
-  .why-axis-x {
-    right: max(24px, calc((100% - var(--max)) / 2));
-    top: calc(58% + 14px);
   }
 }
 

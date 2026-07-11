@@ -59,15 +59,13 @@ const scrubEls = Array.from(document.querySelectorAll("[data-scrub]")).map((el) 
   last: "",
 }));
 
-/* WHY 핀 스크럽 — 히어로 --hs·fwp 미러. --wp(0~1)를 .why-section 인라인에 주입,
-   캔버스 모듈이 whyProgress로 읽음. 챕터 도트는 활성 하나만 .on */
+/* WHY 적응 곡선 진행도 — 핀 없음: 뷰포트 통과 진행도(fwp와 동일 시맨틱)를
+   --wp(0~1)로 .why-section 인라인에 주입, 캔버스 모듈이 whyProgress로 읽음 */
 const whyEl = document.querySelector(".why-section");
-const whyChapterDots = whyEl ? Array.from(whyEl.querySelectorAll(".why-chapters span")) : [];
 let whyTop = 0;
-let whyPinHeight = 1;
+let whyElHeight = 1;
 let whyProgress = 0;
 let lastWp = "";
-let lastWhyChapter = -2; // -1(전체 해제)과 구분되는 초기값
 
 function measureSections() {
   pinEnabled = window.innerWidth > 1024;
@@ -79,7 +77,7 @@ function measureSections() {
   if (whyEl) {
     // getBoundingClientRect 기준(offsetParent 함정 회피) — 호출 시점은 load/resize/필터뿐이라 안전
     whyTop = whyEl.getBoundingClientRect().top + window.scrollY;
-    whyPinHeight = whyEl.offsetHeight;
+    whyElHeight = whyEl.offsetHeight;
   }
   scrubEls.forEach((item) => {
     const rect = item.el.getBoundingClientRect();
@@ -259,21 +257,15 @@ function onScrollFrame() {
     }
   }
 
-  // WHY 핀 진행도 — 데스크탑만. 220svh 섹션 → 트랙 = 높이-vh(=120svh). 역스크롤 자연 복원
+  // WHY 진행도 — 뷰포트 통과(핀 없음, 데스크탑만). 역스크롤 자연 복원
   if (whyEl && pinEnabled) {
     const vh = window.innerHeight;
-    const wp = clamp((y - whyTop) / Math.max(1, whyPinHeight - vh), 0, 1);
+    const wp = clamp((y + vh - whyTop) / (vh + whyElHeight), 0, 1);
     whyProgress = wp;
     const wpKey = wp.toFixed(4);
     if (wpKey !== lastWp) {
       whyEl.style.setProperty("--wp", wpKey);
       lastWp = wpKey;
-    }
-    // 챕터 도트 — 각 비트 등장 램프와 정합(인트로 미점등), RESOLVE 이후(-1) 전체 해제
-    const idx = wp < 0.1 ? -1 : wp < 0.26 ? 0 : wp < 0.44 ? 1 : wp < 0.6 ? 2 : -1;
-    if (idx !== lastWhyChapter) {
-      whyChapterDots.forEach((dot, i) => dot.classList.toggle("on", i === idx));
-      lastWhyChapter = idx;
     }
   }
 
@@ -1418,7 +1410,7 @@ if (canvas && canvas.getContext) {
 }
 
 /* ---------------------------------------------------------
-   WHY — 적응 곡선(The Adaptation Line) 캔버스
+   WHY — 적응 곡선(The Adaptation Line) 캔버스 (핀 없음 — 통과 진행도 wp 구동)
    - wp(=whyProgress) 순수 함수 폴리라인: 충격 → 흡수 → 상승, RESOLVE morph, AQ 코어 착지
    - 좌표는 wp만의 함수(역스크롤 자연 복원). 시간은 셔머/펄스에만 사용
    - 히어로 캔버스 구조 관례 계승(가시성 정지·visibilitychange·DPR 캡·resize 디바운스)
@@ -1431,11 +1423,11 @@ if (whyCanvas && whyCanvas.getContext) {
   let wW = 0;
   let wH = 0;
 
-  // 충격 시점(at)·x위치(폭 대비 비율) — 계약 고정값
+  // 충격 시점(at)·x위치(폭 대비 비율) — 라벨 점등 창(0.22/0.32/0.42 시작)과 동기
   const HITS = [
-    { x: 0.28, at: 0.14 },
-    { x: 0.5, at: 0.3 },
-    { x: 0.72, at: 0.48 },
+    { x: 0.28, at: 0.25 },
+    { x: 0.5, at: 0.35 },
+    { x: 0.72, at: 0.45 },
   ];
   const N = 140; // 폴리라인 표본 수
   const wBoot = performance.now(); // 셔머/펄스 시간 기준(좌표와 무관)
@@ -1485,15 +1477,15 @@ if (whyCanvas && whyCanvas.getContext) {
     const wp = whyProgress;
     wctx.clearRect(0, 0, wW, wH);
 
-    // 인트로 페이드인 — wp 0~0.06
-    const fade = clamp(wp / 0.06, 0, 1);
+    // 인트로 페이드인 — 섹션이 뷰포트에 어느 정도 들어온 뒤(wp 0.06~0.16)
+    const fade = remap(wp, 0.06, 0.16);
     if (fade < 0.01) {
       if (wRunning) wRaf = requestAnimationFrame(whyDraw);
       return;
     }
 
-    const m = easeInOutCubic(remap(wp, 0.58, 0.74)); // RESOLVE morph
-    const ign = remap(wp, 0.74, 0.86); // AQ 코어 점화 — LANDING(정의 0.74·약속 0.78)과 동기
+    const m = easeInOutCubic(remap(wp, 0.52, 0.66)); // RESOLVE morph — 정의(0.52) 착지와 동기
+    const ign = remap(wp, 0.64, 0.76); // AQ 코어 점화 — 약속(0.58~0.7)과 동기
 
     // 폴리라인 — 좌→우, 우측 화면 밖(W*1.03)까지 연장(확장 은유). 시안→블루 가로 그라디언트
     const grad = wctx.createLinearGradient(0, 0, wW, 0);
