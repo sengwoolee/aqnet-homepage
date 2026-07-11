@@ -2982,18 +2982,25 @@ body.menu-open .site-header {
   border-top: 1px solid var(--border-l2);
 }
 
+/* 행 = [태그 | 제목/요약 | 날짜/상태] 3열 2행 — 요약문으로 행 밀도 강화 */
 .insight-list article {
   position: relative;
   display: grid;
-  grid-template-columns: 130px minmax(0, 1fr) 90px auto;
-  gap: 20px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "tag title date"
+    "tag desc soon";
+  column-gap: 24px;
+  row-gap: 6px;
   align-items: center;
-  min-height: 104px;
-  padding: 24px 8px 24px 20px;
+  align-content: center;
+  min-height: 112px;
+  padding: 26px 20px;
   border-bottom: 1px solid var(--border-l2);
 }
 
 .i-tag {
+  grid-area: tag;
   display: inline-flex;
   align-items: center;
   align-self: center;
@@ -3019,24 +3026,43 @@ body.menu-open .site-header {
   color: #3f72c8;
 }
 
+/* 제목 — 리스트 항목 위계로 축소(헤딩이 아닌 목록의 톤) */
 .insight-list strong {
+  grid-area: title;
   color: var(--text-l-1);
-  font-size: clamp(18px, 2.2vw, 26px);
-  line-height: 1.25;
-  font-weight: 800;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   word-break: keep-all;
 }
 
-.insight-list em {
-  color: var(--text-l-3);
+/* 요약 1줄 — 제목 아래 뮤트 톤(3단 위계: 제목 l-1 → 요약 l-2 → 메타 l-3) */
+.i-desc {
+  grid-area: desc;
+  margin: 0;
+  color: var(--text-l-2);
   font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  word-break: keep-all;
+  max-width: 60ch;
+}
+
+.insight-list em {
+  grid-area: date;
+  justify-self: end;
+  color: var(--text-l-3);
+  font-size: 13px;
   font-style: normal;
+  letter-spacing: 0.01em;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 /* 발행 전 상태 라벨 — 죽은 클릭 어포던스 대신 정직한 상태 표기 */
 .i-soon {
+  grid-area: soon;
   justify-self: end;
   padding: 5px 11px;
   border: 1px solid var(--border-l2);
@@ -3045,6 +3071,17 @@ body.menu-open .site-header {
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
+}
+
+/* 절제된 hover — 아직 링크가 아니므로 배경 워시만(transform은 스크럽과 충돌 금지) */
+@media (hover: hover) {
+  .insight-list article {
+    transition: background-color var(--dur) var(--ease-out);
+  }
+
+  .insight-list article:hover {
+    background-color: var(--surface-l1);
+  }
 }
 
 /* =========================================================
@@ -4102,29 +4139,41 @@ body.menu-open .site-header {
     height: 42px;
   }
 
+  /* 모바일 스택 — 상단 칩 북엔드(태그↔상태) → 제목 → 요약 → 날짜 바이라인 */
   .insight-list article {
     grid-template-columns: 1fr auto;
     grid-template-areas:
-      "tag date"
-      "title title";
-    gap: 10px 12px;
+      "tag soon"
+      "title title"
+      "desc desc"
+      "date date";
+    column-gap: 12px;
+    row-gap: 10px;
+    align-content: start;
+    min-height: 0;
+    padding: 22px 20px;
   }
 
   .i-tag {
-    grid-area: tag;
-  }
-
-  .insight-list em {
-    grid-area: date;
-    text-align: right;
-  }
-
-  .insight-list strong {
-    grid-area: title;
+    align-self: center;
   }
 
   .i-soon {
-    display: none;
+    align-self: center;
+  }
+
+  .insight-list strong {
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  .i-desc {
+    font-size: 13.5px;
+  }
+
+  .insight-list em {
+    justify-self: start;
+    text-align: left;
   }
 
   .footer-top {
