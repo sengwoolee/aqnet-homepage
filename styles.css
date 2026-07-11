@@ -1389,11 +1389,12 @@ body.menu-open .site-header {
 
   /* 고스트 인덱스 01·02·03 — About 타임라인 넘버와 표기 라임(decimal-leading-zero).
      text-stroke 미지원 폴백: 저알파 fill 선(先)선언 후 stroke+투명 fill이 덮음.
-     margin-top은 문장 첫 줄 캡하이트에 옵티컬 정렬(문장이 커진 만큼 소폭 상향) */
+     margin-top 0 — 문장은 여백 없이 줄 상단에서 시작하므로 넘버도 상단 정렬(이전 0.14em이
+     넘버를 8px 밀어내려 문장이 상대적으로 위에 뜬 것처럼 보이던 문제 수정) */
   .why-line::before {
     counter-increment: whyidx;
     content: counter(whyidx, decimal-leading-zero);
-    margin-top: 0.14em;
+    margin-top: 0;
     font-size: clamp(40px, 4.2vw, 62px);
     font-weight: 900;
     line-height: 0.82;
