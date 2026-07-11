@@ -1053,10 +1053,22 @@ body.menu-open .site-header {
    ========================================================= */
 /* 증거 밴드 — Solution(라이트)과 Works(라이트) 사이 다크 구두점 */
 .reference-snapshot {
+  position: relative;
   background: var(--surface-0);
   border-top: 1px solid var(--border-1);
   border-bottom: 1px solid var(--border-1);
   background-image: var(--mesh-blue);
+}
+
+/* Solution과의 이음매에 시그니처 헤어라인 — works-section/site-footer와 동일 패턴 */
+.reference-snapshot::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
 }
 
 /* 맥락 캡션 — 맨숫자 고아 방지: 직전 Solution의 시스템을 결과 요약으로 인계 */
