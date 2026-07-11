@@ -1294,39 +1294,36 @@ body.menu-open .site-header {
     margin-right: 0;
   }
 
-  /* 변화 로그 — 세로 레일 서사를 가로 3열 카드 그리드로(가로 공백 해소) */
+  /* 변화 로그 — 풀폭 에디토리얼 행(인사이트 리스트의 행 언어).
+     헤어라인이 밴드 폭을 채우고 서사는 위→아래 순서 유지 */
   .why-log {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    display: block;
     padding: 0;
-    /* 카드 폭에 맞춘 재선언(기본형 34px 오버라이드) */
-    font-size: clamp(19px, 1.45vw, 23px);
+    border-top: 1px solid var(--border-1);
+    font-size: clamp(22px, 2.2vw, 32px);
   }
 
-  /* 카드 그리드에선 세로 레일이 무의미 — 숨김 */
+  /* 행 레이아웃에선 세로 레일이 무의미 — 숨김 */
   .why-log::before {
     display: none;
   }
 
-  /* 각 로그 라인을 서사 비트 카드로 (정보 카드 아님 — hover 효과 없음) */
   .why-line {
-    background: var(--surface-2);
-    border: 1px solid var(--border-1);
-    border-radius: var(--r-md);
-    padding: 26px 28px 28px;
-    min-height: 132px;
-    box-shadow: var(--e-dark-1);
-    line-height: 1.45;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: clamp(20px, 2.4vw, 30px) 4px;
+    border-bottom: 1px solid var(--border-1);
+    line-height: 1.4;
   }
 
-  /* 틱 — absolute 정박 해제 후 카드 상단 액센트 다이아몬드로 */
+  /* 틱 — absolute 정박 해제, 행 좌측 인라인 다이아몬드 */
   .why-tick {
     position: static;
     left: auto;
     top: auto;
-    display: block;
-    margin: 0 0 16px;
+    flex: 0 0 auto;
+    margin: 0;
     transform: rotate(45deg);
   }
 
