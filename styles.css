@@ -1266,8 +1266,7 @@ body.menu-open .site-header {
 }
 
 /* 주어 앵커 — 그라디언트 텍스트(술어는 뮤트 유지). 언더라인은 단색 시안으로 눌러
-   정의 블록의 그라디언트 대시(클라이맥스)가 우위를 갖게 함.
-   --r은 데스크탑 스크럽에서만 주입 — 모바일은 폴백(1)으로 항상 완전히 그려진 정적 액센트 */
+   정의 블록의 그라디언트 대시(클라이맥스)가 우위를 갖게 함(정적 액센트) */
 .why-subj {
   position: relative;
   font-weight: 900;
@@ -1287,8 +1286,6 @@ body.menu-open .site-header {
   height: 2px;
   background: rgba(46, 211, 255, 0.75);
   box-shadow: 0 0 6px rgba(46, 211, 255, 0.3);
-  transform: scaleX(var(--r, 1));
-  transform-origin: left;
 }
 
 /* 정의 + 약속 — 대형 정의 타입 + 시안 인용바 클로징
@@ -1330,13 +1327,21 @@ body.menu-open .site-header {
   height: 2px;
   background: linear-gradient(90deg, var(--cyan), var(--blue));
   box-shadow: 0 0 12px rgba(46, 211, 255, 0.35);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-reveal) var(--ease-emphasized) 120ms;
+}
+
+[data-reveal].is-visible .why-promise::before {
+  transform: scaleX(1);
 }
 
 /* =========================================================
    WHY AQNET — 데스크탑 리디자인 (첫 버전 레이아웃 유지)
    배치는 v1 세로 스택(헤딩 → 레일 로그 → 정의) 그대로.
-   시각 보강만 추가: 히어로 계열 텍스처·경계, 우측 궤도 워터마크 데코(의사요소),
-   --sp 스크럽(레일 드로우 + 순차 등장). 모바일 ≤1024px는 기본형 그대로.
+   시각 보강만 추가: 히어로 계열 텍스처·경계, 우측 궤도 워터마크 데코(의사요소).
+   등장 연출은 AQ FRAMEWORK와 동일한 data-reveal/data-stagger 원샷 방식(스크럽 아님).
+   모바일 ≤1024px는 기본형 그대로.
    ========================================================= */
 @media (min-width: 1025px) {
   /* 섹션 연속성 — 78px 그리드 텍스처 + 하단 헤어라인(검증된 처리 유지) */
@@ -1414,51 +1419,9 @@ body.menu-open .site-header {
     font-size: clamp(40px, 4.2vw, 62px);
   }
 
-  /* 3줄 순차 등장 — data-stagger cardIn 무효화(0,4,0), --sp 창 한 시스템만 구동.
-     한 번 켜지면 유지(퇴장 없음 — 스크롤 힘 뺀 버전) */
-  .why-section[data-scrub] .why-log > .why-line {
-    animation: none;
-    opacity: calc(0.25 + 0.75 * var(--r, 0));
-    transform: translateY(calc((1 - var(--r, 0)) * 18px));
-    will-change: transform, opacity;
-  }
-
-  .why-line:nth-child(1) {
-    --r: clamp(0, calc((var(--sp, 0) - 0.16) / 0.12), 1);
-  }
-
-  .why-line:nth-child(2) {
-    --r: clamp(0, calc((var(--sp, 0) - 0.24) / 0.12), 1);
-  }
-
-  .why-line:nth-child(3) {
-    --r: clamp(0, calc((var(--sp, 0) - 0.32) / 0.12), 1);
-  }
-
   /* 정의 블록 — 로그 축소분만큼 클라이맥스 진입 여백을 늘려 위계 계단 강화(데스크탑 한정) */
   .why-define {
     margin-top: clamp(44px, 6vw, 80px);
-  }
-
-  /* 정의·약속 — 부드러운 착지 창 */
-  .why-def {
-    --d: clamp(0, calc((var(--sp, 0) - 0.42) / 0.14), 1);
-    opacity: calc(0.15 + 0.85 * var(--d));
-    transform: translateY(calc((1 - var(--d)) * 20px));
-    will-change: transform, opacity;
-  }
-
-  .why-promise {
-    --pr: clamp(0, calc((var(--sp, 0) - 0.5) / 0.14), 1);
-    opacity: calc(0.15 + 0.85 * var(--pr));
-    transform: translateY(calc((1 - var(--pr)) * 18px));
-    will-change: transform, opacity;
-  }
-
-  /* 대시 — 착지와 함께 좌→우로 그려짐 */
-  .why-promise::before {
-    transform: scaleX(var(--pr, 1));
-    transform-origin: left;
   }
 }
 
