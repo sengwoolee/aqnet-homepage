@@ -502,6 +502,12 @@ body.menu-open .site-header {
   transform: translate3d(0, 0, 0);
 }
 
+/* CI 모션 비디오 레이어 — 데스크탑 핀 전용(미디어쿼리에서 활성화).
+   모바일·태블릿은 레이어 자체가 없어 JS가 src를 승격하지 않음(대역폭 0) */
+.hero-videos {
+  display: none;
+}
+
 /* 핸드오프 레일 — 데스크탑 핀 스크럽 exit 전용(미디어쿼리에서 활성화) */
 .hero-rail {
   display: none;
@@ -772,6 +778,46 @@ body.menu-open .site-header {
     background: var(--surface-0);
     opacity: calc(var(--hx, 0) * 0.5);
     pointer-events: none;
+  }
+
+  /* CI 모션 비디오 — screen 블렌드로 어두운 배경은 소거되고 광원만 무대에 합성.
+     오퍼시티는 JS가 .hero에 주입하는 --hva/--hvf/--hve(0~1)의 순수 함수 */
+  .hero-videos {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* ★래퍼를 스태킹 컨텍스트로 만들지 말 것: z-index뿐 아니라 opacity<1, transform, filter,
+       backdrop-filter, will-change, contain(paint/layout/content), isolation, perspective, mask
+       중 무엇이 생겨도 래퍼가 블렌드 격리 그룹이 되어 자식의 screen 블렌드가 .hero-stage 배경과
+       합성되지 못하고 어두운 사각형으로 덮임(조용한 시각적 실패). 레이어 순서는 아래
+       .hero-video의 z-index가 .hero-stage 컨텍스트에서 직접 결정 */
+  }
+
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* .hero-canvas(-2)·.hero-noise(-1)보다 한 칸 아래, .hero-stage 배경 위.
+       기존 레이어(캔버스·노이즈·레일·카피·비트·챕터·스킵)의 z-index는 그대로 두어 렌더 불변 */
+    z-index: -3;
+    object-fit: cover;
+    mix-blend-mode: screen;
+    opacity: 0;
+    will-change: opacity;
+  }
+
+  .hero-video-ambient {
+    opacity: calc(var(--hva, 0) * 0.5);
+  }
+
+  .hero-video-fly {
+    opacity: calc(var(--hvf, 0) * 0.85);
+  }
+
+  .hero-video-emblem {
+    opacity: calc(var(--hve, 0) * 0.75);
   }
 
   /* 핸드오프 레일 — 코어(70%W)를 고속 통과할 때의 모션 스트릭이 수평 광선으로 확장.
@@ -4630,7 +4676,8 @@ body.menu-open .site-header {
   .hero-rail,
   .hero-chapters,
   .hero-scrollcue,
-  .hero-skip {
+  .hero-skip,
+  .hero-videos {
     display: none;
   }
 
