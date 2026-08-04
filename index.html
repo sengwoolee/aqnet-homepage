@@ -706,105 +706,61 @@
         <section class="section works-section" id="works" data-scrub>
           <div class="section-heading compact" data-reveal>
             <p class="eyebrow eyebrow-signal">WORKS</p>
-            <h2>성과는 우연이 아니라 <span class="grad">구조</span>입니다.</h2>
+            <h2>데이터와 실행으로 만든<br />성장 사례</h2>
             <p>
-              데이터와 실행으로 만든 성장 사례를 익명화하여 소개합니다.
+              광고주명은 비공개 처리하고, 핵심 인력의 실제 수행 경험을 바탕으로 성과 중심 사례를 익명화해 소개합니다.
             </p>
           </div>
 
+          <!-- 업종 필터 — data-work-tabs/data-filter/data-work-status는 script.js 계약(이름 고정) -->
+          <div class="work-tabs" role="group" aria-label="사례 필터" data-work-tabs>
+            <button class="tab-button is-active" type="button" data-filter="all">All</button>
+            <button class="tab-button" type="button" data-filter="commerce">Commerce</button>
+            <button class="tab-button" type="button" data-filter="health">Health</button>
+            <button class="tab-button" type="button" data-filter="service">Service</button>
+          </div>
+          <p class="sr-only" role="status" data-work-status></p>
+
           <!-- 성과 수치는 클라이언트 실데이터 수급 시 교체 예정(placeholder) -->
           <div class="work-grid" data-reveal data-stagger>
-            <article class="work-card">
-              <span class="cs-initial" aria-hidden="true">A</span>
-              <span class="work-tag">건강기능식품</span>
-              <h3>브랜드 A</h3>
-              <p class="cs-issue">신규 고객 DB 확보 단가가 상승해 확장이 정체된 상황</p>
-              <div class="cs-metrics">
-                <div class="cs-metric">
-                  <b>월 평균 상담 DB</b>
-                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="142" data-suffix="%">0</strong></p>
-                </div>
-                <div class="cs-metric">
-                  <b>전환단가(CPA)</b>
-                  <p class="cs-value"><span class="cs-sign">-</span><strong data-count="38" data-suffix="%">0</strong></p>
-                </div>
+            <article class="work-card" data-category="health">
+              <span class="case-tag">Performance Commerce</span>
+              <h3>건강기능식품 브랜드 A</h3>
+              <div class="case-metrics">
+                <div class="case-metric"><span>월 평균 DB</span><strong>+52건</strong></div>
+                <div class="case-metric"><span>전환단가</span><strong>21만원 절감</strong></div>
               </div>
-              <div class="cs-compare">
-                <span class="cs-cap">상담 DB 지수</span>
-                <div class="cs-bar">
-                  <b>Before</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 41%"></i></span>
-                  <em>100</em>
-                </div>
-                <div class="cs-bar is-after">
-                  <b>After</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
-                  <em>242</em>
-                </div>
-              </div>
+              <p class="case-desc">신규 유입 구조를 재정비하고,<br />검색 수요와 랜딩 흐름을 함께 개선한 사례입니다.</p>
             </article>
-            <article class="work-card">
-              <span class="cs-initial" aria-hidden="true">B</span>
-              <span class="work-tag">가구·리빙</span>
-              <h3>브랜드 B</h3>
-              <p class="cs-issue">광고 의존도가 높고 자사몰 매출 비중이 낮았던 상황</p>
-              <div class="cs-metrics">
-                <div class="cs-metric">
-                  <b>월 매출</b>
-                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="67" data-suffix="%">0</strong></p>
-                </div>
-                <div class="cs-metric">
-                  <b>자사몰 유입</b>
-                  <p class="cs-value"><span class="cs-sign">+</span><strong>2.1배</strong></p>
-                </div>
+            <article class="work-card" data-category="commerce">
+              <span class="case-tag">Channel Mix Optimization</span>
+              <h3>가구·리빙 브랜드 B</h3>
+              <div class="case-metrics">
+                <div class="case-metric"><span>월 평균 매출</span><strong>2배 상승</strong></div>
+                <div class="case-metric"><span>자사몰 유입</span><strong>1.7배 증가</strong></div>
               </div>
-              <div class="cs-compare">
-                <span class="cs-cap">자사몰 유입 지수</span>
-                <div class="cs-bar">
-                  <b>Before</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 48%"></i></span>
-                  <em>100</em>
-                </div>
-                <div class="cs-bar is-after">
-                  <b>After</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
-                  <em>210</em>
-                </div>
-              </div>
+              <p class="case-desc">예산 배분과 상품군별 메시지를 재설계해<br />자사몰 중심 성장을 만든 사례입니다.</p>
             </article>
-            <article class="work-card">
-              <span class="cs-initial" aria-hidden="true">C</span>
-              <span class="work-tag">서비스업</span>
-              <h3>브랜드 C</h3>
-              <p class="cs-issue">일회성 방문 위주로 재방문·재구매 전환이 약했던 상황</p>
-              <div class="cs-metrics">
-                <div class="cs-metric">
-                  <b>월 전환수</b>
-                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="85" data-suffix="%">0</strong></p>
-                </div>
-                <div class="cs-metric">
-                  <b>재방문율</b>
-                  <p class="cs-value"><span class="cs-sign">+</span><strong data-count="31" data-suffix="%">0</strong></p>
-                </div>
+            <article class="work-card" data-category="service">
+              <span class="case-tag">Lead Growth</span>
+              <h3>서비스업 브랜드 C</h3>
+              <div class="case-metrics">
+                <div class="case-metric"><span>전환수</span><strong>약 3배 증가</strong></div>
+                <div class="case-metric"><span>재방문율</span><strong>2.5배 증가</strong></div>
               </div>
-              <div class="cs-compare">
-                <span class="cs-cap">월 전환수 지수</span>
-                <div class="cs-bar">
-                  <b>Before</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 54%"></i></span>
-                  <em>100</em>
-                </div>
-                <div class="cs-bar is-after">
-                  <b>After</b>
-                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
-                  <em>185</em>
-                </div>
+              <p class="case-desc">구매 전환 단계별 이탈 요인을 분리해<br />캠페인 구조와 후속 흐름을 정리했습니다.</p>
+            </article>
+            <article class="work-card" data-category="commerce">
+              <span class="case-tag">Marketplace Scaling</span>
+              <h3>커머스 브랜드 D</h3>
+              <div class="case-metrics">
+                <div class="case-metric"><span>광고비 효율</span><strong>ROAS 개선</strong></div>
+                <div class="case-metric"><span>콘텐츠 반응</span><strong>반복 검증</strong></div>
               </div>
+              <p class="case-desc">제한된 예산 안에서 고효율 조합을 찾고,<br />빠른 테스트로 성과를 확장한 사례입니다.</p>
             </article>
           </div>
-          <p class="works-note">
-            본 사례는 AQNET 핵심 인력의 실제 수행 경험을 바탕으로 재구성한 익명화 사례입니다. 업종 특성과 운영 조건에 따라 성과는 달라질 수 있습니다.
-          </p>
+          <p class="works-note">* 본 사례는 AQNET 핵심 인력의 실제 수행 경험을 바탕으로 재구성한 익명화 레퍼런스입니다. 업종 특성과 운영 조건에 따라 성과는 달라질 수 있습니다.</p>
 
           <div class="cta-band" data-reveal>
             <div>

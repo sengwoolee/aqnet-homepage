@@ -2989,6 +2989,7 @@ body.menu-open .site-header {
 }
 
 .works-section > .section-heading,
+.work-tabs,
 .work-grid,
 .works-note {
   width: min(100%, var(--max));
@@ -2996,27 +2997,74 @@ body.menu-open .site-header {
   margin-right: auto;
 }
 
+/* 예시안 기준 — 헤드라인은 그라디언트 강조 없이 전부 화이트 */
 .works-section .section-heading h2 {
   color: var(--white);
 }
 
+/* 다크 서피스 대비 — solution/contact 섹션과 동일한 리드 문단 처리 */
+.works-section .section-heading p:not(.eyebrow) {
+  color: var(--text-d-2);
+}
+
+/* 업종 필터 칩 — 활성 상태 전환은 script.js(.is-active 토글)가 담당 */
+.work-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.tab-button {
+  padding: 10px 22px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--text-d-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background var(--dur) ease,
+    border-color var(--dur) ease,
+    color var(--dur) ease;
+}
+
+.tab-button:hover {
+  border-color: var(--border-3);
+  color: var(--white);
+}
+
+.tab-button:focus-visible {
+  outline: none;
+  box-shadow: var(--e-focus);
+}
+
+/* 활성 칩은 시안이 아니라 블루 채움(예시안 기준) */
+.tab-button.is-active {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-deep) 100%);
+  border-color: transparent;
+  color: var(--white);
+}
+
+/* 예시안 2×2 — 데스크탑 2열 */
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
 .work-card {
   position: relative;
-  min-height: 340px;
-  padding: 26px;
+  padding: 30px;
   border: 1px solid var(--border-2);
   border-radius: var(--r-md);
   background: var(--surface-2);
   box-shadow: var(--e-dark-1);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   transition:
     transform var(--dur) var(--ease-out),
     border-color var(--dur) ease,
@@ -3030,177 +3078,110 @@ body.menu-open .site-header {
   box-shadow: var(--e-dark-2);
 }
 
-/* 익명 코드(A/B/C) — C.O.R.E 카드(.fw-initial)와 동일한 고스트 이니셜 언어 */
-.cs-initial {
-  position: absolute;
-  top: 4px;
-  right: 18px;
-  font-size: 92px;
-  line-height: 1;
-  font-weight: 900;
-  background: var(--grad-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  opacity: 0.16;
-  pointer-events: none;
-  transition: opacity var(--dur) ease;
+/* 필터 비대상 카드 숨김(script.js 계약) */
+.work-card.hidden {
+  display: none;
 }
 
-.work-card:hover .cs-initial {
-  opacity: 0.36;
-}
-
-/* 업종 라벨 */
-.work-tag {
+/* 전략 태그 — 아웃라인 알약(블루) */
+.case-tag {
   display: inline-flex;
   align-self: flex-start;
   align-items: center;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: var(--r-pill);
-  background: rgba(46, 211, 255, 0.1);
-  border: 1px solid var(--border-3);
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 800;
+  border: 1px solid rgba(34, 118, 255, 0.5);
+  background: transparent;
+  color: #5b9cff;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  word-break: keep-all;
 }
 
 .work-card h3 {
   margin: 16px 0 0;
   color: var(--white);
   font-size: clamp(20px, 2.2vw, 24px);
-  line-height: 1.15;
+  line-height: 1.25;
   font-weight: 800;
   word-break: keep-all;
 }
 
-/* 핵심 과제 1줄 */
-.cs-issue {
-  margin: 10px 0 0;
-  max-width: 32ch;
-  color: var(--text-d-3);
+/* 지표 2종 — 과시형 막대 대신 차분한 보더 박스 */
+.case-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.case-metric {
+  padding: 18px 16px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.case-metric span {
+  display: block;
+  color: var(--text-d-2);
   font-size: 14px;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+/* 값은 "21만원 절감"처럼 서술형이라 카운트업 없이 정적 텍스트 */
+.case-metric strong {
+  display: block;
+  margin-top: 10px;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.case-desc {
+  margin: 16px 0 0;
+  color: var(--text-d-2);
+  font-size: 15.5px;
   line-height: 1.6;
   word-break: keep-all;
 }
 
-/* 핵심 성과 수치 — 카드 하단 정렬로 3장의 숫자 baseline을 맞춤 */
-.cs-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: auto;
-  padding-top: 24px;
-}
-
-.cs-metric b {
-  display: block;
-  color: var(--text-d-3);
-  font-size: 12px;
-  font-weight: 700;
-  word-break: keep-all;
-}
-
-.cs-value {
-  margin: 8px 0 0;
-  color: var(--white);
-  font-size: clamp(26px, 3vw, 36px);
-  line-height: 1;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-/* .grad(0,1,0)보다 뒤에 정의되므로 그라디언트 변형은 color를 다시 비움 */
-.cs-value.grad {
-  color: transparent;
-}
-
-.cs-sign {
-  font-size: 0.68em;
-  margin-right: 1px;
-}
-
-/* Before → After 지수 비교 */
-.cs-compare {
-  display: grid;
-  gap: 9px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-1);
-}
-
-.cs-cap {
-  color: var(--text-d-4);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.cs-bar {
-  display: grid;
-  grid-template-columns: 50px minmax(0, 1fr) 34px;
-  align-items: center;
-  gap: 10px;
-}
-
-.cs-bar b {
-  color: var(--text-d-4);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.cs-track {
-  display: block;
-  height: 8px;
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.cs-fill {
-  display: block;
-  width: var(--w, 100%);
-  height: 100%;
-  border-radius: inherit;
-  background: rgba(255, 255, 255, 0.2);
-  transform: scaleX(0);
-  transform-origin: left;
-  /* 카드 stagger(--i)와 동기 — 좌→우로 차오름 */
-  transition: transform 760ms var(--ease-emphasized) calc(var(--i, 0) * 90ms);
-}
-
-.cs-bar.is-after .cs-fill {
-  background: linear-gradient(90deg, var(--blue), var(--cyan));
-  box-shadow: 0 0 14px rgba(46, 211, 255, 0.22);
-  transition-delay: calc(var(--i, 0) * 90ms + 180ms);
-}
-
-.cs-bar em {
-  font-style: normal;
-  text-align: right;
-  color: var(--text-d-3);
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.cs-bar.is-after em {
-  color: var(--white);
-}
-
-[data-reveal].is-visible .cs-fill {
-  transform: scaleX(1);
-}
-
 .works-note {
-  margin: 24px auto 0;
+  margin: 26px auto 0;
   color: var(--text-d-4);
   font-size: 13px;
   line-height: 1.7;
   word-break: keep-all;
+}
+
+/* 필터 조작 후 stagger 재생(깜빡임) 방지 — 모바일 media의 animation-name
+   재지정(0,3,0)을 이기도록 .works-section을 덧붙여 (0,4,0)로 올림 */
+.works-section [data-stagger].work-grid.stagger-done > * {
+  animation: none;
+  opacity: 1;
+}
+
+/* 태블릿 이하 1열 — 공용 반응형 블록보다 뒤/높은 특이도가 아니라
+   해당 목록에서 .work-grid를 빼고 여기서 섹션 로컬로 관리 */
+@media (max-width: 1024px) {
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 지표 박스는 모바일에서도 2열 유지, 초협폭에서만 1열 */
+@media (max-width: 420px) {
+  .case-metrics {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* 중간 전환 CTA 밴드 — 사례 확인 직후의 전환 경로 */
@@ -4220,10 +4201,11 @@ body.menu-open .site-header {
     --cv: clamp(0, calc((var(--sp) - 0.49) / 0.13), 1);
   }
 
-  /* --- Works — 익명 사례 카드 3장 순차 페이드(opacity만 — hover translateY 보존) --- */
+  /* --- Works — 익명 사례 카드 4장(2×2) 순차 페이드(opacity만 — hover translateY 보존).
+     창이 없는 카드가 영구 저투명으로 남지 않도록 폴백은 0이 아닌 1 --- */
   .works-section[data-scrub] .work-grid > .work-card {
     animation: none;
-    opacity: calc(0.15 + 0.85 * var(--wv, 0));
+    opacity: calc(0.15 + 0.85 * var(--wv, 1));
   }
 
   .work-grid > .work-card:nth-child(1) {
@@ -4231,11 +4213,16 @@ body.menu-open .site-header {
   }
 
   .work-grid > .work-card:nth-child(2) {
-    --wv: clamp(0, calc((var(--sp) - 0.13) / 0.18), 1);
+    --wv: clamp(0, calc((var(--sp) - 0.11) / 0.18), 1);
   }
 
+  /* 2행은 한 박자 뒤 — 행 단위로 밀어 등장 */
   .work-grid > .work-card:nth-child(3) {
-    --wv: clamp(0, calc((var(--sp) - 0.18) / 0.18), 1);
+    --wv: clamp(0, calc((var(--sp) - 0.16) / 0.18), 1);
+  }
+
+  .work-grid > .work-card:nth-child(4) {
+    --wv: clamp(0, calc((var(--sp) - 0.19) / 0.18), 1);
   }
 
   /* --- 인사이트 — 행별 좌측 슬라이드 인(hover transform 없음 — 이동 연출 안전) --- */
@@ -4303,7 +4290,6 @@ body.menu-open .site-header {
   }
 
   .service-grid,
-  .work-grid,
   .framework-grid,
   .mp-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4396,7 +4382,6 @@ body.menu-open .site-header {
   }
 
   .service-grid,
-  .work-grid,
   .framework-grid,
   .mp-grid,
   .pm-steps {

@@ -385,6 +385,50 @@ if (navLinks.length && "IntersectionObserver" in window) {
   byId.forEach((_, section) => spy.observe(section));
 }
 
+/* Works 필터 — 예시안 복원(All/Commerce/Health/Service). 표시 토글 후 스크럽 오프셋 재측정 */
+const filterButtons = document.querySelectorAll("[data-work-tabs] [data-filter]");
+if (filterButtons.length) {
+  const workGrid = document.querySelector(".work-grid");
+  const workStatus = document.querySelector("[data-work-status]");
+  const filterLabels = { all: "전체", commerce: "Commerce", health: "Health", service: "Service" };
+
+  const applyWorkFilter = (filter) => {
+    filterButtons.forEach((btn) => {
+      const active = btn.dataset.filter === filter;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+
+    // display 토글이 등장 keyframe을 되감지 않도록 stagger를 완료 상태로 고정
+    if (workGrid) workGrid.classList.add("stagger-done");
+
+    let visible = 0;
+    document.querySelectorAll(".work-grid .work-card").forEach((card) => {
+      const match = filter === "all" || card.dataset.category === filter;
+      card.classList.toggle("hidden", !match);
+      if (match) visible += 1;
+    });
+
+    if (workStatus) {
+      const label = filterLabels[filter] || filterLabels.all;
+      workStatus.textContent = `${label} 사례 ${visible}건을 표시합니다.`;
+    }
+
+    measureSections(); // 카드 표시/숨김으로 섹션 높이가 바뀌므로 스크럽 오프셋 재측정
+  };
+
+  // 초기 상태 — 마크업에 aria-pressed가 없어 JS에서 세팅(활성 칩 기준, 기본값 all)
+  const activeButton = document.querySelector("[data-work-tabs] [data-filter].is-active");
+  filterButtons.forEach((btn) => {
+    const active = activeButton ? btn === activeButton : btn.dataset.filter === "all";
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => applyWorkFilter(btn.dataset.filter || "all"));
+  });
+}
+
 /* 폼 칩 선택 하이라이트 — :has() 미지원 브라우저 폴백(.checked 미러링) */
 document.querySelectorAll(".check input").forEach((input) => {
   const sync = () => {
