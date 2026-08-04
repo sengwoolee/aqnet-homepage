@@ -385,40 +385,6 @@ if (navLinks.length && "IntersectionObserver" in window) {
   byId.forEach((_, section) => spy.observe(section));
 }
 
-/* Works 필터 */
-const filterButtons = document.querySelectorAll("[data-filter]");
-const workStatus = document.querySelector("[data-work-status]");
-const filterLabels = { all: "전체", commerce: "Commerce", health: "Health", marketplace: "Marketplace" };
-
-const workGrid = document.querySelector(".work-grid");
-
-filterButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    // 필터 조작 시점엔 등장 연출이 끝난 것으로 간주 — display 토글 재생 방지
-    if (workGrid) workGrid.classList.add("stagger-done");
-    const filter = button.dataset.filter;
-    filterButtons.forEach((item) => {
-      const isActive = item === button;
-      item.classList.toggle("active", isActive);
-      item.setAttribute("aria-pressed", String(isActive));
-    });
-
-    let visibleCount = 0;
-    document.querySelectorAll("[data-category]").forEach((card) => {
-      const visible = filter === "all" || card.dataset.category === filter;
-      card.classList.toggle("hidden", !visible);
-      if (visible) visibleCount += 1;
-    });
-
-    if (workStatus) {
-      workStatus.textContent = `${filterLabels[filter] || filter} 사례 ${visibleCount}건을 표시합니다.`;
-    }
-
-    // 필터로 후행 섹션 오프셋이 바뀜 — 스크럽(--sp)·프레임워크 캐시 재측정
-    measureSections();
-  });
-});
-
 /* 폼 칩 선택 하이라이트 — :has() 미지원 브라우저 폴백(.checked 미러링) */
 document.querySelectorAll(".check input").forEach((input) => {
   const sync = () => {

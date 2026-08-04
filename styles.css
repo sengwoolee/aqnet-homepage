@@ -2698,7 +2698,6 @@ body.menu-open .site-header {
 }
 
 .works-section > .section-heading,
-.work-tabs,
 .work-grid,
 .works-note {
   width: min(100%, var(--max));
@@ -2710,43 +2709,6 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
-.work-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.tab-button {
-  min-height: 40px;
-  padding: 0 18px;
-  font-size: 14px;
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-d-2);
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    background var(--dur) ease,
-    border-color var(--dur) ease,
-    color var(--dur) ease;
-}
-
-.tab-button:hover,
-.tab-button:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--border-3);
-  color: var(--white);
-}
-
-.tab-button.active {
-  background: var(--grad-action);
-  border-color: transparent;
-  color: var(--white);
-  box-shadow: var(--glow-blue);
-}
-
 .work-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2755,7 +2717,7 @@ body.menu-open .site-header {
 
 .work-card {
   position: relative;
-  min-height: 320px;
+  min-height: 340px;
   padding: 26px;
   border: 1px solid var(--border-2);
   border-radius: var(--r-md);
@@ -2763,7 +2725,6 @@ body.menu-open .site-header {
   box-shadow: var(--e-dark-1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   overflow: hidden;
   transition:
     transform var(--dur) var(--ease-out),
@@ -2772,16 +2733,34 @@ body.menu-open .site-header {
     opacity var(--dur) ease;
 }
 
-.work-card.hidden {
-  display: none;
-}
-
 .work-card:hover {
   transform: translateY(-3px);
   border-color: var(--border-3);
   box-shadow: var(--e-dark-2);
 }
 
+/* 익명 코드(A/B/C) — C.O.R.E 카드(.fw-initial)와 동일한 고스트 이니셜 언어 */
+.cs-initial {
+  position: absolute;
+  top: 4px;
+  right: 18px;
+  font-size: 92px;
+  line-height: 1;
+  font-weight: 900;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.16;
+  pointer-events: none;
+  transition: opacity var(--dur) ease;
+}
+
+.work-card:hover .cs-initial {
+  opacity: 0.36;
+}
+
+/* 업종 라벨 */
 .work-tag {
   display: inline-flex;
   align-self: flex-start;
@@ -2796,56 +2775,141 @@ body.menu-open .site-header {
 }
 
 .work-card h3 {
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   color: var(--white);
-  font-size: clamp(22px, 2.4vw, 26px);
+  font-size: clamp(20px, 2.2vw, 24px);
   line-height: 1.15;
   font-weight: 800;
   word-break: keep-all;
 }
 
-.work-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 22px;
-}
-
-.work-metrics span {
-  display: grid;
-  gap: 8px;
-  min-height: 80px;
-  padding: 14px;
-  border: 1px solid var(--border-1);
-  border-radius: var(--r-sm);
-  background: var(--surface-1);
-  color: var(--white);
-  font-size: 18px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  align-content: center;
-}
-
-.work-metrics b {
-  color: var(--text-d-3);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.work-card small {
-  display: block;
-  margin-top: 18px;
+/* 핵심 과제 1줄 */
+.cs-issue {
+  margin: 10px 0 0;
+  max-width: 32ch;
   color: var(--text-d-3);
   font-size: 14px;
   line-height: 1.6;
   word-break: keep-all;
 }
 
-.works-note {
-  margin: 22px auto 0;
+/* 핵심 성과 수치 — 카드 하단 정렬로 3장의 숫자 baseline을 맞춤 */
+.cs-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.cs-metric b {
+  display: block;
+  color: var(--text-d-3);
+  font-size: 12px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.cs-value {
+  margin: 8px 0 0;
+  color: var(--white);
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* .grad(0,1,0)보다 뒤에 정의되므로 그라디언트 변형은 color를 다시 비움 */
+.cs-value.grad {
+  color: transparent;
+}
+
+.cs-sign {
+  font-size: 0.68em;
+  margin-right: 1px;
+}
+
+/* Before → After 지수 비교 */
+.cs-compare {
+  display: grid;
+  gap: 9px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-1);
+}
+
+.cs-cap {
+  color: var(--text-d-4);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cs-bar {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-bar b {
+  color: var(--text-d-4);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cs-track {
+  display: block;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.cs-fill {
+  display: block;
+  width: var(--w, 100%);
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scaleX(0);
+  transform-origin: left;
+  /* 카드 stagger(--i)와 동기 — 좌→우로 차오름 */
+  transition: transform 760ms var(--ease-emphasized) calc(var(--i, 0) * 90ms);
+}
+
+.cs-bar.is-after .cs-fill {
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  box-shadow: 0 0 14px rgba(46, 211, 255, 0.22);
+  transition-delay: calc(var(--i, 0) * 90ms + 180ms);
+}
+
+.cs-bar em {
+  font-style: normal;
+  text-align: right;
   color: var(--text-d-3);
   font-size: 13px;
-  line-height: 1.6;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-bar.is-after em {
+  color: var(--white);
+}
+
+[data-reveal].is-visible .cs-fill {
+  transform: scaleX(1);
+}
+
+.works-note {
+  margin: 24px auto 0;
+  color: var(--text-d-4);
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: keep-all;
 }
 
 /* 중간 전환 CTA 밴드 — 사례 확인 직후의 전환 경로 */
@@ -3708,13 +3772,6 @@ body.menu-open .site-header {
   }
 }
 
-/* Works 필터 조작 후에는 등장 애니메이션 고정 — display 토글 재생(빈 그리드/깜빡임) 방지
-   (0,3,0 특이도: 모바일 media의 animation-name 재지정보다 우선) */
-[data-stagger].work-grid.stagger-done > * {
-  animation: none;
-  opacity: 1;
-}
-
 /* 헤딩 라인 마스크 리빌 — <br> 단위 라인이 아래에서 차오름 */
 .h-line {
   display: block;
@@ -3874,8 +3931,7 @@ body.menu-open .site-header {
     --cv: clamp(0, calc((var(--sp) - 0.58) / 0.14), 1);
   }
 
-  /* --- Works — 카드 순차 페이드(opacity만 — hover translateY 보존).
-     필터의 .stagger-done(opacity:1, (0,3,0))보다 우선하도록 (0,4,0) --- */
+  /* --- Works — 익명 사례 카드 3장 순차 페이드(opacity만 — hover translateY 보존) --- */
   .works-section[data-scrub] .work-grid > .work-card {
     animation: none;
     opacity: calc(0.15 + 0.85 * var(--wv, 0));
@@ -3891,18 +3947,6 @@ body.menu-open .site-header {
 
   .work-grid > .work-card:nth-child(3) {
     --wv: clamp(0, calc((var(--sp) - 0.18) / 0.18), 1);
-  }
-
-  .work-grid > .work-card:nth-child(4) {
-    --wv: clamp(0, calc((var(--sp) - 0.23) / 0.18), 1);
-  }
-
-  .work-grid > .work-card:nth-child(5) {
-    --wv: clamp(0, calc((var(--sp) - 0.28) / 0.18), 1);
-  }
-
-  .work-grid > .work-card:nth-child(n + 6) {
-    --wv: clamp(0, calc((var(--sp) - 0.33) / 0.18), 1);
   }
 
   /* --- 인사이트 — 행별 좌측 슬라이드 인(hover transform 없음 — 이동 연출 안전) --- */
@@ -4138,10 +4182,6 @@ body.menu-open .site-header {
   .service-card,
   .work-card {
     min-height: 280px;
-  }
-
-  .work-metrics {
-    grid-template-columns: 1fr;
   }
 
   .logo-tile {

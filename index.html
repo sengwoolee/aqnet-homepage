@@ -583,68 +583,105 @@
         <section class="section works-section" id="works" data-scrub>
           <div class="section-heading compact" data-reveal>
             <p class="eyebrow eyebrow-signal">WORKS</p>
-            <h2>데이터로 검증한<br />성장 사례와 운영 레퍼런스</h2>
+            <h2>성과는 우연이 아니라 <span class="grad">구조</span>입니다.</h2>
             <p>
-              예산과 매출 수치를 단순 성과표로 보지 않고, 채널 구조와 구매 여정 개선을 함께 설계한 사례입니다.
+              데이터와 실행으로 만든 성장 사례를 익명화하여 소개합니다.
             </p>
           </div>
 
-          <div class="work-tabs" aria-label="사례 필터">
-            <button class="tab-button active" type="button" data-filter="all" aria-pressed="true">All</button>
-            <button class="tab-button" type="button" data-filter="commerce" aria-pressed="false">Commerce</button>
-            <button class="tab-button" type="button" data-filter="health" aria-pressed="false">Health</button>
-            <button class="tab-button" type="button" data-filter="marketplace" aria-pressed="false">Marketplace</button>
-          </div>
-          <p class="sr-only" data-work-status aria-live="polite"></p>
-
+          <!-- 성과 수치는 클라이언트 실데이터 수급 시 교체 예정(placeholder) -->
           <div class="work-grid" data-reveal data-stagger>
-            <article class="work-card" data-category="commerce">
-              <span class="work-tag">Data-led Commerce</span>
-              <h3>뮐러악기</h3>
-              <div class="work-metrics">
-                <span><b>월 예산</b>2천만원</span>
-                <span><b>광고 매출</b>2.5억</span>
+            <article class="work-card">
+              <span class="cs-initial" aria-hidden="true">A</span>
+              <span class="work-tag">건강기능식품</span>
+              <h3>브랜드 A</h3>
+              <p class="cs-issue">신규 고객 DB 확보 단가가 상승해 확장이 정체된 상황</p>
+              <div class="cs-metrics">
+                <div class="cs-metric">
+                  <b>월 평균 상담 DB</b>
+                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="142" data-suffix="%">0</strong></p>
+                </div>
+                <div class="cs-metric">
+                  <b>전환단가(CPA)</b>
+                  <p class="cs-value"><span class="cs-sign">-</span><strong data-count="38" data-suffix="%">0</strong></p>
+                </div>
               </div>
-              <small>고관여 상품의 검색 수요와 상세페이지 전환 신호를 함께 읽어 브랜드스토어 운영 구조를 개선했습니다.</small>
+              <div class="cs-compare">
+                <span class="cs-cap">상담 DB 지수</span>
+                <div class="cs-bar">
+                  <b>Before</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 41%"></i></span>
+                  <em>100</em>
+                </div>
+                <div class="cs-bar is-after">
+                  <b>After</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
+                  <em>242</em>
+                </div>
+              </div>
             </article>
-            <article class="work-card" data-category="commerce">
-              <span class="work-tag">Channel Mix Optimization</span>
-              <h3>삼천리자전거 프리미엄샵</h3>
-              <div class="work-metrics">
-                <span><b>월 예산</b>3천만원</span>
-                <span><b>광고 매출</b>4억</span>
+            <article class="work-card">
+              <span class="cs-initial" aria-hidden="true">B</span>
+              <span class="work-tag">가구·리빙</span>
+              <h3>브랜드 B</h3>
+              <p class="cs-issue">광고 의존도가 높고 자사몰 매출 비중이 낮았던 상황</p>
+              <div class="cs-metrics">
+                <div class="cs-metric">
+                  <b>월 매출</b>
+                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="67" data-suffix="%">0</strong></p>
+                </div>
+                <div class="cs-metric">
+                  <b>자사몰 유입</b>
+                  <p class="cs-value"><span class="cs-sign">+</span><strong>2.1배</strong></p>
+                </div>
               </div>
-              <small>시즌성 수요, 상품군별 전환율, 스토어 유입 경로를 기준으로 예산과 캠페인 구조를 재배치했습니다.</small>
+              <div class="cs-compare">
+                <span class="cs-cap">자사몰 유입 지수</span>
+                <div class="cs-bar">
+                  <b>Before</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 48%"></i></span>
+                  <em>100</em>
+                </div>
+                <div class="cs-bar is-after">
+                  <b>After</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
+                  <em>210</em>
+                </div>
+              </div>
             </article>
-            <article class="work-card" data-category="health">
-              <span class="work-tag">Funnel Signal Design</span>
-              <h3>POC</h3>
-              <div class="work-metrics">
-                <span><b>월 예산</b>3천만원</span>
-                <span><b>광고 매출</b>1억 5천</span>
+            <article class="work-card">
+              <span class="cs-initial" aria-hidden="true">C</span>
+              <span class="work-tag">서비스업</span>
+              <h3>브랜드 C</h3>
+              <p class="cs-issue">일회성 방문 위주로 재방문·재구매 전환이 약했던 상황</p>
+              <div class="cs-metrics">
+                <div class="cs-metric">
+                  <b>월 전환수</b>
+                  <p class="cs-value grad"><span class="cs-sign">+</span><strong data-count="85" data-suffix="%">0</strong></p>
+                </div>
+                <div class="cs-metric">
+                  <b>재방문율</b>
+                  <p class="cs-value"><span class="cs-sign">+</span><strong data-count="31" data-suffix="%">0</strong></p>
+                </div>
               </div>
-              <small>전문 상품군의 타겟 수요와 구매 전환 단계를 분리해 캠페인 메시지와 랜딩 흐름을 정리했습니다.</small>
-            </article>
-            <article class="work-card" data-category="health">
-              <span class="work-tag">Lean Growth Loop</span>
-              <h3>여섯별 이야기</h3>
-              <div class="work-metrics">
-                <span><b>월 예산</b>800만원</span>
-                <span><b>매출</b>3억</span>
+              <div class="cs-compare">
+                <span class="cs-cap">월 전환수 지수</span>
+                <div class="cs-bar">
+                  <b>Before</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 54%"></i></span>
+                  <em>100</em>
+                </div>
+                <div class="cs-bar is-after">
+                  <b>After</b>
+                  <span class="cs-track"><i class="cs-fill" style="--w: 100%"></i></span>
+                  <em>185</em>
+                </div>
               </div>
-              <small>제한된 예산 안에서 효율이 높은 고객 반응을 추적하고 콘텐츠 메시지를 빠르게 반복 검증했습니다.</small>
-            </article>
-            <article class="work-card" data-category="marketplace">
-              <span class="work-tag">Marketplace Scaling</span>
-              <h3>전국대표 팔도장터</h3>
-              <div class="work-metrics">
-                <span><b>월 예산</b>100만원</span>
-                <span><b>매출</b>6천만원</span>
-              </div>
-              <small>마켓형 상품 구성과 지역성 메시지를 기준으로 캠페인 효율을 우선 검증한 뒤 확장했습니다.</small>
             </article>
           </div>
-          <p class="works-note">※ 광고 매출은 광고비로 발생한 매출 기준이며, 상품군·운영 기간에 따라 차이가 있습니다.</p>
+          <p class="works-note">
+            본 사례는 AQNET 핵심 인력의 실제 수행 경험을 바탕으로 재구성한 익명화 사례입니다. 업종 특성과 운영 조건에 따라 성과는 달라질 수 있습니다.
+          </p>
 
           <div class="cta-band" data-reveal>
             <div>
