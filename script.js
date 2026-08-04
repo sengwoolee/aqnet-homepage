@@ -363,7 +363,7 @@ if (navLinks.length && "IntersectionObserver" in window) {
   });
 
   // 내비에 없는 섹션은 인접 메뉴로 매핑(스파이 사각지대 제거)
-  const proxyMap = { why: "about", framework: "about", reference: "works" };
+  const proxyMap = { "about-detail": "about", framework: "about", reference: "works" };
   Object.entries(proxyMap).forEach(([sectionId, navId]) => {
     const section = document.getElementById(sectionId);
     const link = Array.from(navLinks).find((l) => l.getAttribute("href") === `#${navId}`);
