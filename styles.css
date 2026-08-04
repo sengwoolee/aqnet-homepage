@@ -647,6 +647,11 @@ body.menu-open .site-header {
   animation: scrollCue 1.8s ease-in-out infinite;
 }
 
+/* 인트로 스킵 — 데스크탑 핀 트랙 전용(모바일은 트랙이 없어 불필요) */
+.hero-skip {
+  display: none;
+}
+
 /* Solution 브리지 — 통과 서사의 결론 선언+CTA (모바일: 정적, 데스크탑: 레일 위 스크럽) */
 .hero-bridge {
   display: flex;
@@ -724,13 +729,14 @@ body.menu-open .site-header {
   animation: heroIn 640ms var(--ease-emphasized) 480ms backwards;
 }
 
-/* 데스크탑 핀 스크럽 — 히어로 330svh 트랙 + sticky 무대
+/* 데스크탑 핀 스크럽 — 히어로 240svh 트랙 + sticky 무대 (CTO 리뷰: 330→240 축소)
    (막1 카피 침강 → 막2 정렬+비트1 → 막3 통과 줌+비트2 → 막4 브리지·레일 → exit 오버랩)
-   휠 하이재킹 없음 — 네이티브 스크롤 + 시각 진행도 lerp(애플 방식) */
+   휠 하이재킹 없음 — 네이티브 스크롤 + 시각 진행도 lerp(애플 방식).
+   막 배분은 script.js warpHeroPhase()가 재배분 — 막1(첫 CTA)은 절대 스크롤 기준으로 길게 유지 */
 @media (min-width: 1025px) {
   .hero {
-    height: 330vh;
-    height: 330svh;
+    height: 240vh;
+    height: 240svh;
     --hero-drift: -56px;
   }
 
@@ -895,6 +901,42 @@ body.menu-open .site-header {
 
   .hero-scrollcue {
     opacity: calc(1 - var(--hcue, 0));
+  }
+
+  /* 인트로 스킵 — 바로 본문을 보고 싶은 방문자용. 챕터 도트와 동일하게 exit에서 소등 */
+  .hero-skip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    position: absolute;
+    right: 26px;
+    bottom: 24px;
+    z-index: 3;
+    padding: 9px 16px;
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-pill);
+    background: rgba(5, 7, 13, 0.42);
+    color: var(--text-d-2);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    opacity: calc(1 - var(--hx, 0) * 2);
+    transition:
+      border-color var(--dur) ease,
+      color var(--dur) ease;
+  }
+
+  .hero-skip::after {
+    content: "↓";
+    font-size: 12px;
+  }
+
+  .hero-skip:hover,
+  .hero-skip:focus-visible {
+    border-color: var(--border-3);
+    color: var(--white);
   }
 }
 
@@ -3714,8 +3756,9 @@ body.menu-open .site-header {
   }
 }
 
-/* 모션 정책: 요청에 따라 모든 애니메이션/인터랙션을 OS '모션 줄이기' 설정과
-   무관하게 항상 재생합니다. (prefers-reduced-motion 비활성화 블록 제거) */
+/* 모션 정책: OS '동작 줄이기' 설정 시 파일 하단의 prefers-reduced-motion 블록이
+   마퀴·패럴랙스·등장 애니메이션을 정적 상태로 축소합니다(CTO 리뷰 반영).
+   스크립트는 캔버스 정지 프레임·스크럽 변수 고정·카운트업 즉시 완료로 대응 */
 
 /* =========================================================
    전반부 스크럽 연출 (--sp) — 데스크탑 전용
@@ -4178,5 +4221,94 @@ body.menu-open .site-header {
   .hero-sub,
   .section-heading p:not(.eyebrow) {
     font-size: 16px;
+  }
+}
+
+/* =========================================================
+   모션 접근성 — OS 동작 줄이기(prefers-reduced-motion) 준수
+   마퀴·캔버스 루프·패럴랙스·등장 애니메이션을 정적 상태로 축소.
+   (script.js 대응: 캔버스 정지 프레임 / --sp·--fwp 고정 / 카운트업 즉시 완료)
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* 채널 마퀴 정지 — 첫 화면 분량만 정적 노출 */
+  .strip-track {
+    animation: none;
+  }
+
+  /* 등장 리빌 계열 — 즉시 완료 상태로 고정 */
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-stagger] > * {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .eyebrow::after,
+  .why-promise::before {
+    transform: scaleX(1);
+    transition: none;
+  }
+
+  .h-line-inner {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .logo-wall .logo-tile {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .ch-fill {
+    transition: none !important;
+  }
+
+  /* 장식 무한 루프 정지 */
+  .hero-scrollcue span,
+  .why-stage::before {
+    animation: none;
+  }
+}
+
+/* 데스크탑 핀 스크럽 해제 — 히어로를 정적 1화면 구성으로(캔버스는 정지 프레임 유지) */
+@media (prefers-reduced-motion: reduce) and (min-width: 1025px) {
+  .hero {
+    height: auto;
+  }
+
+  .hero-stage {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: visible;
+    transform: none !important;
+  }
+
+  .signal-strip {
+    margin-top: 0;
+  }
+
+  .hero-beats,
+  .hero-bridge,
+  .hero-rail,
+  .hero-chapters,
+  .hero-scrollcue,
+  .hero-skip {
+    display: none;
+  }
+
+  .hero-copy {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -15,8 +15,14 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const isWindowsPlatform = /Win/i.test(`${navigator.platform || ""} ${navigator.userAgent || ""}`);
 const reduceMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+const prefersReducedMotion = () => !!(reduceMotionQuery && reduceMotionQuery.matches);
 /* 애플 방식 — 네이티브 스크롤은 그대로 두고 시각 진행도만 lerp(전 데스크탑 공통) */
 const smoothHeroScroll = !(reduceMotionQuery && reduceMotionQuery.matches);
+
+/* 히어로 페이즈 워프 — 240svh 축소 트랙에서 막1(카피·첫 CTA)을 절대 스크롤 기준으로
+   길게 유지. 원시 진행도 0~0.30을 기존 막1 창(0~0.22)에 매핑하고 잔여 구간을 재배분 —
+   이후의 모든 연출 창(비트·브리지·레일·캔버스 게이트)은 원본 좌표를 그대로 재사용한다 */
+const warpHeroPhase = (p) => (p < 0.3 ? p * (0.22 / 0.3) : 0.22 + (p - 0.3) * (0.78 / 0.7));
 
 /* 무한 마퀴: 자식을 한 번 복제해 폭을 2배로 만들고 CSS에서 -50% 이동 */
 if (stripTrack) {
@@ -60,7 +66,7 @@ const scrubEls = Array.from(document.querySelectorAll("[data-scrub]")).map((el) 
 }));
 
 function measureSections() {
-  pinEnabled = window.innerWidth > 1024;
+  pinEnabled = window.innerWidth > 1024 && !prefersReducedMotion();
   heroHeight = heroEl ? heroEl.offsetHeight : 1;
   if (fwSection) {
     fwTop = fwSection.offsetTop;
@@ -104,7 +110,7 @@ function stripBoost() {
   }
 }
 
-let pinEnabled = window.innerWidth > 1024; // 히어로 핀 스크럽(데스크탑 전용)
+let pinEnabled = window.innerWidth > 1024 && !prefersReducedMotion(); // 히어로 핀 스크럽(데스크탑 전용, 동작 줄이기 시 해제)
 
 function shouldSmoothHeroProgress() {
   return smoothHeroScroll && pinEnabled;
@@ -118,8 +124,8 @@ function getHeroTrackLength() {
 const heroChapterDots = heroEl ? Array.from(heroEl.querySelectorAll(".hero-chapters span")) : [];
 let lastChapter = -1;
 
-/* 챕터 타임테이블(330svh 트랙) — 막1 카피 0–0.22 / 막2 정렬+비트1 0.26–0.46 /
-   막3 통과 줌+비트2 0.46–0.76 / 막4 브리지 0.74–0.94 / exit 0.92–1 */
+/* 챕터 타임테이블(240svh 트랙 · warpHeroPhase 좌표계) — 막1 카피 0–0.22(원시 0–0.30) /
+   막2 정렬+비트1 0.26–0.46 / 막3 통과 줌+비트2 0.46–0.76 / 막4 브리지 0.74–0.94 / exit 0.92–1 */
 function syncHeroProgressVars() {
   if (!heroEl) return;
   const key = heroProgress.toFixed(4) + (pinEnabled ? "p" : "m");
@@ -127,7 +133,7 @@ function syncHeroProgressVars() {
 
   lastHs = key;
   if (pinEnabled) {
-    const p = heroProgress;
+    const p = warpHeroPhase(heroProgress);
     heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.05, 0.22)).toFixed(4));
     heroEl.style.setProperty("--hcue", remap(p, 0.03, 0.08).toFixed(4));
 
@@ -222,7 +228,7 @@ function onScrollFrame() {
   lastScrollY = y;
   queueHeroProgressSync();
 
-  if (fwSection) {
+  if (fwSection && !prefersReducedMotion()) {
     const vh = window.innerHeight;
     const fwp = clamp((y + vh - fwTop) / (vh + fwHeight), 0, 1).toFixed(3);
     if (fwp !== lastFwp) {
@@ -231,7 +237,7 @@ function onScrollFrame() {
     }
   }
 
-  if (scrubEls.length) {
+  if (scrubEls.length && !prefersReducedMotion()) {
     const vh = window.innerHeight;
     for (let i = 0; i < scrubEls.length; i += 1) {
       const item = scrubEls[i];
@@ -261,12 +267,46 @@ window.addEventListener(
   { passive: true },
 );
 
+/* 동작 줄이기 — 스크럽 변수를 완료 상태로 고정(styles.css 하단 reduce 블록과 세트) */
+function applyMotionPreference() {
+  if (!prefersReducedMotion()) return;
+  if (fwSection) {
+    fwSection.style.setProperty("--fwp", "1");
+    lastFwp = "1";
+  }
+  scrubEls.forEach((item) => {
+    item.el.style.setProperty("--sp", "1");
+    item.last = "1";
+  });
+}
+
+if (reduceMotionQuery && typeof reduceMotionQuery.addEventListener === "function") {
+  reduceMotionQuery.addEventListener("change", () => {
+    measureSections();
+    applyMotionPreference();
+    lastHs = "";
+    queueHeroProgressSync();
+    // 캔버스 등 기존 리사이즈 경로 재사용 — 루프 재기동/정지 프레임 전환
+    window.dispatchEvent(new Event("resize"));
+  });
+}
+
+/* 인트로 스킵 — 히어로 트랙 끝(p=1)으로 이동해 본문 시작점에 착지 */
+const heroSkipBtn = document.querySelector("[data-hero-skip]");
+if (heroSkipBtn && heroEl) {
+  heroSkipBtn.addEventListener("click", () => {
+    const targetY = Math.max(0, heroEl.offsetTop + heroEl.offsetHeight - window.innerHeight);
+    window.scrollTo({ top: targetY, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  });
+}
+
 let measureTimer;
 window.addEventListener("resize", () => {
   window.clearTimeout(measureTimer);
   measureTimer = window.setTimeout(measureSections, 160);
 });
 measureSections();
+applyMotionPreference();
 onScrollFrame();
 // lazy 이미지 로드로 후행 섹션 높이가 변한 뒤 오프셋 캐시 재측정
 window.addEventListener("load", measureSections);
@@ -532,6 +572,12 @@ if (counters.length) {
       const cell = el.closest("article");
       if (cell) cell.classList.add("counted");
     };
+    // 동작 줄이기 — 카운트업 없이 즉시 최종값
+    if (prefersReducedMotion()) {
+      el.textContent = `${target}${suffix}`;
+      done();
+      return;
+    }
     const duration = 1100;
     const start = performance.now();
     const step = (now) => {
@@ -871,8 +917,9 @@ if (canvas && canvas.getContext) {
     }
 
     context.clearRect(0, 0, viewW, viewH);
-    // Fly-through 마스터 커브 — 전부 p 순수 함수(역스크롤 자연 복원)
-    const p9 = heroProgress;
+    // Fly-through 마스터 커브 — 전부 p 순수 함수(역스크롤 자연 복원).
+    // 핀 모드는 DOM 비트와 동일한 워프 좌표계 공유(막 경계 정합)
+    const p9 = pinEnabled ? warpHeroPhase(heroProgress) : heroProgress;
     // 막2 질서: 지터 감쇠 + 좌향 층류. 모바일은 시간 기반 자율 사이클(~14s 호흡)
     let alignK;
     if (pinEnabled) {
@@ -1314,6 +1361,12 @@ if (canvas && canvas.getContext) {
 
   function startLoop() {
     if (running) return;
+    // 동작 줄이기 — 루프 없이 정지 프레임 1장만 렌더(배경 아이덴티티는 유지).
+    // 로드 페이드-인/드로우-온(introK·orbDraw)을 건너뛰도록 완료 시점 타임스탬프로 그린다
+    if (prefersReducedMotion()) {
+      drawScene(bootT + 4000);
+      return;
+    }
     running = true;
     animationFrame = requestAnimationFrame(drawScene);
   }
