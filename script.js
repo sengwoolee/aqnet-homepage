@@ -235,17 +235,21 @@ function syncHeroProgressVars() {
 
     // 비디오 레이어 — 창 함수는 비트/브리지와 동일 문법(전부 p 순수 함수)
     if (heroVideosEnabled()) {
-      // 엠블럼 소멸 — 비트2(정렬 선언)가 완전히 뜨는 0.60부터 브리지가 다 뜨는 0.82까지
-      // 긴 창으로 서서히 지워진다. 이징 없이 선형이라 등장 직후부터 변화가 바로 감지됨.
+      // 엠블럼 소멸 — 심볼이 다 그려지는 0.70 직전부터 브리지가 다 뜨는 0.82까지 선형 소멸.
+      // 완성 순간(0.70)에도 86% 불투명이라 완성형을 충분히 보여준 뒤 지워진다.
       // 0.82에서 0 → 곧바로 수평선 레일(railIn 0.82~0.94)로 릴레이
-      const hve = 1 - remap(p, 0.6, 0.82);
+      const hve = 1 - remap(p, 0.68, 0.82);
       heroEl.style.setProperty("--hve", hve.toFixed(4));
 
-      // 프레임 단위 스크럽 — p 0~0.58을 영상 0~8s에 매핑해 비트2가 완전히 뜨는 0.60 직전 심볼 완성.
-      // 이후 구간은 완성 프레임 유지(소멸 중에도 프레임 고정). play() 금지 — 순수 스크럽.
-      // 미로드 시 duration NaN이라 자연 통과
+      // 프레임 단위 스크럽 — p 0~0.70을 영상 0~5.6s(광선이 휘도는 구간)에만 매핑한다.
+      // 원본 8s 중 5.6s 이후는 완성 심볼이 멈춰 있는 정지 구간이라, 전체를 매핑하면
+      // 스크롤 후반이 통째로 정지 화면이 되고 비트2(정렬 선언)도 완성 이후에 뜬다.
+      // 5.6s로 자르면 비트2가 완전히 뜨는 0.60이 영상 4.8s = 아직 휘도는 구간이 되어
+      // "생성 중에 메시지가 얹히고, 그 위에서 심볼이 마저 완성"되는 순서가 된다.
+      // play() 금지 — 순수 스크럽. 미로드 시 duration NaN이라 자연 통과
+      const HERO_EMBLEM_MOTION_END = 5.6;
       if (Number.isFinite(heroEmblemEl.duration) && heroEmblemEl.duration > 0) {
-        const t = heroEmblemEl.duration * remap(p, 0, 0.58);
+        const t = Math.min(heroEmblemEl.duration, HERO_EMBLEM_MOTION_END) * remap(p, 0, 0.7);
         if (heroEmblemEl.seeking) {
           // 진행 중 시크를 덮지 않고 예약 — seeked 리스너가 최종 목표를 반영(마지막 쓰기 유실 방지)
           heroEmblemPendingSeek = t;
