@@ -210,9 +210,10 @@ function syncHeroProgressVars() {
     heroEl.style.setProperty("--hs", easeInQuad(remap(p, 0.05, 0.22)).toFixed(4));
     heroEl.style.setProperty("--hcue", remap(p, 0.03, 0.08).toFixed(4));
 
-    // 메시지 비트 — 비트1(문제 제기)은 정렬 구간, 비트2(정렬 선언)는 줌 초입에 머무름
-    const b1 = easeOutCubic(remap(p, 0.26, 0.33)) * (1 - easeInQuad(remap(p, 0.42, 0.49)));
-    const b2 = easeOutCubic(remap(p, 0.53, 0.6)) * (1 - easeInQuad(remap(p, 0.68, 0.74)));
+    // 메시지 비트 — 후행 신호 스트립이 무대를 밀고 올라오기 시작하는 0.53 이전에
+    // 비트2(정렬 선언)까지 다 뜨고 심볼 드로잉도 끝나야 하므로 두 비트를 앞당겨 배치한다.
+    const b1 = easeOutCubic(remap(p, 0.24, 0.29)) * (1 - easeInQuad(remap(p, 0.31, 0.36)));
+    const b2 = easeOutCubic(remap(p, 0.36, 0.42)) * (1 - easeInQuad(remap(p, 0.58, 0.66)));
     heroEl.style.setProperty("--hb1", b1.toFixed(4));
     heroEl.style.setProperty("--hb2", b2.toFixed(4));
 
@@ -227,7 +228,7 @@ function syncHeroProgressVars() {
     heroEl.style.setProperty("--hrla", (railIn * railOut).toFixed(4));
     heroEl.classList.toggle("exiting", p > 0.88 && p < 1);
 
-    const chapter = p < 0.24 ? 0 : p < 0.5 ? 1 : p < 0.72 ? 2 : 3;
+    const chapter = p < 0.22 ? 0 : p < 0.36 ? 1 : p < 0.66 ? 2 : 3;
     if (chapter !== lastChapter) {
       heroChapterDots.forEach((dot, i) => dot.classList.toggle("on", i === chapter));
       lastChapter = chapter;
@@ -235,21 +236,21 @@ function syncHeroProgressVars() {
 
     // 비디오 레이어 — 창 함수는 비트/브리지와 동일 문법(전부 p 순수 함수)
     if (heroVideosEnabled()) {
-      // 엠블럼 소멸 — 심볼이 다 그려지는 0.70 직전부터 브리지가 다 뜨는 0.82까지 선형 소멸.
-      // 완성 순간(0.70)에도 86% 불투명이라 완성형을 충분히 보여준 뒤 지워진다.
-      // 0.82에서 0 → 곧바로 수평선 레일(railIn 0.82~0.94)로 릴레이
-      const hve = 1 - remap(p, 0.68, 0.82);
+      // 엠블럼 소멸 — 완성(0.50)을 충분히 보여준 뒤 0.54부터 브리지가 다 뜨는 0.80까지 선형 소멸.
+      // 0.80에서 0 → 곧바로 수평선 레일(railIn 0.82~0.94)로 릴레이
+      const hve = 1 - remap(p, 0.54, 0.8);
       heroEl.style.setProperty("--hve", hve.toFixed(4));
 
-      // 프레임 단위 스크럽 — p 0~0.70을 영상 0~5.6s(광선이 휘도는 구간)에만 매핑한다.
-      // 원본 8s 중 5.6s 이후는 완성 심볼이 멈춰 있는 정지 구간이라, 전체를 매핑하면
-      // 스크롤 후반이 통째로 정지 화면이 되고 비트2(정렬 선언)도 완성 이후에 뜬다.
-      // 5.6s로 자르면 비트2가 완전히 뜨는 0.60이 영상 4.8s = 아직 휘도는 구간이 되어
+      // 프레임 단위 스크럽 — p 0~0.50을 영상 0~5.6s(광선이 휘도는 구간)에만 매핑한다.
+      // ★종료점 0.50은 후행 신호 스트립이 무대를 밀고 올라오기 시작하는 0.53보다 앞:
+      //   화면이 넘어가기 전에 드로잉이 반드시 끝나야 한다는 요구를 만족시킨다.
+      // 원본 8s 중 5.6s 이후는 완성 심볼이 멈춰 있는 정지 구간이라 매핑에서 제외한다.
+      // 비트2(정렬 선언)가 완전히 뜨는 0.42가 영상 4.7s = 아직 휘도는 구간이라
       // "생성 중에 메시지가 얹히고, 그 위에서 심볼이 마저 완성"되는 순서가 된다.
       // play() 금지 — 순수 스크럽. 미로드 시 duration NaN이라 자연 통과
       const HERO_EMBLEM_MOTION_END = 5.6;
       if (Number.isFinite(heroEmblemEl.duration) && heroEmblemEl.duration > 0) {
-        const t = Math.min(heroEmblemEl.duration, HERO_EMBLEM_MOTION_END) * remap(p, 0, 0.7);
+        const t = Math.min(heroEmblemEl.duration, HERO_EMBLEM_MOTION_END) * remap(p, 0, 0.5);
         if (heroEmblemEl.seeking) {
           // 진행 중 시크를 덮지 않고 예약 — seeked 리스너가 최종 목표를 반영(마지막 쓰기 유실 방지)
           heroEmblemPendingSeek = t;
