@@ -949,35 +949,7 @@ if (canvas && canvas.getContext) {
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4;
   const motionLite = isWindows || lowPower;
 
-  // 오비탈 코어 위성 — ri: 링 인덱스, w: 각속도(rad/s, 부호=방향), ph: 초기 위상
-  const ORB_SATS = [
-    { ri: 0, w: 0.5, ph: 0.4 },
-    { ri: 1, w: -0.3, ph: 2.1 },
-    { ri: 1, w: -0.3, ph: 5.2 },
-    { ri: 2, w: 0.19, ph: 1.1 },
-    { ri: 2, w: 0.19, ph: 4.3 },
-  ];
-  const ORB_LABELS = [
-    { label: "Control", angle: -2.32 },
-    { label: "Ownership", angle: -0.48 },
-    { label: "Reach", angle: 0.55 },
-    { label: "Endurance", angle: 2.42 },
-  ];
   const bootT = performance.now(); // 로드 인트로(캔버스 페이드-인) 기준 시각
-
-  function roundedRectPath(ctx, x, y, width, height, radius) {
-    const r = Math.min(radius, width / 2, height / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + width - r, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-    ctx.lineTo(x + width, y + height - r);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-    ctx.lineTo(x + r, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-  }
 
   function buildScene(width, height) {
     const density = isWindows ? 26000 : motionLite ? 21000 : 15500;
@@ -1071,80 +1043,12 @@ if (canvas && canvas.getContext) {
     context.fillStyle = gradient;
     context.fillRect(0, 0, viewW, viewH);
 
-    // ── 오비탈 시스템 코어 — 시각 앵커. 막3에서 링이 안쪽→바깥 순차 확대·소멸되는
-    //    "통과 게이트"가 됨(카메라 전진 서사 — 파괴가 아니라 통과)
-    const minDim = Math.min(viewW, viewH);
+    // 방사 줌 초점 좌표 — 궤도 다이어그램(링·위성·라벨·코어)은 제거됨(2026-08 피드백:
+    // AQ 엠블럼 영상이 주연이 되면서 회전 원형 그래프와 시각 중복). 좌표는 파티클
+    // 방사 줌·모션 스트릭의 기준점으로만 유지
     const compactHero = !pinEnabled && viewW < 720;
     const orbCx = viewW * (pinEnabled ? 0.7 : compactHero ? 0.78 : 0.76);
     const orbCy = viewH * (pinEnabled ? 0.42 : compactHero ? 0.24 : 0.3); // 데스크탑: 레일(42%)과 동일 좌표 정박
-    const orbScale = pinEnabled ? 1 : compactHero ? 0.46 : 0.62;
-    const orbT = (now - bootT) / 1000;
-    const orbSpin = 1 + alignK * 0.8; // 정렬되면 시스템이 빨라짐
-    const orbDraw = easeOutCubic(clamp((now - bootT - 250) / 1500, 0, 1)); // 로드 드로우-온
-    const ORB_R = [0.16, 0.235, 0.315];
-    // 게이트 창(p): 외곽이 먼저 다가와 통과(0.46–0.58), 중간(0.53–0.65), 내곽(0.60–0.72)
-    const GATES = [
-      [0.6, 0.72],
-      [0.53, 0.65],
-      [0.46, 0.58],
-    ];
-    const ringS = [1, 1, 1];
-    const ringA = [1, 1, 1];
-    for (let ri = 0; ri < 3; ri += 1) {
-      const gk = pinEnabled ? easeInCubic(remap(p9, GATES[ri][0], GATES[ri][1])) : 0;
-      ringS[ri] = 1 + 7 * gk; // 최종 반경 ≈ 2.5·minDim(뷰포트 밖)
-      ringA[ri] = pinEnabled ? 1 - remap(p9, GATES[ri][1] - 0.06, GATES[ri][1] - 0.01) : 1;
-    }
-
-    // 링 3개(중간 링은 점선) — 통과 근접 시 선이 굵어짐(원근)
-    for (let ri = 0; ri < 3; ri += 1) {
-      if (compactHero && ri === 1) continue;
-      const rr = ORB_R[ri] * minDim * orbScale * ringS[ri];
-      const ra = [0.3, 0.22, 0.17][ri] * orbDraw * ringA[ri] * (compactHero ? 0.62 : 1);
-      if (ra < 0.01) continue;
-      context.lineWidth = 1 + Math.min(1.5, 1.5 * remap(ringS[ri], 1, 8));
-      context.strokeStyle = `rgba(122, 183, 255, ${ra})`;
-      if (ri === 1) context.setLineDash([3, 7]);
-      context.beginPath();
-      context.ellipse(orbCx, orbCy, rr, rr, 0, -Math.PI / 2, -Math.PI / 2 + orbDraw * Math.PI * 2);
-      context.stroke();
-      if (ri === 1) context.setLineDash([]);
-    }
-    context.lineWidth = 1;
-    // 외곽 링 계기 틱 24개 — 줌 시작 전 조기 소등(확대 중 지터 방지)
-    const tickFade = pinEnabled ? 1 - remap(p9, 0.52, 0.6) : 1;
-    const tickR = ORB_R[2] * minDim * orbScale * ringS[2];
-    if (tickFade > 0.01) {
-      context.strokeStyle = `rgba(122, 183, 255, ${0.2 * orbDraw * tickFade * (compactHero ? 0.5 : 1)})`;
-      context.beginPath();
-      const tickCount = compactHero ? 12 : 24;
-      for (let ti = 0; ti < tickCount; ti += 1) {
-        const ang = orbT * 0.045 + (ti / tickCount) * Math.PI * 2;
-        const ca = Math.cos(ang);
-        const sa = Math.sin(ang);
-        context.moveTo(orbCx + ca * tickR, orbCy + sa * tickR);
-        context.lineTo(orbCx + ca * (tickR + (compactHero ? 4 : 6)), orbCy + sa * (tickR + (compactHero ? 4 : 6)));
-      }
-      context.stroke();
-    }
-    // 회전 스윕 아크 — 소속 링의 스케일·알파를 승계(링과 함께 다가와 함께 지나감)
-    context.lineWidth = 1.6;
-    if (ringA[2] > 0.01) {
-      const sweepA = orbT * 0.24 * orbSpin;
-      context.strokeStyle = `rgba(46, 211, 255, ${0.5 * orbDraw * ringA[2]})`;
-      context.beginPath();
-      context.ellipse(orbCx, orbCy, tickR, tickR, 0, sweepA, sweepA + 0.55);
-      context.stroke();
-    }
-    if (ringA[1] > 0.01) {
-      const sweepB = -orbT * 0.16 * orbSpin + 2.4;
-      const midR = ORB_R[1] * minDim * orbScale * ringS[1];
-      context.strokeStyle = `rgba(34, 118, 255, ${0.55 * orbDraw * ringA[1]})`;
-      context.beginPath();
-      context.ellipse(orbCx, orbCy, midR, midR, 0, sweepB, sweepB + 0.4);
-      context.stroke();
-    }
-    context.lineWidth = 1;
 
     // update pass — drift + 층류 + pointer ripple + 방사 줌 (좌표는 매 프레임 재계산: p 순수 함수)
     for (let i = 0; i < particles.length; i += 1) {
@@ -1256,230 +1160,16 @@ if (canvas && canvas.getContext) {
     }
     context.lineWidth = 1;
 
-    // 코어 → 근접 허브 인입선 — 줌 시작과 함께 페이드(신호를 읽는 시스템 은유)
-    const inflowFade = pinEnabled ? 1 - remap(p9, 0.46, 0.57) : 1;
-    if (inflowFade > 0.01) {
-      const baseTickR = ORB_R[2] * minDim * orbScale;
-      const linkR2 = baseTickR * baseTickR * 1.3;
-      for (let i = 0; i < particles.length; i += 1) {
-        const hp = particles[i];
-        if (!hp.hub) continue;
-        const hdx = hp.x - orbCx;
-        const hdy = hp.y - orbCy;
-        if (hdx * hdx + hdy * hdy < linkR2) {
-          context.strokeStyle = `rgba(46, 211, 255, ${0.14 * orbDraw * inflowFade * hp.g})`;
-          context.beginPath();
-          context.moveTo(orbCx, orbCy);
-          context.lineTo(hp.x, hp.y);
-          context.stroke();
-        }
-      }
-    }
-
-    // 궤도 위성 노드 — 소속 링의 스케일·알파 승계(링과 함께 다가와 화면을 스쳐 지나감)
-    const satBase = (pinEnabled ? 0.85 : compactHero ? 0.28 : 0.6) * orbDraw;
-    for (let si = 0; si < ORB_SATS.length; si += 1) {
-      const s = ORB_SATS[si];
-      const sa = satBase * ringA[s.ri];
-      if (sa < 0.02) continue;
-      const rr = ORB_R[s.ri] * minDim * orbScale * ringS[s.ri];
-      const ang = s.ph + orbT * s.w * orbSpin;
-      const sx = orbCx + Math.cos(ang) * rr;
-      const sy = orbCy + Math.sin(ang) * rr;
-      context.shadowBlur = 10;
-      context.shadowColor = "rgba(46, 211, 255, 0.9)";
-      context.fillStyle = `rgba(46, 211, 255, ${sa})`;
-      context.beginPath();
-      context.arc(sx, sy, (s.ri === 2 ? 2 : 2.6) * (1 + (ringS[s.ri] - 1) * 0.12), 0, Math.PI * 2);
-      context.fill();
-      context.shadowBlur = 0;
-    }
-    // 코어 — 펄스 글로우. 통과 순간(0.62–0.68) 플레어 후 레일 스트릭에 바통
-    const flare = pinEnabled ? easeOutCubic(remap(p9, 0.62, 0.68)) * (1 - remap(p9, 0.68, 0.76)) : 0;
-    if (flare > 0.01) {
-      const fr = 90 + 60 * flare;
-      const fg = context.createRadialGradient(orbCx, orbCy, 0, orbCx, orbCy, fr);
-      fg.addColorStop(0, `rgba(46, 211, 255, ${0.35 * flare})`);
-      fg.addColorStop(1, "rgba(46, 211, 255, 0)");
-      context.fillStyle = fg;
-      context.fillRect(orbCx - fr, orbCy - fr, fr * 2, fr * 2);
-    }
-    const coreFade = pinEnabled ? 1 - remap(p9, 0.58, 0.76) : 1;
-    if (coreFade > 0.01) {
-      const pulse = 0.75 + 0.25 * Math.sin(orbT * 1.1);
-      const glowR = (10 + 3 * pulse) * (1 + 1.2 * (pinEnabled ? remap(p9, 0.64, 0.84) : 0));
-      context.shadowBlur = 14 * pulse;
-      context.shadowColor = "rgba(46, 211, 255, 0.85)";
-      context.fillStyle = `rgba(255, 255, 255, ${0.95 * orbDraw * coreFade})`;
-      context.beginPath();
-      context.arc(orbCx, orbCy, 3.2, 0, Math.PI * 2);
-      context.fill();
-      context.shadowBlur = 0;
-      context.strokeStyle = `rgba(46, 211, 255, ${0.5 * pulse * orbDraw * coreFade})`;
-      context.lineWidth = 1;
-      context.beginPath();
-      context.arc(orbCx, orbCy, glowR, 0, Math.PI * 2);
-      context.stroke();
-    }
-
-    // AQ Growth OS 원형 메시지 — 네 운영 원칙을 궤도 점에 고정하고 중앙에 시스템명을 둠
-    const labelExit = pinEnabled ? easeInQuad(remap(p9, 0.54, 0.68)) : 0;
-    const labelFade = compactHero ? 0 : orbDraw * (1 - labelExit);
-    if (labelFade > 0.01) {
-      const baseAlpha = context.globalAlpha;
-      const labelOrbitK = pinEnabled ? easeInOutCubic(remap(p9, 0.34, 0.66)) : 0;
-      const stableR = ORB_R[2] * minDim * orbScale * (1 + 0.06 * alignK + 0.22 * labelOrbitK);
-      const labelFont = clamp(minDim * 0.017, 11, 14);
-      const coreFont = clamp(minDim * 0.024, 15, 21);
-      const labelHeight = labelFont + 17;
-      const labelPadX = 16;
-      const labelFontFace =
-        `800 ${labelFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
-
-      context.save();
-      context.globalAlpha = baseAlpha * labelFade;
-      context.font = labelFontFace;
-
-      const coreW = Math.max(132, coreFont * 7.8);
-      const coreH = Math.max(44, coreFont * 2.45);
-      const coreX = orbCx - coreW / 2;
-      const coreY = orbCy - coreH / 2;
-      const labelItems = compactHero
-        ? []
-        : ORB_LABELS.map((item, index) => {
-        const bob = Math.sin(orbT * 0.9 + index * 1.3) * (3 - labelOrbitK * 1.5);
-        const angle = item.angle + labelOrbitK * 0.18 + Math.sin(orbT * 0.18 + index) * 0.025 * alignK;
-        const radius = stableR + (index % 2 === 0 ? 10 : -2);
-        const dx = Math.cos(angle);
-        const dy = Math.sin(angle);
-        const dotX = orbCx + dx * radius;
-        const dotY = clamp(
-          orbCy + dy * radius + bob,
-          pinEnabled ? 104 : labelHeight / 2 + 8,
-          viewH - labelHeight / 2 - 28,
-        );
-        const textWidth = context.measureText(item.label).width;
-        const labelWidth = Math.ceil(textWidth) + labelPadX * 2 + 2;
-        let labelX = dx >= 0 ? dotX + 15 : dotX - labelWidth - 15;
-        const labelMinX = pinEnabled ? viewW * 0.5 : 10;
-        labelX = clamp(labelX, labelMinX, viewW - labelWidth - 28);
-        return {
-          ...item,
-          dx,
-          dy,
-          dotX,
-          dotY,
-          labelX,
-          labelY: dotY - labelHeight / 2,
-          labelWidth,
-        };
-      });
-
-      labelItems.forEach((item) => {
-        context.strokeStyle = `rgba(46, 211, 255, ${0.15 + alignK * 0.13})`;
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(orbCx + item.dx * (coreW * 0.5), orbCy + item.dy * (coreH * 0.58));
-        context.lineTo(item.dotX - item.dx * 6, item.dotY - item.dy * 6);
-        context.stroke();
-      });
-
-      const coreRadius = Math.min(20, coreH / 2);
-      const coreFill = context.createLinearGradient(coreX, coreY, coreX + coreW, coreY + coreH);
-      coreFill.addColorStop(0, "rgba(12, 36, 60, 0.94)");
-      coreFill.addColorStop(0.54, "rgba(6, 15, 31, 0.94)");
-      coreFill.addColorStop(1, "rgba(8, 27, 46, 0.9)");
-
-      roundedRectPath(context, coreX - 6, coreY - 6, coreW + 12, coreH + 12, coreRadius + 6);
-      context.strokeStyle = "rgba(46, 211, 255, 0.16)";
-      context.lineWidth = 1;
-      context.stroke();
-
-      roundedRectPath(context, coreX, coreY, coreW, coreH, coreRadius);
-      context.fillStyle = coreFill;
-      context.fill();
-      context.strokeStyle = "rgba(46, 211, 255, 0.58)";
-      context.lineWidth = 1.2;
-      context.stroke();
-
-      roundedRectPath(context, coreX + 4, coreY + 4, coreW - 8, coreH - 8, Math.max(10, coreRadius - 4));
-      context.strokeStyle = "rgba(255, 255, 255, 0.08)";
-      context.lineWidth = 1;
-      context.stroke();
-
-      const coreAccent = context.createLinearGradient(coreX + 18, coreY, coreX + coreW - 18, coreY);
-      coreAccent.addColorStop(0, "rgba(46, 211, 255, 0)");
-      coreAccent.addColorStop(0.5, "rgba(46, 211, 255, 0.64)");
-      coreAccent.addColorStop(1, "rgba(46, 211, 255, 0)");
-      context.strokeStyle = coreAccent;
-      context.beginPath();
-      context.moveTo(coreX + 22, coreY + 1.5);
-      context.lineTo(coreX + coreW - 22, coreY + 1.5);
-      context.stroke();
-
-      context.fillStyle = "rgba(46, 211, 255, 0.96)";
-      [coreX, coreX + coreW].forEach((portX) => {
-        context.beginPath();
-        context.arc(portX, orbCy, 3.4, 0, Math.PI * 2);
-        context.fill();
-      });
-      context.fillStyle = "rgba(122, 183, 255, 0.9)";
-      [coreY, coreY + coreH].forEach((portY) => {
-        context.beginPath();
-        context.arc(orbCx, portY, 2.2, 0, Math.PI * 2);
-        context.fill();
-      });
-
-      context.font =
-        `900 ${coreFont}px Pretendard, "Pretendard Variable", "Noto Sans KR", Arial, sans-serif`;
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      const coreTextFill = context.createLinearGradient(coreX, orbCy, coreX + coreW, orbCy);
-      coreTextFill.addColorStop(0, "rgba(255, 255, 255, 0.96)");
-      coreTextFill.addColorStop(0.56, "rgba(232, 247, 255, 1)");
-      coreTextFill.addColorStop(1, "rgba(122, 183, 255, 0.96)");
-      context.fillStyle = coreTextFill;
-      context.fillText("AQ Growth OS", orbCx, orbCy + 0.5);
-
-      context.font = labelFontFace;
-      context.textBaseline = "middle";
-      labelItems.forEach((item) => {
-        context.strokeStyle = "rgba(46, 211, 255, 0.28)";
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(item.dotX, item.dotY);
-        context.lineTo(item.dx >= 0 ? item.labelX : item.labelX + item.labelWidth, item.dotY);
-        context.stroke();
-
-        context.shadowBlur = 10;
-        context.shadowColor = "rgba(46, 211, 255, 0.8)";
-        context.fillStyle = "rgba(46, 211, 255, 0.96)";
-        context.beginPath();
-        context.arc(item.dotX, item.dotY, 4.2, 0, Math.PI * 2);
-        context.fill();
-        context.shadowBlur = 0;
-
-        roundedRectPath(context, item.labelX, item.labelY, item.labelWidth, labelHeight, labelHeight / 2);
-        context.fillStyle = "rgba(8, 18, 35, 0.78)";
-        context.fill();
-        context.strokeStyle = "rgba(122, 183, 255, 0.28)";
-        context.stroke();
-        context.fillStyle = "rgba(232, 242, 255, 0.9)";
-        context.textAlign = "left";
-        context.fillText(item.label, item.labelX + labelPadX, item.dotY);
-      });
-      context.restore();
-    }
-
     context.globalAlpha = 1;
 
     if (running) animationFrame = requestAnimationFrame(drawScene);
   }
 
+
   function startLoop() {
     if (running) return;
     // 동작 줄이기 — 루프 없이 정지 프레임 1장만 렌더(배경 아이덴티티는 유지).
-    // 로드 페이드-인/드로우-온(introK·orbDraw)을 건너뛰도록 완료 시점 타임스탬프로 그린다
+    // 로드 페이드-인(introK)을 건너뛰도록 완료 시점 타임스탬프로 그린다
     if (prefersReducedMotion()) {
       drawScene(bootT + 4000);
       return;
