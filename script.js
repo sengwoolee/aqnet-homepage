@@ -235,15 +235,17 @@ function syncHeroProgressVars() {
 
     // 비디오 레이어 — 창 함수는 비트/브리지와 동일 문법(전부 p 순수 함수)
     if (heroVideosEnabled()) {
-      // 엠블럼: 트랙 전체가 드로잉 타임라인. 완성(0.78) 후 잠깐 머금었다가
-      // 수평선 레일(railIn 0.82~0.94)이 떠오르는 구간과 크로스페이드로 소멸 — 심볼→수평선 핸드오프
-      const hve = 1 - easeInQuad(remap(p, 0.8, 0.9));
+      // 엠블럼: 트랙 전체가 드로잉 타임라인. 완성(0.72) 후 잠깐 머금었다가
+      // 브리지 문장(성장 운영 체계, bridgeIn 0.74~0.82)이 떠오르는 창과 정확히 교대로 소멸 —
+      // 문장 완전 등장 시점(0.82)에 심볼 0, 곧바로 수평선 레일(railIn 0.82~0.94)로 릴레이
+      const hve = 1 - easeInQuad(remap(p, 0.74, 0.82));
       heroEl.style.setProperty("--hve", hve.toFixed(4));
 
-      // 프레임 단위 스크럽 — p 0~0.78을 영상 0~8s에 매핑해 브리지 진입(0.74~0.82) 직전 심볼 완성.
-      // 이후 구간은 완성 프레임 유지. play() 금지 — 순수 스크럽. 미로드 시 duration NaN이라 자연 통과
+      // 프레임 단위 스크럽 — p 0~0.72를 영상 0~8s에 매핑해 브리지 진입(0.74) 직전 심볼 완성.
+      // 이후 구간은 완성 프레임 유지(소멸 중에도 프레임 고정). play() 금지 — 순수 스크럽.
+      // 미로드 시 duration NaN이라 자연 통과
       if (Number.isFinite(heroEmblemEl.duration) && heroEmblemEl.duration > 0) {
-        const t = heroEmblemEl.duration * remap(p, 0, 0.78);
+        const t = heroEmblemEl.duration * remap(p, 0, 0.72);
         if (heroEmblemEl.seeking) {
           // 진행 중 시크를 덮지 않고 예약 — seeked 리스너가 최종 목표를 반영(마지막 쓰기 유실 방지)
           heroEmblemPendingSeek = t;
