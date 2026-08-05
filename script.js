@@ -24,17 +24,15 @@ const smoothHeroScroll = !(reduceMotionQuery && reduceMotionQuery.matches);
    이후의 모든 연출 창(비트·브리지·레일·캔버스 게이트)은 원본 좌표를 그대로 재사용한다 */
 const warpHeroPhase = (p) => (p < 0.3 ? p * (0.22 / 0.3) : 0.22 + (p - 0.3) * (0.78 / 0.7));
 
-/* 히어로 CI 비디오 — 막별 오퍼시티 변수 + 플라이스루 스크럽 + 엠블럼 원샷 */
+/* 히어로 CI 비디오 — 2층 구성: 엠블럼 오프닝 원샷(막1~2) + 플라이스루 스크럽(막3) */
 const heroVideoEls = Array.from(document.querySelectorAll("[data-hero-video]"));
-const heroVideos = { ambient: null, fly: null, emblem: null };
+const heroVideos = { fly: null, emblem: null };
 heroVideoEls.forEach((el) => {
   const key = el.dataset.heroVideo;
   if (key in heroVideos) heroVideos[key] = el;
 });
 let heroVideosLoaded = false;
 let heroVideoLoadTimer = null;
-let heroAmbientOn = false; // 앰비언트 오퍼시티(--hva) 창 안쪽 여부
-let heroEmblemPlayed = false; // 엠블럼 원샷 래치 — 역스크롤 재진입 시 리셋
 let heroVideoActive = false; // 핀 해제 전환 감지용 래치(else 분기 1회 정지)
 let heroFlyPendingSeek = null; // 시크 진행 중 도착한 목표 시각 — seeked에서 반영(마지막 쓰기 유실 방지)
 
@@ -50,17 +48,16 @@ function promoteHeroVideo(video) {
 }
 
 /* src 승격은 1회만 — 초기 로드(LCP) 경합을 피해 지연 실행.
-   단계 승격: 앰비언트 먼저, 준비되는 대로 나머지(첫 화면과의 동시 커넥션 3→1) */
+   단계 승격: 최상단에서 바로 필요한 엠블럼(주연) 먼저, 준비되는 대로 플라이(동시 커넥션 2→1) */
 function loadHeroVideos() {
   if (heroVideosLoaded || !heroVideosEnabled()) return;
   heroVideosLoaded = true;
 
-  let restPromoted = false;
-  const promoteRest = () => {
-    if (restPromoted) return;
-    restPromoted = true;
+  let flyPromoted = false;
+  const promoteFly = () => {
+    if (flyPromoted) return;
+    flyPromoted = true;
     promoteHeroVideo(heroVideos.fly);
-    promoteHeroVideo(heroVideos.emblem);
   };
 
   // 플라이 시크 예약 반영 — 진행 중 시크에 덮인 마지막 목표를 완료 시점에 재적용
@@ -73,22 +70,22 @@ function loadHeroVideos() {
     });
   }
 
-  const ambient = heroVideos.ambient;
-  if (ambient) {
-    // 로드 완료 즉시 앰비언트 기동(첫 스크롤 전 정지 프레임 대기 방지) 후 나머지 승격
-    ambient.addEventListener(
+  const emblem = heroVideos.emblem;
+  if (emblem) {
+    // 로드 완료 즉시 오프닝 기동(최상단에서 정지 프레임 대기 방지) 후 플라이 승격
+    emblem.addEventListener(
       "canplay",
       () => {
-        playHeroAmbient();
-        promoteRest();
+        playHeroEmblem();
+        promoteFly();
       },
       { once: true },
     );
-    ambient.addEventListener("error", promoteRest, { once: true });
-    window.setTimeout(promoteRest, 4000); // 저속망 안전망 — 앰비언트 canplay 지연 시에도 병행 승격
-    promoteHeroVideo(ambient);
+    emblem.addEventListener("error", promoteFly, { once: true });
+    window.setTimeout(promoteFly, 4000); // 저속망 안전망 — 엠블럼 canplay 지연 시에도 병행 승격
+    promoteHeroVideo(emblem);
   } else {
-    promoteRest();
+    promoteFly();
   }
 }
 
@@ -100,12 +97,12 @@ function triggerHeroVideoLoad() {
   if (heroVideosLoaded) window.removeEventListener("scroll", triggerHeroVideoLoad);
 }
 
-/* 앰비언트 루프 — 자동재생 정책 거절에 대비해 play()는 항상 catch */
-function playHeroAmbient() {
-  const ambient = heroVideos.ambient;
-  if (!ambient || !heroVideosLoaded || !heroAmbientOn) return;
-  if (document.hidden || !heroVideosEnabled() || !ambient.paused) return;
-  const played = ambient.play();
+/* 엠블럼 오프닝 — 1회 재생 후 최종 프레임 유지. 자동재생 거절 대비 catch, 탭 복귀 시 sync가 재개 */
+function playHeroEmblem() {
+  const emblem = heroVideos.emblem;
+  if (!emblem || !heroVideosLoaded || emblem.ended) return;
+  if (document.hidden || !heroVideosEnabled() || !emblem.paused) return;
+  const played = emblem.play();
   if (played && played.catch) played.catch(() => {});
 }
 
@@ -126,7 +123,7 @@ if (heroVideoEls.length) {
     if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
     else start();
   });
-  // 탭 비활성 — 3개 전부 정지. 복귀 시 전 레이어 재평가(앰비언트 재개 + 엠블럼 이어재생)
+  // 탭 비활성 — 2층 전부 정지. 복귀 시 전 레이어 재평가(엠블럼 이어재생 + 플라이 스크럽 복원)
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       pauseHeroVideos();
@@ -275,23 +272,14 @@ function syncHeroProgressVars() {
 
     // 비디오 레이어 — 창 함수는 비트/브리지와 동일 문법(전부 p 순수 함수)
     if (heroVideosEnabled()) {
-      const hva = 1 - easeInQuad(remap(p, 0.46, 0.62));
+      // 엠블럼: 막1~2 오프닝 — 최상단에서 완전 노출, 줌 시작과 함께 소등(플라이 진입과 크로스페이드)
+      const hve = 1 - easeInQuad(remap(p, 0.42, 0.58));
       const hvf = easeOutCubic(remap(p, 0.5, 0.58)) * (1 - easeInQuad(remap(p, 0.72, 0.8)));
-      const hve = easeOutCubic(remap(p, 0.76, 0.84)) * (1 - easeInQuad(remap(p, 0.92, 0.98)));
-      heroEl.style.setProperty("--hva", hva.toFixed(4));
-      heroEl.style.setProperty("--hvf", hvf.toFixed(4));
       heroEl.style.setProperty("--hve", hve.toFixed(4));
+      heroEl.style.setProperty("--hvf", hvf.toFixed(4));
 
-      const ambient = heroVideos.ambient;
       const fly = heroVideos.fly;
       const emblem = heroVideos.emblem;
-
-      // 앰비언트 — 창 밖에서는 정지(보이지 않는 프레임 디코딩 절전)
-      heroAmbientOn = hva > 0.01;
-      if (ambient) {
-        if (heroAmbientOn) playHeroAmbient();
-        else if (!ambient.paused) ambient.pause();
-      }
 
       // 플라이스루 — 순수 스크럽 레이어(play() 금지). 미로드 시 duration이 NaN이라 자연 통과
       if (fly && hvf > 0 && Number.isFinite(fly.duration) && fly.duration > 0) {
@@ -306,21 +294,13 @@ function syncHeroProgressVars() {
         }
       }
 
-      // 엠블럼 — 창 진입 시 원샷, 역스크롤로 창을 벗어나면 되감아 재무장.
+      // 엠블럼 — 페이지 로드당 1회. 되감기·재무장 없이 종료 후 최종 프레임(완성된 AQ 심볼) 유지.
       // 자기수정형: 탭 복귀·자동재생 거절 후에도 창 안이면 이어재생, 창을 지나치면(hve=0) 디코딩 정지
       if (emblem && heroVideosLoaded) {
-        if (p < 0.7 && heroEmblemPlayed) {
+        if (hve > 0.001 && emblem.paused && !emblem.ended && !document.hidden) {
+          playHeroEmblem();
+        } else if (hve <= 0.001 && !emblem.paused) {
           emblem.pause();
-          emblem.currentTime = 0;
-          heroEmblemPlayed = false;
-        } else if (p >= 0.76) {
-          heroEmblemPlayed = true;
-          if (hve > 0.001 && emblem.paused && !emblem.ended && !document.hidden) {
-            const played = emblem.play();
-            if (played && played.catch) played.catch(() => {});
-          } else if (hve <= 0.001 && !emblem.paused) {
-            emblem.pause();
-          }
         }
       }
 
@@ -328,11 +308,9 @@ function syncHeroProgressVars() {
     }
   } else {
     heroEl.style.setProperty("--hs", heroProgress.toFixed(4));
-    // 핀 해제(리사이즈로 ≤1024px 진입 등) — 재생 중이던 레이어를 1회만 정지 + 원샷 재무장
+    // 핀 해제(리사이즈로 ≤1024px 진입 등) — 재생 중이던 레이어를 1회만 정지
     if (heroVideoActive) {
       heroVideoActive = false;
-      heroAmbientOn = false;
-      heroEmblemPlayed = false;
       pauseHeroVideos();
     }
   }
