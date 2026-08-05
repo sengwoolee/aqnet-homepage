@@ -2227,68 +2227,135 @@ body.menu-open .site-header {
   background: var(--grad-action);
 }
 
-/* (1) 매체 커버리지 — 서비스 그리드와 같은 3열 리듬 */
+/* (1) 고객 여정 4단계 — 채널 나열이 아니라 '단계별로 무엇을 해주는가'로 읽히는 트랙.
+   바로 아래 운영 프로세스 5스텝(.pm-step)과 혼동되지 않도록 UI 언어를 분리한다.
+   · 여정: 카드 밖 헤더(노드+레일)로 4장을 하나의 흐름으로 잇고, 패널은 플랫(그림자·리프트 없음)
+   · 프로세스: 독립 카드 5장 + 블루 숫자 + hover 리프트/상단 바(기존 유지) */
 .mp-grid {
+  /* 레일이 gap을 건너 다음 단계까지 이어지므로 gap 값을 토큰화해 계산에 재사용 */
+  --mp-gap: 14px;
+  --mp-pad: 20px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--mp-gap);
 }
 
+/* 카드가 아니라 '단계' — 헤더행 + 본문 패널의 2단 구성 */
 .mp-card {
   display: flex;
   flex-direction: column;
-  padding: 22px;
-  border: 1px solid var(--border-l2);
-  border-radius: var(--r-md);
-  background: var(--surface-l0);
-  box-shadow: var(--e-1);
-  transition:
-    transform var(--dur) var(--ease-out),
-    border-color var(--dur) ease,
-    box-shadow var(--dur) ease;
 }
 
-.mp-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-l3);
-  box-shadow: var(--e-2);
-}
-
-.mp-card h4 {
+/* 단계 헤더: 노드(::before) + STAGE 번호 + 다음 단계로 이어지는 레일.
+   프로세스의 블루 숫자(.pm-no)와 겹치지 않게 회색 트래킹 라벨로 처리 */
+.mp-stage {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+  margin: 0 0 12px;
+  padding-left: 1px;
+  color: var(--text-l-3);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+}
+
+.mp-stage::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--blue);
+  border-radius: var(--r-pill);
+  background: var(--surface-l0);
+  transition: background var(--dur) ease;
+}
+
+.mp-card:hover .mp-stage::before {
+  background: var(--blue);
+}
+
+/* 레일 — 남는 폭을 채우는 hairline(좌→우 진행감) */
+.mp-rail {
+  position: relative;
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(34, 118, 255, 0.24);
+}
+
+/* 마지막 단계를 제외하고 gap만큼 연장 — 다음 단계 노드 바로 앞까지 이어짐.
+   헤더행은 패널(.mp-body) 밖이라 카드 패딩이 걸리지 않으므로 gap 폭만 보정 */
+.mp-card:not(:last-child) .mp-rail {
+  margin-right: calc(-1 * var(--mp-gap));
+}
+
+/* 레일 끝 셰브런 — 화살촉만 hairline으로(진행 방향만 암시, 과하지 않게) */
+.mp-card:not(:last-child) .mp-rail::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-top: 1px solid rgba(34, 118, 255, 0.5);
+  border-right: 1px solid rgba(34, 118, 255, 0.5);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* 본문 패널 — 섹션 배경(--surface-l1) 위 화이트 플랫 패널.
+   .pm-step과 달리 그림자·리프트 없음, 반경도 한 단계 작게 */
+.mp-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--mp-pad);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--r-sm);
+  background: var(--surface-l0);
+  transition: border-color var(--dur) ease;
+}
+
+.mp-card:hover .mp-body {
+  border-color: var(--border-l3);
+}
+
+/* 단계명 — 영문 대문자(단계) + 국문 목표 한 줄 */
+.mp-card h4 {
   margin: 14px 0 0;
   color: var(--text-l-1);
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.25;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.mp-goal {
+  display: block;
+  margin-top: 7px;
+  color: var(--text-l-2);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 700;
+  letter-spacing: 0;
   word-break: keep-all;
 }
 
-/* SA(검색) / DA(디스플레이) 구분 배지 — 같은 매체의 다른 상품임을 명시 */
-.mp-abbr {
-  flex: 0 0 auto;
-  padding: 3px 7px;
-  border-radius: var(--r-xs);
-  background: var(--surface-l2);
-  color: var(--blue);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
-/* 상품 라인업 태그 */
+/* 채널 태그 */
 .mp-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 12px 0 0;
+  margin: 13px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .mp-tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 9px;
   border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
@@ -2300,8 +2367,20 @@ body.menu-open .site-header {
   white-space: nowrap;
 }
 
-/* 운영 포인트 — margin-top auto로 카드 하단 정렬(행 내 기준선 일치) */
-.mp-card p {
+/* SA(검색) / GFA(디스플레이) 구분 배지 — 같은 네이버라도 상품·입찰 구조가 다름을 명시 */
+.mp-abbr {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border-radius: var(--r-xs);
+  background: var(--surface-l2);
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+/* 운영 포인트 — margin-top auto로 패널 하단 정렬(행 내 기준선 일치) */
+.mp-note {
   margin: auto 0 0;
   padding: 14px 0 0;
   border-top: 1px solid var(--border-l1);
@@ -2311,18 +2390,18 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
-/* 매체 로고 행: 라이트 배경에선 잉크 회색, 카드 hover 시 브랜드 컬러 복원 */
+/* 매체 로고 행: 라이트 배경에선 잉크 회색, 단계 hover 시 브랜드 컬러 복원 */
 .mp-logos {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 20px;
+  min-height: 18px;
 }
 
 .mp-ico {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background: var(--text-l-3);
   -webkit-mask-image: var(--ico);
   mask-image: var(--ico);
@@ -2341,7 +2420,7 @@ body.menu-open .site-header {
 
 /* 가로 워드마크형 로고(쿠팡 등): 높이는 유지하되 폭을 넓혀 비율 보존 */
 .mp-ico.wide {
-  width: 52px;
+  width: 48px;
 }
 
 /* (2) 운영 프로세스 5스텝 */
@@ -4169,30 +4248,22 @@ body.menu-open .site-header {
     --cv: clamp(0, calc((var(--sp) - 0.15) / 0.16), 1);
   }
 
-  /* 매체 카드 6장(3열 2행) — PM 상세 3단이 붙어 섹션이 길어진 만큼 창을 앞으로 당김.
-     1~3은 1행, 4~6은 2행이라 행 단위로 0.03씩 밀어 등장 */
+  /* 여정 4단계(1행 4열) — PM 상세 3단이 붙어 섹션이 길어진 만큼 창을 앞으로 당김.
+     좌→우 흐름이 읽히도록 0.03씩 밀어 순차 등장 */
   .mp-grid > .mp-card:nth-child(1) {
     --cv: clamp(0, calc((var(--sp) - 0.38) / 0.13), 1);
   }
 
   .mp-grid > .mp-card:nth-child(2) {
-    --cv: clamp(0, calc((var(--sp) - 0.4) / 0.13), 1);
+    --cv: clamp(0, calc((var(--sp) - 0.41) / 0.13), 1);
   }
 
   .mp-grid > .mp-card:nth-child(3) {
-    --cv: clamp(0, calc((var(--sp) - 0.42) / 0.13), 1);
+    --cv: clamp(0, calc((var(--sp) - 0.44) / 0.13), 1);
   }
 
   .mp-grid > .mp-card:nth-child(4) {
-    --cv: clamp(0, calc((var(--sp) - 0.45) / 0.13), 1);
-  }
-
-  .mp-grid > .mp-card:nth-child(5) {
     --cv: clamp(0, calc((var(--sp) - 0.47) / 0.13), 1);
-  }
-
-  .mp-grid > .mp-card:nth-child(6) {
-    --cv: clamp(0, calc((var(--sp) - 0.49) / 0.13), 1);
   }
 
   /* --- Works — 익명 사례 카드 4장(2×2) 순차 페이드(opacity만 — hover translateY 보존).
@@ -4299,6 +4370,15 @@ body.menu-open .site-header {
     column-gap: 20px;
   }
 
+  /* 여정 4단계가 2열(2+2)로 접히므로 행 끝(짝수) 단계의 레일 연장·화살촉은 끊음 */
+  .mp-card:nth-child(2n) .mp-rail {
+    margin-right: 0;
+  }
+
+  .mp-card:nth-child(2n) .mp-rail::after {
+    display: none;
+  }
+
   /* 5스텝은 2열 스택 시 여백 낭비가 커서 3열(3+2)로 접음 */
   .pm-steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4390,6 +4470,15 @@ body.menu-open .site-header {
   .mp-grid,
   .pm-steps {
     grid-template-columns: 1fr;
+  }
+
+  /* 여정 1열 세로 스택 — 가로 연결선은 의미가 없으므로 카드 안 hairline으로만 남김 */
+  .mp-card:not(:last-child) .mp-rail {
+    margin-right: 0;
+  }
+
+  .mp-card:not(:last-child) .mp-rail::after {
+    display: none;
   }
 
   .panel-kpis {

@@ -384,83 +384,93 @@
               </p>
             </div>
 
+            <!-- 매체를 나열하지 않고 고객 여정 4단계로 재구성 —
+                 광고주가 '우리 매체를 하냐'가 아니라 '우리 단계에 뭘 해주냐'를 읽도록 구성.
+                 단계 헤더(노드+레일)는 카드 밖에 두어 아래 운영 프로세스 5스텝과 시각적으로 구분 -->
             <div class="pm-block" data-reveal>
-              <p class="pm-sub">매체 커버리지</p>
+              <p class="pm-sub">고객 여정별 채널 운영</p>
               <div class="mp-grid" data-stagger>
                 <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
-                  </span>
-                  <h4>네이버 검색광고<span class="mp-abbr">SA</span></h4>
-                  <ul class="mp-tags">
-                    <li>파워링크</li>
-                    <li>쇼핑검색광고</li>
-                    <li>브랜드검색</li>
-                  </ul>
-                  <p>구매 의도가 가장 명확한 검색 수요를 전환으로 연결합니다.</p>
+                  <p class="mp-stage">STAGE 01<i class="mp-rail" aria-hidden="true"></i></p>
+                  <div class="mp-body">
+                    <span class="mp-logos" aria-hidden="true">
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/googleads.svg'); --brand: #4285F4;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/kakao.svg'); --brand: #3C1E1E;"></i>
+                    </span>
+                    <h4>DEMAND CAPTURE<span class="mp-goal">이미 존재하는 수요를 확보</span></h4>
+                    <!-- 검색광고(SA)와 GFA는 상품·입찰 구조가 다른 별개 매체 —
+                         SA는 STAGE 01, GFA는 STAGE 02 디스플레이 광고에 두고 배지로 구분 표기 -->
+                    <ul class="mp-tags">
+                      <li>네이버 검색광고<span class="mp-abbr">SA</span></li>
+                      <li>구글 검색광고</li>
+                      <li>카카오 키워드광고</li>
+                      <li>쇼핑검색광고</li>
+                    </ul>
+                    <p class="mp-note">구매 의도가 뚜렷한 검색 수요를 전환으로 연결합니다.</p>
+                  </div>
                 </article>
-                <!-- 검색광고(SA)와 GFA는 상품·입찰 구조가 다른 별개 매체 — 카드도 분리해 표기 -->
+
                 <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
-                  </span>
-                  <h4>네이버 GFA<span class="mp-abbr">DA</span></h4>
-                  <ul class="mp-tags">
-                    <li>성과형 디스플레이</li>
-                    <li>리타겟팅</li>
-                  </ul>
-                  <p>잠재 고객 도달로 퍼널 상단을 확장합니다.</p>
+                  <p class="mp-stage">STAGE 02<i class="mp-rail" aria-hidden="true"></i></p>
+                  <div class="mp-body">
+                    <span class="mp-logos" aria-hidden="true">
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/meta.svg'); --brand: #0866FF;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/youtube.svg'); --brand: #FF0000;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/tiktok.svg'); --brand: #010101;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                    </span>
+                    <h4>DEMAND CREATION<span class="mp-goal">새로운 잠재고객과 수요를 발굴</span></h4>
+                    <ul class="mp-tags">
+                      <li>Meta</li>
+                      <li>Instagram</li>
+                      <li>YouTube</li>
+                      <li>TikTok</li>
+                      <li>디스플레이 광고<span class="mp-abbr">네이버 GFA</span></li>
+                    </ul>
+                    <p class="mp-note">관심사·행동 데이터로 아직 검색하지 않은 고객을 찾아 소재 실험으로 수요를 만듭니다.</p>
+                  </div>
                 </article>
-                <!-- 카카오 로고 사용 승인 완료(2026-07). 카카오 심볼은 브라운(#3C1E1E) — 옐로우(#FEE500)는 라이트 배경 대비 부족으로 호버 컬러 부적합 -->
-                <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/kakao.svg'); --brand: #3C1E1E;"></i>
-                  </span>
-                  <h4>카카오</h4>
-                  <ul class="mp-tags">
-                    <li>카카오모먼트</li>
-                    <li>카카오 키워드광고</li>
-                  </ul>
-                  <p>메신저 기반 일상 접점에서 도달과 전환을 만듭니다.</p>
-                </article>
-                <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/googleads.svg'); --brand: #4285F4;"></i>
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/youtube.svg'); --brand: #FF0000;"></i>
-                  </span>
-                  <h4>구글</h4>
-                  <ul class="mp-tags">
-                    <li>검색</li>
-                    <li>GDN</li>
-                    <li>YouTube</li>
-                    <li>PMax</li>
-                  </ul>
-                  <p>글로벌 인벤토리를 묶어 풀퍼널로 운영합니다.</p>
-                </article>
-                <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/meta.svg'); --brand: #0866FF;"></i>
-                  </span>
-                  <h4>메타</h4>
-                  <ul class="mp-tags">
-                    <li>Facebook</li>
-                    <li>Instagram</li>
-                    <li>Advantage+</li>
-                  </ul>
-                  <p>관심사·행동 기반 정밀 타겟팅으로 소재를 검증합니다.</p>
-                </article>
+
                 <!-- 쿠팡 로고 사용 승인 완료(2026-07). 가로 워드마크형 → .wide로 비율 유지 -->
                 <article class="mp-card">
-                  <span class="mp-logos" aria-hidden="true">
-                    <i class="mp-ico wide" style="--ico: url('assets/logos/platforms/coupang.svg'); --brand: #E4002B;"></i>
-                    <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
-                  </span>
-                  <h4>커머스 광고</h4>
-                  <ul class="mp-tags">
-                    <li>쿠팡 광고</li>
-                    <li>네이버쇼핑</li>
-                  </ul>
-                  <p>구매 직전 트래픽을 상품 단위로 최적화합니다.</p>
+                  <p class="mp-stage">STAGE 03<i class="mp-rail" aria-hidden="true"></i></p>
+                  <div class="mp-body">
+                    <span class="mp-logos" aria-hidden="true">
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/naver.svg'); --brand: #03C75A;"></i>
+                      <i class="mp-ico wide" style="--ico: url('assets/logos/platforms/coupang.svg'); --brand: #E4002B;"></i>
+                    </span>
+                    <h4>COMMERCE CONVERSION<span class="mp-goal">상품 탐색부터 구매까지 연결</span></h4>
+                    <ul class="mp-tags">
+                      <li>네이버쇼핑</li>
+                      <li>쿠팡</li>
+                      <li>오픈마켓</li>
+                      <li>자사몰</li>
+                      <li>커머스 플랫폼</li>
+                    </ul>
+                    <p class="mp-note">상품·채널별 노출과 입찰을 조정해 탐색 트래픽을 구매까지 이어갑니다.</p>
+                  </div>
+                </article>
+
+                <!-- 카카오 로고 사용 승인 완료(2026-07). 카카오 심볼은 브라운(#3C1E1E) — 옐로우(#FEE500)는 라이트 배경 대비 부족으로 호버 컬러 부적합 -->
+                <article class="mp-card">
+                  <p class="mp-stage">STAGE 04<i class="mp-rail" aria-hidden="true"></i></p>
+                  <div class="mp-body">
+                    <span class="mp-logos" aria-hidden="true">
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/kakao.svg'); --brand: #3C1E1E;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/meta.svg'); --brand: #0866FF;"></i>
+                      <i class="mp-ico" style="--ico: url('assets/logos/platforms/googleads.svg'); --brand: #4285F4;"></i>
+                    </span>
+                    <h4>RETENTION &amp; CRM<span class="mp-goal">재방문·재구매·고객 관계 강화</span></h4>
+                    <ul class="mp-tags">
+                      <li>CRM</li>
+                      <li>카카오채널</li>
+                      <li>이메일·메시지</li>
+                      <li>리타게팅</li>
+                      <li>고객 세그먼트 운영</li>
+                    </ul>
+                    <p class="mp-note">구매 이후 고객을 세그먼트로 나눠 재구매와 관계 유지 캠페인을 운영합니다.</p>
+                  </div>
                 </article>
               </div>
             </div>
