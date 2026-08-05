@@ -817,11 +817,12 @@ body.menu-open .site-header {
   }
 
   /* 핸드오프 레일 — 코어(70%W)를 고속 통과할 때의 모션 스트릭이 수평 광선으로 확장.
-     top 42% − 무대 translateY 2vh = 40svh = p=1 시점 Signal Strip border-top(200−160svh)과 정합 */
+     top 62% − 무대 translateY 2vh = 60svh = p=1 시점 Signal Strip border-top과 정합
+     (오버랩 40svh 축소에 맞춰 42%→62% 하향) */
   .hero-rail {
     display: block;
     position: absolute;
-    top: 42%;
+    top: 62%;
     left: 0;
     right: 0;
     height: 2px;
@@ -840,11 +841,13 @@ body.menu-open .site-header {
     pointer-events: none;
   }
 
-  /* 60svh 오버랩 — 후행 섹션이 핀 무대 위로 슬라이드 인하며 레일과 바통터치.
-     p=1 시점 strip border-top = 무대높이 100 − 60 = 40svh(레일 42% − 이탈 2vh)로 트랙 길이와 무관하게 정합 */
+  /* 40svh 오버랩 — 후행 섹션이 핀 무대 위로 슬라이드 인하며 레일과 바통터치.
+     ★60→40으로 축소: 무대가 덮이기 전 깨끗한 구간이 271px→464px로 늘어 심볼 드로잉과
+     메시지 2개가 화면이 넘어가기 전에 모두 끝날 수 있다(트랙 길이는 240svh 유지).
+     p=1 시점 strip border-top = 무대높이 100 − 40 = 60svh(레일 62% − 이탈 2vh)로 정합 */
   .signal-strip {
-    margin-top: -60vh;
-    margin-top: -60svh;
+    margin-top: -40vh;
+    margin-top: -40svh;
   }
 
   /* 오버랩 구간의 후행 섹션은 핀 무대 위에 페인트 — WHY는 자체 base에서 relative 처리 */
@@ -935,7 +938,7 @@ body.menu-open .site-header {
   .hero-bridge {
     position: absolute;
     left: 50%;
-    top: 42%;
+    top: 62%;
     width: max-content;
     max-width: 84vw;
     padding: 0;
