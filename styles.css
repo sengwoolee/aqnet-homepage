@@ -780,10 +780,9 @@ body.menu-open .site-header {
     pointer-events: none;
   }
 
-  /* CI 모션 비디오(2층) — screen 블렌드로 어두운 배경은 소거되고 광원만 무대에 합성.
-     엠블럼: 막1~2 오프닝(로드 즉시 1회 재생 → 최종 프레임 유지, 줌과 함께 페이드아웃) = --hve
-     플라이스루: 막3 스크롤 스크럽 = --hvf
-     오퍼시티는 JS가 .hero에 주입하는 --hvf/--hve(0~1)의 순수 함수 */
+  /* CI 모션 비디오(단일층) — screen 블렌드로 어두운 배경은 소거되고 광원만 무대에 합성.
+     AQ 엠블럼 드로잉을 스크롤 진행도에 프레임 단위 스크럽(JS currentTime) — 브리지 직전 심볼 완성.
+     오퍼시티는 JS가 .hero에 주입하는 --hve(0~1, exit에서만 소등)의 순수 함수 */
   .hero-videos {
     display: block;
     position: absolute;
@@ -810,11 +809,7 @@ body.menu-open .site-header {
     will-change: opacity;
   }
 
-  .hero-video-fly {
-    opacity: calc(var(--hvf, 0) * 0.85);
-  }
-
-  /* 주연 승격이지만 첫 화면 카피와 공존해야 하므로 배율은 0.7로 억제("영상이 과함" 반영) */
+  /* 첫 화면 카피와 공존해야 하므로 배율은 0.7로 억제("영상이 과함" 반영) */
   .hero-video-emblem {
     opacity: calc(var(--hve, 0) * 0.7);
   }
