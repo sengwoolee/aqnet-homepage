@@ -235,8 +235,9 @@ function syncHeroProgressVars() {
 
     // 비디오 레이어 — 창 함수는 비트/브리지와 동일 문법(전부 p 순수 함수)
     if (heroVideosEnabled()) {
-      // 엠블럼: 트랙 전체가 드로잉 타임라인 — exit에서만 소등
-      const hve = 1 - easeInQuad(remap(p, 0.9, 0.98));
+      // 엠블럼: 트랙 전체가 드로잉 타임라인. 완성(0.78) 후 잠깐 머금었다가
+      // 수평선 레일(railIn 0.82~0.94)이 떠오르는 구간과 크로스페이드로 소멸 — 심볼→수평선 핸드오프
+      const hve = 1 - easeInQuad(remap(p, 0.8, 0.9));
       heroEl.style.setProperty("--hve", hve.toFixed(4));
 
       // 프레임 단위 스크럽 — p 0~0.78을 영상 0~8s에 매핑해 브리지 진입(0.74~0.82) 직전 심볼 완성.
