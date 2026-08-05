@@ -45,6 +45,28 @@ function promoteHeroVideo(video) {
   video.load();
 }
 
+/* 준비 페이드 — 지연 로드 특성상 첫 프레임이 늦게 도착하는데, 그때 스크럽 농도(--hve)가
+   이미 1이라 심볼이 툭 튀어나온다. 첫 프레임 확보 시점에 --hvr을 0→1로 램프해 서서히 배어나오게
+   한다(CSS에서 --hve와 곱연산). transition이 아니라 rAF 램프인 이유: opacity에 transition을
+   걸면 이후 스크럽 변화까지 지연돼 스크롤 동기가 무너진다 */
+let heroEmblemFadeRaf = null;
+
+function rampHeroEmblemIn() {
+  if (!heroEl) return;
+  if (heroEmblemFadeRaf) cancelAnimationFrame(heroEmblemFadeRaf);
+  // 기준 시각은 예약 시점이 아니라 첫 프레임에서 잡는다 — 백그라운드 탭에서 로드되면
+  // rAF가 멈춰 있다가 복귀하는데, 예약 시각 기준이면 경과분이 이미 지나 즉시 1로 튀어버린다
+  let start = 0;
+  const DUR = 620;
+  const step = (now) => {
+    if (!start) start = now;
+    const t = clamp((now - start) / DUR, 0, 1);
+    heroEl.style.setProperty("--hvr", easeOutCubic(t).toFixed(4));
+    heroEmblemFadeRaf = t < 1 ? requestAnimationFrame(step) : null;
+  };
+  heroEmblemFadeRaf = requestAnimationFrame(step);
+}
+
 /* src 승격은 1회만 — 초기 로드(LCP) 경합을 피해 지연 실행 */
 function loadHeroVideos() {
   if (heroVideosLoaded || !heroVideosEnabled()) return;
@@ -57,6 +79,8 @@ function loadHeroVideos() {
     heroEmblemPendingSeek = null;
     if (Math.abs(t - heroEmblemEl.currentTime) > 0.08) heroEmblemEl.currentTime = t;
   });
+  // 첫 프레임 확보 시점에 페이드 인(로드 실패 시 --hvr은 0으로 남아 레이어가 조용히 비활성)
+  heroEmblemEl.addEventListener("loadeddata", rampHeroEmblemIn, { once: true });
   promoteHeroVideo(heroEmblemEl);
 }
 
