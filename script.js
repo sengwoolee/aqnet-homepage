@@ -1040,7 +1040,7 @@ if (canvas && canvas.getContext) {
     const gx = viewW * 0.78;
     const gy = viewH * 0.24 + heroProgress * 40;
     const gradient = context.createRadialGradient(gx, gy, 30, gx, gy, viewW * 0.62);
-    gradient.addColorStop(0, "rgba(46, 211, 255, 0.20)");
+    gradient.addColorStop(0, "rgba(3, 144, 238, 0.20)");
     gradient.addColorStop(0.42, "rgba(34, 118, 255, 0.10)");
     gradient.addColorStop(1, "rgba(5, 7, 13, 0)");
     context.fillStyle = gradient;
@@ -1124,7 +1124,7 @@ if (canvas && canvas.getContext) {
             const alpha =
               (0.14 * (1 - dist / 128) + 0.22 * near) * linkBoost * linkFade * ((a.g + b.g) * 0.5);
             context.strokeStyle =
-              near > 0.02 ? `rgba(46, 211, 255, ${alpha})` : `rgba(122, 183, 255, ${alpha})`;
+              near > 0.02 ? `rgba(3, 144, 238, ${alpha})` : `rgba(122, 183, 255, ${alpha})`;
             context.beginPath();
             context.moveTo(a.x, a.y);
             context.lineTo(b.x, b.y);
@@ -1152,7 +1152,7 @@ if (canvas && canvas.getContext) {
       } else {
         if (p.hub) {
           context.shadowBlur = 6;
-          context.shadowColor = "rgba(46, 211, 255, 0.8)";
+          context.shadowColor = "rgba(3, 144, 238, 0.8)";
         }
         context.fillStyle = `rgba(255, 255, 255, ${nodeA})`;
         context.beginPath();

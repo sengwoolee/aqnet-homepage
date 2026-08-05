@@ -10,7 +10,9 @@
   --navy-soft: #14243f;
   --blue: #2276ff;
   --blue-deep: #0f63ea;
-  --cyan: #2ed3ff;
+  /* 시그니처 액센트 — CI v2.0 팔레트의 azure. 구 하늘색(#2ed3ff)에서 전환(2026-08 클라이언트 A안).
+     토큰명은 사이트 전역 참조 유지를 위해 그대로 두었으나 값은 하늘색 계열이 아님 */
+  --cyan: #0390ee;
   --signal: #7ab7ff;
   --ice: #e8f2ff;
   --white: #ffffff;
@@ -47,14 +49,14 @@
   --text-l-3: #6b7a92;
 
   /* --- Signature gradients & glows --- */
-  --grad-brand: linear-gradient(118deg, #2ed3ff 0%, #7ab7ff 46%, #2276ff 100%);
-  --grad-action: linear-gradient(135deg, #2276ff 0%, #2ed3ff 150%);
-  --grad-bar: linear-gradient(180deg, #2ed3ff 0%, #2276ff 100%);
-  --grad-accent-surface: linear-gradient(180deg, rgba(46, 211, 255, 0.16) 0%, transparent 54%);
-  --grad-line: linear-gradient(90deg, transparent, rgba(46, 211, 255, 0.6), transparent);
+  --grad-brand: linear-gradient(118deg, #0390ee 0%, #7ab7ff 46%, #2276ff 100%);
+  --grad-action: linear-gradient(135deg, #2276ff 0%, #0390ee 150%);
+  --grad-bar: linear-gradient(180deg, #0390ee 0%, #2276ff 100%);
+  --grad-accent-surface: linear-gradient(180deg, rgba(3, 144, 238, 0.16) 0%, transparent 54%);
+  --grad-line: linear-gradient(90deg, transparent, rgba(3, 144, 238, 0.6), transparent);
   --glow-blue: 0 18px 50px rgba(34, 118, 255, 0.28);
-  --glow-cyan: 0 0 26px rgba(46, 211, 255, 0.32);
-  --mesh-cyan: radial-gradient(620px 420px at 78% 16%, rgba(46, 211, 255, 0.16), transparent 70%);
+  --glow-cyan: 0 0 26px rgba(3, 144, 238, 0.32);
+  --mesh-cyan: radial-gradient(620px 420px at 78% 16%, rgba(3, 144, 238, 0.16), transparent 70%);
   --mesh-blue: radial-gradient(700px 520px at 10% 92%, rgba(34, 118, 255, 0.14), transparent 72%);
 
   /* --- Elevation --- */
@@ -689,7 +691,7 @@ body.menu-open .site-header {
   color: var(--cyan);
   font-weight: 900;
   letter-spacing: 0;
-  text-shadow: 0 0 16px rgba(46, 211, 255, 0.34);
+  text-shadow: 0 0 16px rgba(3, 144, 238, 0.34);
   white-space: nowrap;
 }
 
@@ -700,7 +702,7 @@ body.menu-open .site-header {
   right: 0;
   bottom: -4px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(46, 211, 255, 0.9), transparent);
+  background: linear-gradient(90deg, transparent, rgba(3, 144, 238, 0.9), transparent);
   opacity: 0.86;
 }
 
@@ -829,9 +831,9 @@ body.menu-open .site-header {
       rgba(34, 118, 255, 0),
       var(--blue) 18%,
       var(--cyan) 82%,
-      rgba(46, 211, 255, 0)
+      rgba(3, 144, 238, 0)
     );
-    box-shadow: 0 0 18px rgba(46, 211, 255, 0.45);
+    box-shadow: 0 0 18px rgba(3, 144, 238, 0.45);
     opacity: var(--hrla, 0);
     transform: scaleX(var(--hrl, 0));
     transform-origin: 70% 50%;
@@ -925,7 +927,7 @@ body.menu-open .site-header {
   .hero-chapters span.on {
     height: 20px;
     background: var(--cyan);
-    box-shadow: 0 0 10px rgba(46, 211, 255, 0.5);
+    box-shadow: 0 0 10px rgba(3, 144, 238, 0.5);
   }
 
   /* 브리지 캡션 — 통과 직후(막 4) 레일 위에서 서사의 결론으로 등장.
@@ -945,7 +947,7 @@ body.menu-open .site-header {
   }
 
   .hero-bridge-core {
-    text-shadow: 0 0 26px rgba(46, 211, 255, 0.45);
+    text-shadow: 0 0 26px rgba(3, 144, 238, 0.45);
   }
 
   .hero-scrollcue {
@@ -1375,8 +1377,9 @@ body.menu-open .site-header {
   line-height: 0.82;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  color: rgba(46, 211, 255, 0.13);
-  -webkit-text-stroke: 1.5px rgba(46, 211, 255, 0.25);
+  /* azure는 구 하늘색보다 광도가 절반이라 알파를 0.13/0.25에서 상향해 시인성 보정 */
+  color: rgba(3, 144, 238, 0.24);
+  -webkit-text-stroke: 1.5px rgba(3, 144, 238, 0.48);
   -webkit-text-fill-color: transparent;
 }
 
@@ -1404,8 +1407,8 @@ body.menu-open .site-header {
   right: 0;
   bottom: -0.12em;
   height: 2px;
-  background: rgba(46, 211, 255, 0.75);
-  box-shadow: 0 0 6px rgba(46, 211, 255, 0.3);
+  background: rgba(3, 144, 238, 0.75);
+  box-shadow: 0 0 6px rgba(3, 144, 238, 0.3);
 }
 
 /* 정의 + 약속 — 대형 정의 타입 + 시안 인용바 클로징
@@ -1446,7 +1449,7 @@ body.menu-open .site-header {
   width: 64px;
   height: 2px;
   background: linear-gradient(90deg, var(--cyan), var(--blue));
-  box-shadow: 0 0 12px rgba(46, 211, 255, 0.35);
+  box-shadow: 0 0 12px rgba(3, 144, 238, 0.35);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--dur-reveal) var(--ease-emphasized) 120ms;
@@ -1494,8 +1497,8 @@ body.menu-open .site-header {
     pointer-events: none;
     z-index: -1;
     background:
-      radial-gradient(circle, rgba(46, 211, 255, 0.5) 0 2.5px, rgba(46, 211, 255, 0.12) 2.5px 9px, transparent 10px),
-      radial-gradient(circle, rgba(46, 211, 255, 0.045), transparent 60%),
+      radial-gradient(circle, rgba(3, 144, 238, 0.5) 0 2.5px, rgba(3, 144, 238, 0.12) 2.5px 9px, transparent 10px),
+      radial-gradient(circle, rgba(3, 144, 238, 0.045), transparent 60%),
       radial-gradient(
         circle,
         transparent 0 31.5%,
@@ -1519,7 +1522,7 @@ body.menu-open .site-header {
     border-radius: 50%;
     pointer-events: none;
     z-index: -1;
-    background: radial-gradient(circle at 50% 17.5%, rgba(46, 211, 255, 0.75) 0 2.5px, transparent 4px);
+    background: radial-gradient(circle at 50% 17.5%, rgba(3, 144, 238, 0.75) 0 2.5px, transparent 4px);
     animation: whyOrbitSpin 52s linear infinite;
   }
 
@@ -1730,7 +1733,7 @@ body.menu-open .site-header {
   top: 38px; /* padding-top 14 + 24 */
   bottom: -50px; /* -(gap 12 + 다음 padding-top 14 + 24) */
   width: 2px;
-  background: linear-gradient(180deg, rgba(34, 118, 255, 0.38), rgba(46, 211, 255, 0.2));
+  background: linear-gradient(180deg, rgba(34, 118, 255, 0.38), rgba(3, 144, 238, 0.2));
 }
 
 .t-step {
@@ -2528,7 +2531,7 @@ body.menu-open .site-header {
   width: 34px;
   height: 34px;
   border-radius: var(--r-sm);
-  background: rgba(46, 211, 255, 0.14);
+  background: rgba(3, 144, 238, 0.14);
   color: var(--cyan);
 }
 
@@ -2605,7 +2608,7 @@ body.menu-open .site-header {
   width: 2px;
   transform: translateX(-1px);
   background:
-    repeating-linear-gradient(180deg, rgba(46, 211, 255, 0.5) 0 8px, transparent 8px 16px);
+    repeating-linear-gradient(180deg, rgba(3, 144, 238, 0.5) 0 8px, transparent 8px 16px);
   animation: railFlow 2.5s linear infinite;
 }
 
@@ -2638,7 +2641,7 @@ body.menu-open .site-header {
   top: 32px;
   bottom: 32px;
   width: 14px;
-  border: 2px dashed rgba(46, 211, 255, 0.22);
+  border: 2px dashed rgba(3, 144, 238, 0.22);
   border-left: none;
   border-radius: 0 14px 14px 0;
   transition: border-color var(--dur) ease;
@@ -2646,7 +2649,7 @@ body.menu-open .site-header {
 }
 
 .growth-loop.returning .loop-return {
-  border-color: rgba(46, 211, 255, 0.55);
+  border-color: rgba(3, 144, 238, 0.55);
 }
 
 .loop-node {
@@ -2827,7 +2830,7 @@ body.menu-open .site-header {
 
 .panel-kpis.lit > div {
   border-color: var(--border-3);
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
 }
 
 .panel-kpis span {
@@ -2873,7 +2876,7 @@ body.menu-open .site-header {
 
 .panel-channels.lit {
   border-color: var(--border-3);
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
 }
 
 .panel-cap {
@@ -2924,7 +2927,7 @@ body.menu-open .site-header {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--blue), var(--cyan));
-  box-shadow: 0 0 14px rgba(46, 211, 255, 0.18);
+  box-shadow: 0 0 14px rgba(3, 144, 238, 0.18);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--dur-slow) var(--ease-out);
@@ -2980,7 +2983,7 @@ body.menu-open .site-header {
 
 .chat-a.lit {
   border-color: var(--border-3);
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
 }
 
 /* 존5 — 상태 라인 · 캡션 · 데모 CTA */
@@ -3277,7 +3280,7 @@ body.menu-open .site-header {
   border: 1px solid var(--border-2);
   border-radius: var(--r-lg);
   background:
-    linear-gradient(135deg, rgba(34, 118, 255, 0.16), rgba(46, 211, 255, 0.05)),
+    linear-gradient(135deg, rgba(34, 118, 255, 0.16), rgba(3, 144, 238, 0.05)),
     var(--surface-2);
   box-shadow: var(--e-dark-1);
   display: flex;
@@ -3447,7 +3450,7 @@ body.menu-open .site-header {
 }
 
 .tag-strategy {
-  background: rgba(46, 211, 255, 0.12);
+  background: rgba(3, 144, 238, 0.12);
   color: #0aa6cc;
 }
 
@@ -3654,14 +3657,14 @@ body.menu-open .site-header {
 
 .check:has(input:checked) {
   border-color: var(--border-3);
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
   color: var(--white);
 }
 
 /* :has() 미지원 브라우저 폴백 — JS가 .checked를 미러링 (별도 규칙 필수) */
 .check.checked {
   border-color: var(--border-3);
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
   color: var(--white);
 }
 
@@ -3795,7 +3798,7 @@ body.menu-open .site-header {
 .contact-form .select-list .check:has(input:checked),
 .contact-form .select-list .check.checked {
   border-color: transparent;
-  background: rgba(46, 211, 255, 0.08);
+  background: rgba(3, 144, 238, 0.08);
   color: var(--white);
 }
 
