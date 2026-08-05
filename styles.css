@@ -2073,9 +2073,19 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
+/* 영역 정의 한 줄 — 영문 영역명 바로 아래 한국어 정의 */
+.service-card .svc-def {
+  margin: 9px 0 0;
+  color: var(--blue);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+/* 실행 항목 — auto 마진으로 항목~키워드 묶음을 카드 하단에 정렬 */
 .service-card ul {
   margin: auto 0 0;
-  padding: 24px 0 0;
+  padding: 22px 0 0;
   list-style: none;
   display: grid;
   gap: 10px;
@@ -2102,91 +2112,47 @@ body.menu-open .site-header {
   transform: rotate(-45deg);
 }
 
-/* Flagship accent card */
-.accent-card {
+/* 하단 키워드 줄 — 헤어라인 위 소형 텍스트로 개별 서비스명 유지 */
+.service-card .svc-keys {
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--border-l1);
+  color: var(--text-l-3);
+  font-size: 12.5px;
+  line-height: 1.6;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* 선두 영역(01) — 배지 없이 액센트 보더·상단 라인·미세 틴트로만 위계 표기 */
+.service-card.is-lead {
+  border-color: var(--border-l3);
   background:
-    var(--grad-accent-surface),
-    var(--surface-2);
-  border-color: var(--border-2);
-  box-shadow: var(--e-dark-1);
-  background-size:
-    auto,
-    52px 52px;
+    linear-gradient(180deg, rgba(34, 118, 255, 0.06), rgba(34, 118, 255, 0) 46%),
+    var(--surface-l0);
+  box-shadow: var(--e-2);
 }
 
-.accent-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: linear-gradient(180deg, #000, transparent 60%);
-  opacity: 0.7;
+.service-card.is-lead::before {
+  transform: scaleX(1);
 }
 
-.accent-card > * {
-  position: relative;
-  z-index: 1;
+.service-card.is-lead .svc-icon {
+  background: rgba(34, 118, 255, 0.12);
 }
 
-.accent-card .svc-icon {
-  background: rgba(46, 211, 255, 0.14);
-  color: var(--cyan);
+.service-card.is-lead .svc-index {
+  color: var(--blue);
 }
 
-.accent-card:hover .svc-icon {
-  background: rgba(46, 211, 255, 0.22);
-}
-
-.accent-card h3 {
-  color: var(--white);
-}
-
-.accent-card p {
-  color: var(--text-d-2);
-}
-
-.accent-card li {
-  color: var(--text-d-2);
-}
-
-.accent-card li::before {
-  border-color: var(--cyan);
-}
-
-.accent-card .svc-index {
-  color: var(--text-d-3);
-}
-
-.flagship-pill {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 2;
-  padding: 5px 10px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--border-3);
-  color: var(--cyan);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-}
-
-.accent-card .svc-index {
-  display: none;
-}
-
-/* FLAGSHIP → 퍼포먼스 마케팅 상세(#pm-detail) 앵커 — ul의 margin-top:auto 아래에 붙음 */
+/* 01 영역 → 퍼포먼스 마케팅 상세(#pm-detail) 앵커 — 키워드 줄 위에 배치해 하단 정렬 유지 */
 .svc-more {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-top: 16px;
-  color: var(--cyan);
+  color: var(--blue);
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
@@ -2201,7 +2167,7 @@ body.menu-open .site-header {
 }
 
 .svc-more:focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--blue);
   outline-offset: 3px;
   border-radius: var(--r-xs);
 }
@@ -4182,7 +4148,7 @@ body.menu-open .site-header {
     --ts: clamp(0, calc((var(--sp) - 0.54) / 0.12), 1);
   }
 
-  /* --- 서비스 — 카드 인덱스별 순차 페이드
+  /* --- 서비스 — 영역 카드 3장 순차 페이드
      (hover translateY·transform transition 보존을 위해 opacity만 스크럽.
       [data-scrub] (0,4,0)로 stagger 원샷 (0,3,0)을 무효화) --- */
   .service-section[data-scrub] .service-grid > .service-card,
@@ -4196,23 +4162,11 @@ body.menu-open .site-header {
   }
 
   .service-grid > .service-card:nth-child(2) {
-    --cv: clamp(0, calc((var(--sp) - 0.09) / 0.16), 1);
+    --cv: clamp(0, calc((var(--sp) - 0.1) / 0.16), 1);
   }
 
   .service-grid > .service-card:nth-child(3) {
-    --cv: clamp(0, calc((var(--sp) - 0.13) / 0.16), 1);
-  }
-
-  .service-grid > .service-card:nth-child(4) {
-    --cv: clamp(0, calc((var(--sp) - 0.17) / 0.16), 1);
-  }
-
-  .service-grid > .service-card:nth-child(5) {
-    --cv: clamp(0, calc((var(--sp) - 0.21) / 0.16), 1);
-  }
-
-  .service-grid > .service-card:nth-child(6) {
-    --cv: clamp(0, calc((var(--sp) - 0.25) / 0.16), 1);
+    --cv: clamp(0, calc((var(--sp) - 0.15) / 0.16), 1);
   }
 
   /* 매체 카드 6장(3열 2행) — PM 상세 3단이 붙어 섹션이 길어진 만큼 창을 앞으로 당김.
@@ -4329,10 +4283,20 @@ body.menu-open .site-header {
     padding-top: calc(var(--header-height) + 48px);
   }
 
-  .service-grid,
   .framework-grid,
   .mp-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* 영역 3장은 2열에서 한 장이 남으므로 가로 1열 행으로 스택,
+     대신 실행 항목을 2열로 펴서 행 높이를 줄임 */
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
   }
 
   /* 5스텝은 2열 스택 시 여백 낭비가 커서 3열(3+2)로 접음 */
@@ -4515,6 +4479,10 @@ body.menu-open .site-header {
   .service-card,
   .work-card {
     min-height: 280px;
+  }
+
+  .service-card ul {
+    grid-template-columns: 1fr;
   }
 
   .logo-tile {
