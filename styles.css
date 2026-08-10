@@ -1835,9 +1835,13 @@ body.menu-open .site-header {
 }
 
 .framework-grid {
+  /* 셰브런 오버레이가 카드와 동일한 트랙·gap을 재사용하므로 gap을 토큰화 */
+  --fw-gap: 16px;
+  --fw-chev: 7px;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--fw-gap);
 }
 
 .fw-card {
@@ -1861,6 +1865,24 @@ body.menu-open .site-header {
   transform: translateY(-3px);
   border-color: var(--border-3);
   box-shadow: var(--e-dark-2);
+}
+
+/* 카드 상단 2px 블루 라인 — 소개서 카드 언어(상시 노출, hover에서 선명해짐).
+   카드가 overflow:hidden이라 radius로 자동 클리핑됨 */
+.fw-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--grad-action);
+  opacity: 0.55;
+  transition: opacity var(--dur) ease;
+}
+
+.fw-card:hover::before {
+  opacity: 1;
 }
 
 .fw-initial {
@@ -1938,6 +1960,120 @@ body.menu-open .site-header {
   color: var(--text-d-3);
   font-size: 12px;
   font-weight: 700;
+}
+
+/* --- 진행 셰브런 오버레이 — 카드 그리드와 같은 트랙을 깔고 gap 중앙에 화살촉 배치.
+   그리드의 절대 배치 자식은 셀을 점유하지 않으므로 4장 레이아웃에 영향 없음 --- */
+.fw-flow {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: 1fr;
+  gap: var(--fw-gap);
+  pointer-events: none;
+}
+
+/* 셰브런 3개가 1~3열에 자동 배치 → 각 열 오른쪽 끝에서 gap 중앙으로 밀어냄.
+   화살촉 형태는 .mp-rail::after(여정 레일)와 동일한 border 기법 */
+.fw-flow i {
+  align-self: center;
+  justify-self: end;
+  width: var(--fw-chev);
+  height: var(--fw-chev);
+  margin-right: calc(-1 * (var(--fw-gap) / 2 + var(--fw-chev) / 2));
+  border-top: 1.5px solid rgba(3, 144, 238, 0.62);
+  border-right: 1.5px solid rgba(3, 144, 238, 0.62);
+  transform: rotate(45deg);
+}
+
+/* --- 학습 순환 되돌림 라인 — E(4번)에서 C(1번)로 돌아가는 헤어라인.
+   좌우 반쪽 라인 사이에 캡션을 끼워 넣어, 배경 위에 칩을 덧대지 않고도 선이 끊긴다 --- */
+.fw-outro {
+  width: min(100%, var(--max));
+  margin: 0 auto;
+}
+
+.fw-cycle {
+  --fw-cycle-h: 38px;
+  --fw-line: rgba(3, 144, 238, 0.32);
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.fw-cycle-line {
+  position: relative;
+  flex: 1 1 auto;
+  height: var(--fw-cycle-h);
+  border-bottom: 1px solid var(--fw-line);
+}
+
+/* 양끝 세로 스텁 — 카드 하단에서 되돌림 라인까지 내려오는 구간 */
+.fw-cycle-line.is-left {
+  border-left: 1px solid var(--fw-line);
+  border-bottom-left-radius: 12px;
+}
+
+.fw-cycle-line.is-right {
+  border-right: 1px solid var(--fw-line);
+  border-bottom-right-radius: 12px;
+}
+
+/* 좌측 화살촉 — 되돌림 방향(E→C)만 암시.
+   top:100%(=하단 라인) 기준 -50% 이동은 .mp-rail::after와 동일한 정렬 기법 */
+.fw-cycle-line.is-left::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 100%;
+  width: 6px;
+  height: 6px;
+  border-left: 1.5px solid rgba(3, 144, 238, 0.62);
+  border-bottom: 1.5px solid rgba(3, 144, 238, 0.62);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* 라인 사이 캡션 — flex-end 정렬이라 padding-bottom이 라인 위 여백이 된다 */
+.fw-cycle-cap {
+  flex: 0 0 auto;
+  margin: 0;
+  padding-bottom: 3px;
+  color: var(--text-d-3);
+  font-size: 12.5px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* --- 마무리 문장 — 순환 라인 아래 중앙 2줄 --- */
+.fw-closing {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.fw-closing-lead {
+  margin: 0;
+  color: var(--white);
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.fw-closing-sub {
+  margin: 7px 0 0;
+  color: var(--text-d-3);
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.fw-closing-sub strong {
+  color: var(--cyan);
+  font-weight: 800;
 }
 
 /* =========================================================
@@ -3215,6 +3351,270 @@ body.menu-open .site-header {
   color: var(--text-d-4);
   font-size: 12.5px;
   line-height: 1.65;
+  word-break: keep-all;
+}
+
+/* ---------------------------------------------------------
+   모듈 아키텍처 — 좌2 모듈 · 중앙 시스템 노드 · 우2 모듈 3열 도식.
+   커넥터(브래킷·스텁·접점 도트)는 전부 의사요소 border로 그린다.
+   개발 중 제품이므로 글로우 없이 hairline·틴트로만 위계 표현
+   --------------------------------------------------------- */
+.os-arch-block {
+  width: min(100%, var(--max));
+  margin: 34px auto 0;
+}
+
+.os-arch {
+  /* 커넥터가 gap 절반을 정확히 가로지르므로 gap은 고정값으로 토큰화 */
+  --os-gap: 56px;
+  --os-row: 16px;
+  --os-line: rgba(3, 144, 238, 0.34);
+  --os-dot: rgba(3, 144, 238, 0.6);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(232px, 292px) minmax(0, 1fr);
+  column-gap: var(--os-gap);
+  align-items: stretch;
+}
+
+/* 두 모듈의 높이를 강제로 균등화 — 브래킷이 만나는 지점(열 중앙)과
+   노드 중앙이 항상 같은 y에 오도록 하는 전제 */
+.os-col {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  row-gap: var(--os-row);
+}
+
+.os-mod {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 17px 19px 15px;
+  border: 1px solid var(--border-2);
+  /* 소개서 카드 언어 — 상단 얇은 블루 라인 */
+  border-top: 2px solid rgba(3, 144, 238, 0.55);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: var(--e-dark-1);
+  transition: border-color var(--dur) ease;
+}
+
+.os-mod:hover {
+  border-color: var(--border-3);
+  border-top-color: var(--cyan);
+}
+
+/* 접점 도트 — 커넥터가 카드에서 출발하는 지점(.mp-stage::before와 동일한 링 표현) */
+.os-mod::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -5px;
+  border: 1.5px solid var(--os-dot);
+  border-radius: 50%;
+  background: var(--surface-0);
+}
+
+/* 브래킷 — 카드 중앙에서 가로로 나와 열 중앙(노드 높이)까지 꺾여 내려/올라간다.
+   끝 +3px는 위·아래 브래킷이 보더 두께 오차 없이 겹쳐 만나게 하는 여유분 */
+.os-mod::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--os-gap) / 2);
+  height: calc(50% + var(--os-row) / 2 + 3px);
+  border: 0 solid var(--os-line);
+}
+
+.os-mod:first-child::after {
+  top: 50%;
+  border-top-width: 1px;
+}
+
+.os-mod:last-child::after {
+  bottom: 50%;
+  border-bottom-width: 1px;
+}
+
+.os-col.is-left .os-mod::before {
+  left: 100%;
+  margin-left: -5px;
+}
+
+.os-col.is-left .os-mod::after {
+  left: 100%;
+  border-right-width: 1px;
+}
+
+.os-col.is-left .os-mod:first-child::after {
+  border-top-right-radius: 10px;
+}
+
+.os-col.is-left .os-mod:last-child::after {
+  border-bottom-right-radius: 10px;
+}
+
+.os-col.is-right .os-mod::before {
+  right: 100%;
+  margin-right: -5px;
+}
+
+.os-col.is-right .os-mod::after {
+  right: 100%;
+  border-left-width: 1px;
+}
+
+.os-col.is-right .os-mod:first-child::after {
+  border-top-left-radius: 10px;
+}
+
+.os-col.is-right .os-mod:last-child::after {
+  border-bottom-left-radius: 10px;
+}
+
+.os-mod-no {
+  color: var(--text-d-4);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.os-mod h3 {
+  margin: 5px 0 0;
+  color: var(--white);
+  font-size: 17.5px;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.os-mod p {
+  margin: 7px 0 0;
+  color: var(--text-d-3);
+  font-size: 14.5px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.os-mod-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: auto 0 0;
+  padding: 13px 0 0;
+}
+
+.os-mod-tags li {
+  padding: 4px 10px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-d-3);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* 중앙 시스템 노드 — 모듈보다 한 단계 밝은 서피스 + 블루 보더로만 허브 위계 */
+.os-core {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 20px;
+  border: 1px solid var(--border-3);
+  border-radius: var(--r-md);
+  background-color: var(--surface-1);
+  background-image: linear-gradient(180deg, rgba(3, 144, 238, 0.12), rgba(3, 144, 238, 0) 62%);
+  box-shadow: var(--e-dark-1);
+  text-align: center;
+}
+
+/* 노드 좌우 스텁 — gap 절반을 가로질러 모듈 브래킷 수직선과 겹쳐 물린다(+2px 여유) */
+.os-core::before,
+.os-core::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(var(--os-gap) / 2 + 2px);
+  border-top: 1px solid var(--os-line);
+}
+
+.os-core::before {
+  right: 100%;
+}
+
+.os-core::after {
+  left: 100%;
+}
+
+.os-cap {
+  display: block;
+  color: var(--text-d-3);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.os-core-name {
+  display: block;
+  margin-top: 8px;
+  color: var(--white);
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.os-src-cap {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-2);
+}
+
+.os-src {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.os-src li {
+  padding: 5px 11px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-d-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.os-arch-cap {
+  margin: 24px 0 0;
+  text-align: center;
+  color: var(--text-d-2);
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.os-arch-cap strong {
+  color: var(--cyan);
+  font-weight: 800;
+}
+
+/* 각주 — 콘솔 면책과 동일 톤(개발 단계 명시) */
+.os-arch-note {
+  margin: 9px 0 0;
+  text-align: center;
+  color: var(--text-d-4);
+  font-size: 12px;
+  line-height: 1.6;
   word-break: keep-all;
 }
 
@@ -4573,6 +4973,31 @@ body.menu-open .site-header {
     display: none;
   }
 
+  /* 모듈 아키텍처 — 노드 상단 + 모듈 2열.
+     열 래퍼를 display:contents로 풀어 4장이 그리드에 직접 배치되게 한다 */
+  .os-arch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .os-col {
+    display: contents;
+  }
+
+  .os-core {
+    order: -1;
+    grid-column: 1 / -1;
+    padding: 22px 18px;
+  }
+
+  /* 3열 전제가 사라지므로 커넥터는 전부 숨김 */
+  .os-mod::before,
+  .os-mod::after,
+  .os-core::before,
+  .os-core::after {
+    display: none;
+  }
+
   .hero-inner {
     align-items: start;
     padding-top: calc(var(--header-height) + 48px);
@@ -4581,6 +5006,26 @@ body.menu-open .site-header {
   .framework-grid,
   .mp-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* 2열에서는 C→O→R→E 행 흐름이 끊기므로 진행 셰브런·되돌림 라인은 성립하지 않음.
+     순환의 의미만 캡션으로 남긴다 */
+  .fw-flow,
+  .fw-cycle-line {
+    display: none;
+  }
+
+  .fw-cycle {
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .fw-cycle-cap {
+    font-size: 12px;
+  }
+
+  .fw-closing {
+    margin-top: 16px;
   }
 
   /* 영역 3장은 2열에서 한 장이 남으므로 가로 1열 행으로 스택,
@@ -4781,6 +5226,19 @@ body.menu-open .site-header {
 
   .solution-panel {
     padding: 18px;
+  }
+
+  /* 모듈 아키텍처 1열 스택 */
+  .os-arch {
+    grid-template-columns: 1fr;
+  }
+
+  .os-arch-block {
+    margin-top: 26px;
+  }
+
+  .os-arch-cap {
+    font-size: 14.5px;
   }
 
   .chat-q,

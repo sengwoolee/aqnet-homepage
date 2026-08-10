@@ -305,6 +305,25 @@
                 <li>운영 기준 업데이트</li>
               </ul>
             </article>
+
+            <!-- 진행 셰브런 — 카드 사이 gap 중앙에서 C→O→R→E 흐름 표시(데스크탑 4열 전용).
+                 그리드의 절대 배치 자식이라 셀을 차지하지 않고 stagger에만 편승 -->
+            <span class="fw-flow" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+
+          <!-- 학습 순환 — E(Endurance)에서 다시 C(Control)로 되돌아가는 되돌림 라인 + 마무리 문장 -->
+          <div class="fw-outro">
+            <div class="fw-cycle" data-reveal>
+              <span class="fw-cycle-line is-left" aria-hidden="true"></span>
+              <p class="fw-cycle-cap">학습을 다시 기준으로</p>
+              <span class="fw-cycle-line is-right" aria-hidden="true"></span>
+            </div>
+            <div class="fw-closing" data-reveal>
+              <p class="fw-closing-lead">AQ의 철학은 이어집니다</p>
+              <p class="fw-closing-sub">
+                한 번의 성과에서 멈추지 않고 <strong class="nowrap">반복되는 운영</strong>으로
+              </p>
+            </div>
           </div>
         </section>
 
@@ -709,6 +728,78 @@
             <p>
               화면과 수치는 제품 기획을 위한 예시이며 실제 고객 데이터가 아닙니다. AQ Growth OS는
               AQNET 내부 운영 적용을 목표로 개발 중인 <span class="nowrap">통합 성장 운영 시스템입니다.</span>
+            </p>
+          </div>
+
+          <!-- 모듈 아키텍처 — 좌2 모듈 · 중앙 시스템 노드 · 우2 모듈.
+               노드↔모듈 커넥터는 카드/노드 의사요소의 border로만 그린다(추가 마크업·JS 없음) -->
+          <div class="os-arch-block" data-reveal>
+            <div class="os-arch" role="group" aria-label="AQ Growth OS 모듈 아키텍처">
+              <div class="os-col is-left" data-stagger>
+                <article class="os-mod">
+                  <span class="os-mod-no">MODULE 01</span>
+                  <h3>Unified Dashboard</h3>
+                  <p>주요 광고·커머스·CRM 데이터를 하나의 화면과 기준으로 통합합니다.</p>
+                  <ul class="os-mod-tags">
+                    <li>통합 KPI</li>
+                    <li>예산·목표</li>
+                    <li>이상 감지</li>
+                  </ul>
+                </article>
+                <article class="os-mod">
+                  <span class="os-mod-no">MODULE 02</span>
+                  <h3>Conversational Report</h3>
+                  <p>자연어 질문으로 성과 원인과 다음 액션을 빠르게 확인합니다.</p>
+                  <ul class="os-mod-tags">
+                    <li>질문</li>
+                    <li>근거</li>
+                    <li>실행안</li>
+                  </ul>
+                </article>
+              </div>
+
+              <div class="os-core">
+                <span class="os-cap">GROWTH OPERATING SYSTEM</span>
+                <strong class="os-core-name">AQ GROWTH OS</strong>
+                <span class="os-cap os-src-cap">DATA SOURCE</span>
+                <ul class="os-src">
+                  <li>광고 매체</li>
+                  <li>CRM</li>
+                  <li>커머스</li>
+                  <li>상품</li>
+                  <li>고객</li>
+                </ul>
+              </div>
+
+              <div class="os-col is-right" data-stagger>
+                <article class="os-mod">
+                  <span class="os-mod-no">MODULE 03</span>
+                  <h3>AI Operations</h3>
+                  <p>반복 업무를 자동화하고 성과 변화를 감지해 운영 액션을 제안합니다.</p>
+                  <ul class="os-mod-tags">
+                    <li>모니터</li>
+                    <li>탐지</li>
+                    <li>추천</li>
+                  </ul>
+                </article>
+                <article class="os-mod">
+                  <span class="os-mod-no">MODULE 04</span>
+                  <h3>Market Intelligence</h3>
+                  <p>업종·채널·성과 데이터를 비교해 시장 흐름과 성장 기회를 분석합니다.</p>
+                  <ul class="os-mod-tags">
+                    <li>카테고리</li>
+                    <li>성장 기회</li>
+                    <li>확장</li>
+                  </ul>
+                </article>
+              </div>
+            </div>
+
+            <p class="os-arch-cap">
+              데이터 → 판단 → 실행 → 학습이 <strong class="nowrap">하나의 시스템</strong> 안에서 이어집니다.
+            </p>
+            <p class="os-arch-note">
+              * 일부 기능은 테스트·고도화 단계이며 실제 적용 범위는 <span class="nowrap">프로젝트별로 협의됩니다.</span>
             </p>
           </div>
         </section>
