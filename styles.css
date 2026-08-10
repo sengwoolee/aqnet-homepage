@@ -3279,6 +3279,7 @@ body.menu-open .site-header {
 
 /* 중간 전환 CTA 밴드 — 사례 확인 직후의 전환 경로 */
 .cta-band {
+  position: relative;
   width: min(100%, var(--max));
   margin: 44px auto 0;
   padding: clamp(24px, 3vw, 34px) clamp(24px, 3vw, 38px);
@@ -3308,6 +3309,23 @@ body.menu-open .site-header {
   color: var(--text-d-3);
   font-size: 13px;
   word-break: keep-all;
+}
+
+/* 상단 시그니처 헤어라인 — works-section/site-footer와 동일 패턴으로 밴드를 문의 진입점으로 표시 */
+.cta-band::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
+}
+
+/* 문의 동선 앵커 — 공용 .button 대비 소폭만 상향(정보 탐색형 톤 유지) */
+.cta-band .button {
+  min-height: 54px;
+  padding: 0 30px;
 }
 
 /* =========================================================
@@ -3545,6 +3563,33 @@ body.menu-open .site-header {
 
 .contact-section .section-heading p:not(.eyebrow) {
   color: var(--text-d-2);
+}
+
+/* eyebrow + 회신 SLA 한 줄 — 헤딩보다 먼저 읽히는 위치에 배치 */
+.contact-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.contact-eyebrow .eyebrow {
+  margin-bottom: 0;
+}
+
+.sla-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid rgba(3, 144, 238, 0.4);
+  border-radius: var(--r-pill);
+  background: rgba(3, 144, 238, 0.1);
+  color: var(--text-d-2);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  word-break: keep-all;
 }
 
 .contact-meta {
@@ -3870,6 +3915,16 @@ body.menu-open .site-header {
   width: 100%;
   margin-top: 4px;
   border: 0;
+}
+
+/* 온라인 접수 오픈 전 임시 안내 — 마크업의 .form-notice와 이 블록만 제거하면 원복 */
+.form-notice {
+  margin: 0;
+  color: var(--text-d-4);
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+  word-break: keep-all;
 }
 
 .form-note {

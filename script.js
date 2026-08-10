@@ -706,7 +706,7 @@ if (contactForm) {
     window.location.href = `mailto:contact@aqnet.co.kr?subject=${subject}&body=${body}`;
     if (formNote) {
       formNote.textContent =
-        "메일 앱에서 문의 내용을 확인해주세요. 메일 앱이 열리지 않으면 contact@aqnet.co.kr 로 직접 보내주세요.";
+        "메일 앱에서 문의 내용을 확인 후 전송해주세요. 메일 앱이 열리지 않으면 contact@aqnet.co.kr 로 직접 보내주세요.";
     }
   });
 }
