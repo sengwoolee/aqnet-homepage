@@ -3935,6 +3935,24 @@ body.menu-open .site-header {
   font-weight: 800;
 }
 
+/* 블록 CTA — 클라이언트 지정 라벨(개발 로드맵 문의) 상시 노출 */
+.os-arch-cta {
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+.os-arch-cta a {
+  color: var(--cyan);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.os-arch-cta a:hover,
+.os-arch-cta a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* 각주 — 콘솔 면책과 동일 톤(개발 단계 명시) */
 .os-arch-note {
   margin: 9px 0 0;
