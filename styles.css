@@ -661,15 +661,6 @@ body.menu-open .site-header {
   transition-duration: var(--dur-fast);
 }
 
-/* Solution 콘솔 캡션(공유) — 히어로 제거 후에도 Solution 패널 푸터가 사용 */
-.console-note {
-  display: block;
-  margin-top: 10px;
-  color: var(--text-d-4);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-
 .hero-scrollcue {
   position: absolute;
   left: 50%;
@@ -3131,7 +3122,8 @@ body.menu-open .site-header {
   color: var(--cyan);
 }
 
-/* Console panel — 제품 목업(통합 대시보드 개발 중 프리뷰 + 대화형 레포트 티저) */
+/* Console panel — 회사소개서 v2.8 p24(Unified Dashboard) 목업.
+   크롬바 / 앱 헤더 / KPI 4종 / 추이 차트+채널 표 / 이상 감지 / 상태바 6존 */
 .solution-panel {
   position: relative;
   padding: clamp(20px, 3vw, 28px);
@@ -3142,7 +3134,7 @@ body.menu-open .site-header {
   box-shadow: var(--e-dark-1);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   overflow: hidden;
   transition: border-color var(--dur) ease;
 }
@@ -3194,19 +3186,56 @@ body.menu-open .site-header {
   overflow: hidden;
 }
 
+/* '테스트 버전' 알약 — 소개서 표기를 승계(구 IN DEVELOPMENT 뱃지 대체) */
 .preview-badge {
   flex: 0 0 auto;
   padding: 4px 10px;
   border: 1px solid var(--border-3);
   border-radius: var(--r-pill);
   color: var(--cyan);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
-/* 존2 — KPI 4셀 */
+/* 존2 — 앱 헤더: 화면명 + 조회 필터 칩 */
+.dash-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.dash-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.dash-filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dash-chip {
+  padding: 4px 9px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-d-3);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 존3 — KPI 4셀. 값이 ₩·콤마·단위를 포함한 긴 문자열이라
+   폭 기준으로 자간·크기를 조인다(4열에서 줄바꿈 금지) */
 .panel-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3214,7 +3243,7 @@ body.menu-open .site-header {
 }
 
 .panel-kpis > div {
-  padding: 12px;
+  padding: 11px 10px;
   border: 1px solid var(--border-1);
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.04);
@@ -3230,20 +3259,22 @@ body.menu-open .site-header {
 
 .panel-kpis span {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-d-2);
+  letter-spacing: 0.01em;
+  color: var(--text-d-3);
   white-space: nowrap;
   overflow: hidden;
 }
 
+/* 데스크탑은 좁은 4열 안에 ₩1,773,700,000(14자)까지 한 줄로 들어가야 한다.
+   패널 폭이 뷰포트에 비례하므로 vw 클램프로 맞춘다(≤1024/≤720에서 상향 조정) */
 .panel-kpis strong {
   display: block;
-  margin-top: 6px;
-  font-size: clamp(16px, 1.6vw, 20px);
+  margin-top: 5px;
+  font-size: clamp(12px, 1.15vw, 15.5px);
   font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--white);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -3251,16 +3282,28 @@ body.menu-open .site-header {
 
 .panel-kpis em {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   font-style: normal;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--cyan);
 }
 
-/* 존3 — 채널 ROAS 가로 바 */
-.panel-channels {
-  padding: 14px 16px;
+/* 존4 — 추이 차트 + 채널 표.
+   공유 프리미티브(.ch-track/.ch-fill)는 두 카드가 함께 쓰고,
+   드로우온 트리거 [data-bars]는 공통 래퍼 .dash-body가 받는다 */
+.dash-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.dash-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px;
   border: 1px solid var(--border-1);
   border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.04);
@@ -3269,43 +3312,233 @@ body.menu-open .site-header {
     background var(--dur) ease;
 }
 
-.panel-channels.lit {
+.dash-card.lit {
   border-color: var(--border-3);
   background: rgba(3, 144, 238, 0.08);
 }
 
-.panel-cap {
-  display: block;
+.dash-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 10px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--text-d-2);
 }
 
-.ch-row {
+.dash-cap {
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text-d-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-sub {
+  flex: 0 0 auto;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-d-4);
+}
+
+/* 차트 — 9주 세로 바 + ROAS 꺾은선 오버레이 */
+.dash-plot {
+  position: relative;
+  flex: 1;
+  min-height: clamp(96px, 9vw, 132px);
+  border-bottom: 1px solid var(--border-1);
+}
+
+/* 25% 간격 가이드라인 */
+.dash-plot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.055) 0 1px,
+    transparent 1px 25%
+  );
+  pointer-events: none;
+}
+
+/* 바 그리드와 꺾은선 SVG를 같은 절대 박스(inset:0)에 겹쳐 x·y 좌표계를 일치시킨다 */
+.dash-bars {
+  position: absolute;
+  inset: 0;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 48px;
-  gap: 10px;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+/* gap 없이 9등분 — 열 중심이 정확히 (i+0.5)/9가 되어 SVG 꺾은선 x와 맞는다.
+   막대 사이 여백은 열 간격이 아니라 막대 자체의 폭으로 만든다 */
+.dash-bar {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.dash-bar .ch-fill {
+  width: 54%;
+  max-width: 16px;
+  height: var(--h, 40%);
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, rgba(3, 144, 238, 0.7), rgba(34, 118, 255, 0.24));
+  box-shadow: none;
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+
+.dash-bar.is-now .ch-fill {
+  background: linear-gradient(180deg, var(--cyan), rgba(34, 118, 255, 0.5));
+  box-shadow: 0 0 16px rgba(3, 144, 238, 0.32);
+}
+
+/* 포인트 도트는 SVG가 아니라 열 안의 CSS 요소 — 비균등 스케일에도 정원 유지 */
+.dash-dot {
+  position: absolute;
+  left: 50%;
+  bottom: var(--v, 50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 0 2px rgba(3, 144, 238, 0.85);
+  opacity: 0;
+  transform: translate(-50%, 50%) scale(0.3);
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 60ms + 260ms);
+}
+
+.dash-bar.is-now .dash-dot {
+  width: 7px;
+  height: 7px;
+}
+
+.dash-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 820ms var(--ease-out) 180ms;
+}
+
+.dash-line polyline {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* 리빌 — 세로 바(scaleY)와 가로 게이지(scaleX)를 transform:none 하나로 함께 편다 */
+.dash-body.drawn .ch-fill {
+  transform: none;
+}
+
+.dash-body.drawn .dash-dot {
+  opacity: 1;
+  transform: translate(-50%, 50%) scale(1);
+}
+
+.dash-body.drawn .dash-line {
+  clip-path: inset(0 0 0 0);
+}
+
+.dash-axis {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  margin-top: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-d-4);
+  text-align: center;
+}
+
+.dash-axis span:last-child {
+  color: var(--cyan);
+}
+
+/* 채널별 성과 표 — 헤더와 행이 같은 열 폭을 공유해야 표로 읽힌다 */
+.dt-head,
+.dt-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 60px 50px;
+  column-gap: 8px;
   align-items: center;
 }
 
-.ch-row + .ch-row {
-  margin-top: 10px;
+.dt-head {
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-1);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-d-4);
 }
 
-.ch-row b {
-  font-size: 13px;
+.dt-head span,
+.dt-spend,
+.dt-row strong {
+  text-align: right;
+}
+
+.dt-row {
+  row-gap: 5px;
+  padding-top: 9px;
+}
+
+.dt-row b {
+  min-width: 0;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-d-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ch-row strong {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--white);
-  text-align: right;
+.dt-spend {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-d-3);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dt-row strong {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-d-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ROAS 상위 2개 채널만 블루 강조 */
+.dt-row.is-lead strong {
+  color: var(--cyan);
+}
+
+.dt-row .ch-track {
+  grid-column: 1 / -1;
+  height: 4px;
+}
+
+.dt-row .ch-fill {
+  opacity: 0.4;
+}
+
+.dt-row.is-lead .ch-fill {
+  opacity: 1;
 }
 
 .ch-track {
@@ -3328,70 +3561,82 @@ body.menu-open .site-header {
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-.panel-channels.drawn .ch-fill {
-  transform: scaleX(1);
-}
-
-/* 존4 — 대화형 레포트 티저 */
-.panel-chat {
+/* 존5 — 이상 감지 알림 + 추천 액션(구 '개발 로드맵 문의' CTA를 승계) */
+.dash-alert {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.panel-chat .panel-cap {
-  margin-bottom: 2px;
-}
-
-.chat-q,
-.chat-a {
-  margin: 0;
-  max-width: 88%;
-  padding: 10px 14px;
-  font-size: 13px;
-  line-height: 1.55;
-  word-break: keep-all;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.04);
   transition:
     border-color var(--dur) ease,
-    outline-color var(--dur) ease;
+    background var(--dur) ease;
 }
 
-.chat-q {
-  align-self: flex-end;
-  border-radius: 14px 14px 4px 14px;
-  background: var(--grad-action);
-  color: var(--white);
-  outline: 1px solid transparent;
-}
-
-.chat-q.lit {
-  outline-color: var(--cyan);
-}
-
-.chat-a {
-  align-self: flex-start;
-  border-radius: 14px 14px 14px 4px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  color: var(--text-d-2);
-}
-
-.chat-a.lit {
+.dash-alert.lit {
   border-color: var(--border-3);
   background: rgba(3, 144, 238, 0.08);
 }
 
-/* 존5 — 상태 라인 · 캡션 · 데모 CTA */
+.da-pill {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--grad-action);
+  color: var(--white);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.da-msg {
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-d-2);
+  word-break: keep-all;
+}
+
+.da-action {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 1px solid var(--border-3);
+  border-radius: var(--r-pill);
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition:
+    background var(--dur) ease,
+    border-color var(--dur) ease,
+    color var(--dur) ease;
+}
+
+.da-action:hover,
+.da-action:focus-visible {
+  background: rgba(3, 144, 238, 0.14);
+  border-color: var(--cyan);
+  color: var(--white);
+}
+
+/* 존6 — 앱 상태바(운영 루프 5단계와 동기화) */
 .panel-foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 16px;
   margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-1);
 }
 
 .console-status {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--text-d-3);
   font-variant-numeric: tabular-nums;
@@ -3400,24 +3645,6 @@ body.menu-open .site-header {
 
 .console-status.lit {
   color: var(--cyan);
-}
-
-.demo-link {
-  margin-left: auto;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--cyan);
-}
-
-.demo-link:hover,
-.demo-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.panel-foot .console-note {
-  flex-basis: 100%;
-  margin-top: 0;
 }
 
 /* 콘솔 목업 면책 — 예시 화면·샘플 데이터임을 레이아웃 하단에 명시 */
@@ -5074,6 +5301,11 @@ body.menu-open .site-header {
     grid-template-columns: 1fr;
   }
 
+  /* 콘솔이 1열 폭 전체를 쓰므로 KPI 값을 다시 키운다 */
+  .panel-kpis strong {
+    font-size: clamp(13px, 1.9vw, 18px);
+  }
+
   /* 1열 스택에서는 리턴 패스(우측 돌출) 숨김 */
   .loop-return {
     display: none;
@@ -5332,12 +5564,30 @@ body.menu-open .site-header {
     margin-top: 5px;
   }
 
+  /* 콘솔 — KPI 4→2열, 차트/표 세로 스택 */
   .panel-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  /* 2열이라 카드 폭이 다시 좁아진다 — 320px까지 ₩ 값이 안 넘치는 하한 */
+  .panel-kpis strong {
+    font-size: clamp(12px, 3.4vw, 18px);
+  }
+
   .solution-panel {
     padding: 18px;
+  }
+
+  .dash-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-plot {
+    min-height: 110px;
+  }
+
+  .dash-bar .ch-fill {
+    max-width: 22px;
   }
 
   /* 모듈 아키텍처 1열 스택 */
@@ -5351,11 +5601,6 @@ body.menu-open .site-header {
 
   .os-arch-cap {
     font-size: 14.5px;
-  }
-
-  .chat-q,
-  .chat-a {
-    max-width: 100%;
   }
 
   /* 지표 4종은 2×2로 유지 — '대시보드감' 보존 */
@@ -5555,7 +5800,9 @@ body.menu-open .site-header {
     opacity: 1 !important;
   }
 
-  .ch-fill {
+  .ch-fill,
+  .dash-dot,
+  .dash-line {
     transition: none !important;
   }
 

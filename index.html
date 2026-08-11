@@ -670,64 +670,130 @@
               <span class="loop-return" aria-hidden="true"></span>
             </ol>
 
-            <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 제품 예시 화면">
+            <!-- 콘솔 목업 = 회사소개서 v2.8 p24(Unified Dashboard) 구성·수치와 1:1.
+                 수치를 바꿀 때는 소개서와 동시에 갱신할 것(두 자료를 나란히 보는 클라이언트 기준) -->
+            <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 통합 대시보드 테스트 버전 예시 화면">
+              <!-- 존1 — 브라우저 크롬바 -->
               <div class="panel-chrome" aria-hidden="true">
                 <span class="chrome-dots"><i></i><i></i><i></i></span>
-                <span class="chrome-url">AQ Growth OS · Dashboard</span>
-                <span class="preview-badge">IN DEVELOPMENT</span>
+                <span class="chrome-url">app.aqnet.co.kr/dashboard</span>
+                <span class="preview-badge">테스트 버전</span>
               </div>
 
+              <!-- 존2 — 앱 헤더: 화면명 + 조회 필터 칩 -->
+              <div class="dash-head">
+                <span class="dash-title">AQ Growth OS · Dashboard</span>
+                <span class="dash-filters" aria-hidden="true">
+                  <span class="dash-chip">2026.01.01–01.31</span>
+                  <span class="dash-chip">전체 채널</span>
+                </span>
+              </div>
+
+              <!-- 존3 — KPI 4종. 값은 소개서 verbatim(천 단위 콤마·단위 포함)이라
+                   콤마를 못 찍는 data-count 카운트업은 적용하지 않는다 -->
               <div class="panel-kpis" data-sync="0">
                 <div>
-                  <span>Total Spend</span>
-                  <strong>₩84.2M</strong>
-                  <em>+12.4%</em>
+                  <span>광고비</span>
+                  <strong>₩130,400,000</strong>
+                  <em>▲ 12.4%</em>
                 </div>
                 <div>
-                  <span>Impressions</span>
-                  <strong>12.4M</strong>
-                  <em>+8.1%</em>
+                  <span>전환</span>
+                  <strong>12,486건</strong>
+                  <em>▲ 8.6%</em>
                 </div>
                 <div>
-                  <span>Conversions</span>
-                  <strong>3,284</strong>
-                  <em>+21.6%</em>
+                  <span>매출</span>
+                  <strong>₩1,773,700,000</strong>
+                  <em>▲ 21.3%</em>
                 </div>
                 <div>
-                  <span>Avg. ROAS</span>
-                  <strong data-count="427" data-suffix="%">0</strong>
-                  <em>+0.34x</em>
+                  <span>ROAS</span>
+                  <strong>1,360%</strong>
+                  <em>▲ 7.9%</em>
                 </div>
               </div>
 
-              <div class="panel-channels" data-sync="1" data-bars role="img"
-                aria-label="채널별 ROAS 예시: 카카오 412%, 네이버 388%, 메타 506%, 구글 441%">
-                <span class="panel-cap">CHANNEL ROAS</span>
-                <div class="ch-row"><b>Kakao</b><span class="ch-track"><span class="ch-fill" style="--h: 74%"></span></span><strong>412%</strong></div>
-                <div class="ch-row"><b>Naver</b><span class="ch-track"><span class="ch-fill" style="--h: 69%"></span></span><strong>388%</strong></div>
-                <div class="ch-row"><b>Meta</b><span class="ch-track"><span class="ch-fill hot" style="--h: 90%"></span></span><strong>506%</strong></div>
-                <div class="ch-row"><b>Google</b><span class="ch-track"><span class="ch-fill" style="--h: 79%"></span></span><strong>441%</strong></div>
+              <!-- 존4 — 좌: 추이 차트 / 우: 채널별 성과.
+                   data-bars를 두 카드의 공통 래퍼에 두어 기존 drawChartBars가
+                   세로 바 9개와 채널 게이지 5개를 한 번에 stagger 드로우한다.
+                   꺾은선은 바 그리드와 같은 박스를 덮는 SVG(열 중심 x = (i+0.5)/9),
+                   포인트 도트는 각 열 안의 CSS 요소라 비균등 스케일에도 정원 유지 -->
+              <div class="dash-body" data-bars>
+                <div class="dash-card dash-chart" data-sync="1" role="img"
+                  aria-label="최근 9주 전환·매출·ROAS 추이 예시: 9주 연속 상승했고 마지막 주가 가장 높습니다.">
+                  <div class="dash-card-head">
+                    <span class="dash-cap">전환 · 매출 · ROAS 추이</span>
+                    <span class="dash-sub">최근 9주</span>
+                  </div>
+                  <div class="dash-plot">
+                    <div class="dash-bars">
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 32%"></i><i class="dash-dot" style="--v: 40%; --d: 0"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 38%"></i><i class="dash-dot" style="--v: 45%; --d: 1"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 44%"></i><i class="dash-dot" style="--v: 49%; --d: 2"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 49%"></i><i class="dash-dot" style="--v: 55%; --d: 3"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 56%"></i><i class="dash-dot" style="--v: 60%; --d: 4"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 63%"></i><i class="dash-dot" style="--v: 67%; --d: 5"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 72%"></i><i class="dash-dot" style="--v: 73%; --d: 6"></i></span>
+                      <span class="dash-bar"><i class="ch-fill" style="--h: 83%"></i><i class="dash-dot" style="--v: 81%; --d: 7"></i></span>
+                      <span class="dash-bar is-now"><i class="ch-fill" style="--h: 96%"></i><i class="dash-dot" style="--v: 90%; --d: 8"></i></span>
+                    </div>
+                    <svg class="dash-line" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+                      <polyline points="5.56,60 16.67,55 27.78,51 38.89,45 50,40 61.11,33 72.22,27 83.33,19 94.44,10" />
+                    </svg>
+                  </div>
+                  <div class="dash-axis">
+                    <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span>
+                  </div>
+                </div>
+
+                <div class="dash-card dash-table" data-sync="2">
+                  <div class="dash-card-head">
+                    <span class="dash-cap">채널별 성과</span>
+                  </div>
+                  <div class="dt-head"><b>채널</b><span>광고비</span><span>ROAS</span></div>
+                  <div class="dt-row is-lead">
+                    <b>네이버 검색</b><span class="dt-spend">4,820만원</span><strong>1,680%</strong>
+                    <span class="ch-track" aria-hidden="true"><i class="ch-fill" style="--h: 100%"></i></span>
+                  </div>
+                  <div class="dt-row is-lead">
+                    <b>쿠팡</b><span class="dt-spend">3,140만원</span><strong>1,420%</strong>
+                    <span class="ch-track" aria-hidden="true"><i class="ch-fill" style="--h: 84.5%"></i></span>
+                  </div>
+                  <div class="dt-row">
+                    <b>Meta</b><span class="dt-spend">2,260만원</span><strong>1,180%</strong>
+                    <span class="ch-track" aria-hidden="true"><i class="ch-fill" style="--h: 70.2%"></i></span>
+                  </div>
+                  <div class="dt-row">
+                    <b>구글</b><span class="dt-spend">1,780만원</span><strong>980%</strong>
+                    <span class="ch-track" aria-hidden="true"><i class="ch-fill" style="--h: 58.3%"></i></span>
+                  </div>
+                  <div class="dt-row">
+                    <b>카카오</b><span class="dt-spend">1,040만원</span><strong>740%</strong>
+                    <span class="ch-track" aria-hidden="true"><i class="ch-fill" style="--h: 44%"></i></span>
+                  </div>
+                </div>
               </div>
 
-              <div class="panel-chat">
-                <span class="panel-cap">CONVERSATIONAL REPORT · IN DEVELOPMENT</span>
-                <p class="chat-q" data-sync="2">지난 7일 ROAS 상위 캠페인 3개 보여줘</p>
-                <p class="chat-a" data-sync="3">Meta 리타게팅 612%가 가장 높았습니다. 예산 +20% 적용 시 전환 +14~18% 예상됩니다.</p>
+              <!-- 존5 — 이상 감지 알림 + 추천 액션(구 '개발 로드맵 문의' CTA의 #contact 링크를 승계) -->
+              <div class="dash-alert" data-sync="3">
+                <span class="da-pill">이상 감지</span>
+                <span class="da-msg">리타겟팅 전환 하락 감지</span>
+                <a class="da-action" href="#contact" aria-label="추천 액션 보기 — AQ Growth OS 개발 로드맵 문의로 이동">추천 액션 보기 →</a>
               </div>
 
+              <!-- 존6 — 앱 상태바. 좌측 운영 루프 5단계와 동기화(script.js STATUS) -->
               <div class="panel-foot">
                 <span class="console-status" data-sync="4" aria-hidden="true">STEP 01 · Collect — 12개 소스 수집 중</span>
-                <a class="demo-link" href="#contact">개발 로드맵 문의 →</a>
-                <span class="console-note">AQ Growth 콘솔 OS 예시 화면입니다.</span>
               </div>
             </div>
           </div>
 
-          <!-- 콘솔 목업 면책 — 개발 중 제품의 예시 화면·샘플 데이터임을 명시 -->
+          <!-- 콘솔 목업 면책 — 첫 문장은 회사소개서 p24 각주 확정본(verbatim) -->
           <div class="console-disclaimer">
             <span class="cd-label">UI CONCEPT · SAMPLE DATA</span>
             <p>
-              화면과 수치는 제품 기획을 위한 예시이며 실제 고객 데이터가 아닙니다. AQ Growth OS는
+              * 개발 예정 기능의 테스트 버전 화면이며 실제 데이터가 아닙니다. AQ Growth OS는
               AQNET 내부 운영 적용을 목표로 개발 중인 <span class="nowrap">통합 성장 운영 시스템입니다.</span>
             </p>
           </div>
