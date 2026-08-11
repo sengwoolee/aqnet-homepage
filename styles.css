@@ -58,6 +58,11 @@
   --glow-cyan: 0 0 26px rgba(3, 144, 238, 0.32);
   --mesh-cyan: radial-gradient(620px 420px at 78% 16%, rgba(3, 144, 238, 0.16), transparent 70%);
   --mesh-blue: radial-gradient(700px 520px at 10% 92%, rgba(34, 118, 255, 0.14), transparent 72%);
+  /* 라이트 섹션 미세 텍스처 — 다크 섹션의 mesh·그리드에 대응하는 화이트 면의 결.
+     섹션 배경에만 깔리고 카드(--surface-l0/l1)는 그대로 덮으므로 카드가 한 겹 떠 보인다.
+     본문 대비를 건드리지 않도록 알파는 0.05 상한 */
+  --dot-light: radial-gradient(rgba(34, 118, 255, 0.05) 1.2px, transparent 1.2px);
+  --dot-light-size: 24px 24px;
 
   /* --- Elevation --- */
   --e-1: 0 1px 2px rgba(8, 16, 32, 0.06);
@@ -424,6 +429,21 @@ body.menu-open .site-header {
 
 .eyebrow-signal {
   color: var(--cyan);
+}
+
+/* 섹션 인덱스 — 소개서의 "NN · LABEL" 문법을 본문 섹션 아이브로우로 이식.
+   색은 아이브로우 관례를 그대로 상속받아 라이트 섹션 var(--blue) / 다크 섹션 var(--cyan)로 갈린다.
+   숫자 폭이 흔들리지 않게 tabular-nums, 구분자는 라벨과 한 호흡 떨어지도록 반투명 처리 */
+.eyebrow-no {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.eyebrow-no::after {
+  content: "·";
+  margin: 0 0.5em;
+  opacity: 0.5;
+  font-weight: 700;
 }
 
 .grad {
@@ -1167,16 +1187,7 @@ body.menu-open .site-header {
   background-image: var(--mesh-blue);
 }
 
-/* Solution과의 이음매에 시그니처 헤어라인 — works-section/site-footer와 동일 패턴 */
-.reference-snapshot::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--grad-line);
-}
+/* Solution과의 이음매 헤어라인은 SECTIONS(generic)의 SEAM 규칙이 일괄 담당 */
 
 /* 맥락 캡션 — 맨숫자 고아 방지: 직전 Solution의 시스템을 결과 요약으로 인계 */
 .snapshot-head {
@@ -1277,6 +1288,41 @@ body.menu-open .site-header {
   width: min(100%, var(--max));
   margin: 0 auto;
   padding: var(--section-y) 24px;
+}
+
+/* --- SEAM — 섹션 이음매 헤어라인(시그니처) ---
+   소개서가 페이지마다 상단 룰로 챕터를 끊듯, 배경 톤이 바뀌는 모든 경계에 --grad-line 1px을 깐다.
+   배경 순서: 히어로(D) → 스트립(D) → 01 WHY(D) → 02 About(L) → 03 Framework(D) → 04 Service(L)
+             → 05 Solution(D) → 06 Snapshot(D) → 07 Works(D) → 08 Client(L) → 09 Insight(L)
+             → 10 Contact(D) → Footer(D)
+   신규 6곳은 다크↔라이트 전환 경계, Snapshot/Works/Footer 3곳은 다크 연속 구간의 기존 구두점.
+   전환이 없는 이음매(스트립→WHY, Client→Insight)와 히어로 경계는 손대지 않는다
+   — 히어로↔스트립은 스트립의 border-top이 이미 담당 */
+.about-section,
+.framework-section,
+.service-section,
+.solution-section,
+.reference-section,
+.contact-section {
+  position: relative;
+}
+
+.about-section::before,
+.framework-section::before,
+.service-section::before,
+.solution-section::before,
+.reference-section::before,
+.contact-section::before,
+.reference-snapshot::before,
+.works-section::before,
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
 }
 
 .section-heading {
@@ -1565,7 +1611,14 @@ body.menu-open .site-header {
 .about-section {
   width: 100%;
   max-width: none;
-  background: var(--surface-l0);
+  background-color: var(--surface-l0);
+  /* 라이트 섹션 공통 텍스처 — 상단에서만 도트가 보이고 아래로 갈수록 서피스가 덮으며 사라진다 */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0), var(--surface-l0) 520px),
+    var(--dot-light);
+  background-size:
+    auto,
+    var(--dot-light-size);
 }
 
 .about-section > .section-heading,
@@ -2083,13 +2136,14 @@ body.menu-open .site-header {
   width: 100%;
   max-width: none;
   background-color: var(--surface-l1);
-  /* 상단에서만 은은한 도트 텍스처 — 아래 페이드 레이어가 도트를 서서히 덮음 */
+  /* 상단에서만 은은한 도트 텍스처 — 아래 페이드 레이어가 도트를 서서히 덮음.
+     도트 자체는 라이트 섹션 공통 토큰으로 통일(About·Client·Insight와 같은 결) */
   background-image:
     linear-gradient(180deg, rgba(248, 251, 255, 0), var(--surface-l1) 560px),
-    radial-gradient(rgba(34, 118, 255, 0.07) 1.2px, transparent 1.2px);
+    var(--dot-light);
   background-size:
     auto,
-    22px 22px;
+    var(--dot-light-size);
 }
 
 .service-section > .section-heading,
@@ -3636,16 +3690,7 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
-/* Solution(다크)과의 이음매에 시그니처 헤어라인 */
-.works-section::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--grad-line);
-}
+/* Snapshot(다크)과의 이음매 헤어라인은 SECTIONS(generic)의 SEAM 규칙이 일괄 담당 */
 
 .works-section > .section-heading,
 .work-tabs,
@@ -3900,7 +3945,14 @@ body.menu-open .site-header {
 .reference-section {
   width: 100%;
   max-width: none;
-  background: var(--surface-l1);
+  background-color: var(--surface-l1);
+  /* 라이트 섹션 공통 텍스처 — 로고월이 화이트 셀이라 텍스처는 월 바깥에만 남는다 */
+  background-image:
+    linear-gradient(180deg, rgba(248, 251, 255, 0), var(--surface-l1) 520px),
+    var(--dot-light);
+  background-size:
+    auto,
+    var(--dot-light-size);
 }
 
 .reference-section > .section-heading,
@@ -3985,7 +4037,14 @@ body.menu-open .site-header {
 .insight-section {
   width: 100%;
   max-width: none;
-  background: var(--surface-l0);
+  background-color: var(--surface-l0);
+  /* 라이트 섹션 공통 텍스처 — 행 카드가 흰 면이라 텍스처는 카드 사이 여백에만 남는다 */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0), var(--surface-l0) 520px),
+    var(--dot-light);
+  background-size:
+    auto,
+    var(--dot-light-size);
 }
 
 .insight-section > .section-heading,
@@ -4519,15 +4578,7 @@ body.menu-open .site-header {
   color: var(--text-d-2);
 }
 
-.site-footer::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--grad-line);
-}
+/* Contact(다크)과의 이음매 헤어라인은 SECTIONS(generic)의 SEAM 규칙이 일괄 담당 */
 
 .footer-top {
   display: grid;
