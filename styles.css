@@ -2431,7 +2431,7 @@ body.menu-open .site-header {
 
 /* 3단(매체·프로세스·차별점) 사이 리듬 */
 .pm-block + .pm-block {
-  margin-top: clamp(32px, 4vw, 48px);
+  margin-top: clamp(44px, 5vw, 64px);
 }
 
 .pm-sub {
@@ -2770,7 +2770,8 @@ body.menu-open .site-header {
   position: relative;
   height: 26px;
   margin-top: 12px;
-  border: 1px dashed var(--border-l3);
+  /* 순환 라인 가시성 — 뉴트럴 보더 대신 저알파 블루(디자인 정돈 피드백) */
+  border: 1px dashed rgba(34, 118, 255, 0.38);
   border-top: 0;
   border-radius: 0 0 var(--r-md) var(--r-md);
 }
@@ -2809,24 +2810,24 @@ body.menu-open .site-header {
 .pm-cycle {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 30px 0 0;
+  gap: 12px;
+  margin: 24px 0 0;
   padding: 0;
-  border: 1px solid var(--border-l1);
-  border-radius: var(--r-sm);
-  background: var(--surface-l0);
   list-style: none;
 }
 
+/* 독립 박스 3칸 — 라벨(영문) 위·설명 아래 스택(소개서 p22 주기 박스 문법) */
 .pm-cycle li {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 13px 16px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-l1);
+  border-radius: var(--r-sm);
+  background: var(--surface-l0);
 }
 
-.pm-cycle li + li {
-  border-left: 1px solid var(--border-l1);
-}
+
 
 .pm-cycle-k {
   flex: 0 0 auto;
@@ -2914,9 +2915,14 @@ body.menu-open .site-header {
 }
 
 .pm-diff-from {
+  padding: 10px 14px;
+  border: 1px solid var(--border-l1);
+  border-radius: var(--r-sm);
+  background: var(--surface-l1);
   color: var(--text-l-3);
   font-size: 14.5px;
   line-height: 1.5;
+  text-align: center;
   word-break: keep-all;
 }
 
@@ -2928,10 +2934,15 @@ body.menu-open .site-header {
 }
 
 .pm-diff-to {
+  padding: 10px 14px;
+  border: 1px solid rgba(34, 118, 255, 0.45);
+  border-radius: var(--r-sm);
+  background: rgba(34, 118, 255, 0.05);
   color: var(--text-l-1);
-  font-size: 16.5px;
+  font-size: 16px;
   line-height: 1.4;
   font-weight: 800;
+  text-align: center;
   word-break: keep-all;
 }
 
@@ -5553,11 +5564,6 @@ body.menu-open .site-header {
 
   .pm-cycle {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .pm-cycle li + li {
-    border-left: 0;
-    border-top: 1px solid var(--border-l1);
   }
 
   /* 비교 — 축 → BEFORE → AFTER → 설명 세로 스택(화살표는 아래 방향으로 회전) */
