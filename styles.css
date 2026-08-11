@@ -79,6 +79,15 @@
   --r-lg: 20px;
   --r-pill: 999px;
 
+  /* --- Card grammar (소개서 카드 문법) ---
+     콘텐츠 카드 공통 규칙: 상단 2px 블루 라인(상시 노출) + hover에서
+     리프트 2px · 보더 한 단계 · 그림자 한 단계.
+     리프트를 transform이 아니라 translate로 두는 이유 —
+     등장 리빌(cardIn)과 스크럽 패럴랙스가 transform을 점유하므로
+     축을 분리해야 두 시스템이 서로의 값을 덮어쓰지 않는다 */
+  --card-line: var(--grad-action);
+  --card-lift: -2px;
+
   /* --- Layout --- */
   --max: 1200px;
   --max-wide: 1320px;
@@ -1215,11 +1224,39 @@ body.menu-open .site-header {
   position: relative;
   min-height: 128px;
   padding: 24px;
-  border: 1px solid var(--border-1);
+  border: 1px solid var(--border-2);
   border-radius: var(--r-md);
   background: var(--surface-2);
   box-shadow: var(--e-dark-1);
   overflow: hidden;
+  /* transform은 데스크탑 패럴랙스가 점유 — 리프트는 translate 축으로 분리 */
+  transition:
+    translate var(--dur) var(--ease-out),
+    border-color var(--dur) ease,
+    box-shadow var(--dur) ease;
+}
+
+/* 지표 카드도 콘텐츠 카드 패밀리 — 상단 2px 라인 상시 노출 */
+.snapshot-inner article::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-line);
+  opacity: 0.55;
+  transition: opacity var(--dur) ease;
+}
+
+.snapshot-inner article:hover {
+  translate: 0 var(--card-lift);
+  border-color: var(--border-3);
+  box-shadow: var(--e-dark-2);
+}
+
+.snapshot-inner article:hover::before {
+  opacity: 1;
 }
 
 .snapshot-inner strong {
@@ -1909,13 +1946,13 @@ body.menu-open .site-header {
   flex-direction: column;
   overflow: hidden;
   transition:
-    transform var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out),
     border-color var(--dur) ease,
     box-shadow var(--dur) ease;
 }
 
 .fw-card:hover {
-  transform: translateY(-3px);
+  translate: 0 var(--card-lift);
   border-color: var(--border-3);
   box-shadow: var(--e-dark-2);
 }
@@ -1929,7 +1966,7 @@ body.menu-open .site-header {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--grad-action);
+  background: var(--card-line);
   opacity: 0.55;
   transition: opacity var(--dur) ease;
 }
@@ -2006,7 +2043,7 @@ body.menu-open .site-header {
 }
 
 .fw-tags li {
-  padding: 5px 11px;
+  padding: 4px 10px;
   border: 1px solid var(--border-1);
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.04);
@@ -2203,11 +2240,13 @@ body.menu-open .site-header {
   flex-direction: column;
   overflow: hidden;
   transition:
-    transform var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out),
     border-color var(--dur) ease,
     box-shadow var(--dur) ease;
 }
 
+/* 상단 2px 라인 — hover 연출이 아니라 3장 공통 상시 표기(소개서 카드 문법).
+   선두 영역(01)의 위계는 라인이 아니라 틴트·보더·그림자로만 구분한다 */
 .service-card::before {
   content: "";
   position: absolute;
@@ -2215,20 +2254,13 @@ body.menu-open .site-header {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--grad-action);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--dur) var(--ease-out);
+  background: var(--card-line);
 }
 
 .service-card:hover {
-  transform: translateY(-3px);
+  translate: 0 var(--card-lift);
   border-color: var(--border-l3);
   box-shadow: var(--e-2);
-}
-
-.service-card:hover::before {
-  transform: scaleX(1);
 }
 
 .svc-icon {
@@ -2327,7 +2359,8 @@ body.menu-open .site-header {
   letter-spacing: 0.01em;
 }
 
-/* 선두 영역(01) — 배지 없이 액센트 보더·상단 라인·미세 틴트로만 위계 표기 */
+/* 선두 영역(01) — 배지 없이 액센트 보더·미세 틴트·한 단계 높은 그림자로만 위계 표기.
+   기본 상태가 이미 한 단계 위이므로 hover도 한 단계 위(--e-3)로 받는다 */
 .service-card.is-lead {
   border-color: var(--border-l3);
   background:
@@ -2336,8 +2369,8 @@ body.menu-open .site-header {
   box-shadow: var(--e-2);
 }
 
-.service-card.is-lead::before {
-  transform: scaleX(1);
+.service-card.is-lead:hover {
+  box-shadow: var(--e-3);
 }
 
 .service-card.is-lead .svc-icon {
@@ -2559,7 +2592,7 @@ body.menu-open .site-header {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 9px;
+  padding: 4px 10px;
   border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
   background: var(--surface-l1);
@@ -2652,7 +2685,7 @@ body.menu-open .site-header {
   background: var(--surface-l0);
   box-shadow: var(--e-1);
   transition:
-    transform var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out),
     border-color var(--dur) ease,
     box-shadow var(--dur) ease;
 }
@@ -2671,8 +2704,9 @@ body.menu-open .site-header {
 }
 
 .pm-step:hover {
-  transform: translateY(-2px);
+  translate: 0 var(--card-lift);
   border-color: var(--border-l3);
+  /* 위 border-color 단축 속성이 상단 라인까지 덮으므로 블루로 되돌린다 */
   border-top-color: var(--blue);
   box-shadow: var(--e-2);
 }
@@ -3449,17 +3483,24 @@ body.menu-open .site-header {
   flex-direction: column;
   padding: 17px 19px 15px;
   border: 1px solid var(--border-2);
-  /* 소개서 카드 언어 — 상단 얇은 블루 라인 */
-  border-top: 2px solid rgba(3, 144, 238, 0.55);
+  /* 소개서 카드 언어 — 상단 2px 블루 라인.
+     커넥터(::before 접점 도트 · ::after 브래킷)가 두 의사요소를 모두 쓰므로
+     이 패밀리만 라인을 border-top으로 그린다(그래서 그라디언트가 아닌 solid) */
+  border-top: 2px solid rgba(34, 118, 255, 0.55);
   border-radius: var(--r-md);
   background: var(--surface-2);
   box-shadow: var(--e-dark-1);
-  transition: border-color var(--dur) ease;
+  transition:
+    border-color var(--dur) ease,
+    box-shadow var(--dur) ease;
 }
 
+/* 리프트 없음 — 브래킷·접점 도트가 카드에 물려 있어 2px만 올려도
+   중앙 노드 스텁과 커넥터가 어긋난다. 보더·그림자·라인만으로 응답 */
 .os-mod:hover {
   border-color: var(--border-3);
-  border-top-color: var(--cyan);
+  border-top-color: var(--blue);
+  box-shadow: var(--e-dark-2);
 }
 
 /* 접점 도트 — 커넥터가 카드에서 출발하는 지점(.mp-stage::before와 동일한 링 표현) */
@@ -3643,10 +3684,10 @@ body.menu-open .site-header {
 }
 
 .os-src li {
-  padding: 5px 11px;
-  border: 1px solid var(--border-2);
+  padding: 4px 10px;
+  border: 1px solid var(--border-1);
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-d-2);
   font-size: 12.5px;
   font-weight: 700;
