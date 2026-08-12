@@ -2913,12 +2913,15 @@ body.menu-open .site-header {
   border-bottom: 1px solid var(--border-l2);
 }
 
+/* 아래 BEFORE·AFTER 박스가 text-align: center라 헤더 라벨도 같은 축에 세운다.
+   (start 정렬이면 라벨이 열 왼쪽 끝에 붙어 박스 중심과 100px 이상 어긋남) */
 .pm-diff-cap {
   color: var(--text-l-3);
   font-size: 11px;
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: 0.14em;
+  text-align: center;
 }
 
 .pm-diff-cap.is-from {
