@@ -5690,6 +5690,12 @@ body.menu-open .site-header {
     padding: 20px 18px 22px;
   }
 
+  /* 카운트업 밑줄은 카드 여백과 같은 선에서 시작·끝나야 한다 */
+  .snapshot-inner article::after {
+    left: 18px;
+    right: 18px;
+  }
+
   .snapshot-inner strong {
     font-size: clamp(38px, 11.5vw, 54px);
   }
