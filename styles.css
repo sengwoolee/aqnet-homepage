@@ -1213,8 +1213,8 @@ body.menu-open .site-header {
 
 .snapshot-inner article {
   position: relative;
-  min-height: 128px;
-  padding: 24px;
+  min-height: 168px;
+  padding: 28px 24px 30px;
   border: 1px solid var(--border-2);
   border-radius: var(--r-md);
   background: var(--surface-2);
@@ -1250,19 +1250,22 @@ body.menu-open .site-header {
   opacity: 1;
 }
 
+/* 수치가 카드의 주인공 — 라벨보다 한 위계가 아니라 두 위계 위에 둔다.
+   큰 자소에서 벌어져 보이는 자간은 -0.02em으로 조인다 */
 .snapshot-inner strong {
   display: block;
   color: var(--white);
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(48px, 6vw, 86px);
   line-height: 1;
   font-weight: 900;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
 /* 라벨은 카드 직계 span만 — 내부 .nowrap이 블록으로 떨어지지 않도록 스코프 한정 */
 .snapshot-inner article > span {
   display: block;
-  margin-top: 14px;
+  margin-top: 16px;
   color: var(--text-d-3);
   font-size: 15px;
   font-weight: 700;
@@ -2789,6 +2792,19 @@ body.menu-open .site-header {
   transform: rotate(45deg);
 }
 
+/* 우측 끝 기점 — 흐름이 05에서 빠져나가는 지점.
+   화살촉(도착)과 점(출발)이 짝을 이뤄야 U자가 방향을 가진 리턴 패스로 읽힌다 */
+.pm-loop::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(34, 118, 255, 0.5);
+}
+
 .pm-loop-cap {
   position: absolute;
   left: 50%;
@@ -2806,11 +2822,23 @@ body.menu-open .site-header {
   white-space: nowrap;
 }
 
-/* 운영 주기 — 프로세스가 1회성 세팅이 아님을 헤어라인 박스 3칸으로만 */
+/* 순환 기호 — 리턴 패스가 '한 번 되돌아감'이 아니라 '반복해서 돈다'로 읽히게.
+   alt를 빈 문자열로 둬서 낭독에는 끼어들지 않는다(미지원 브라우저는 글리프만 노출) */
+.pm-loop-cap::before {
+  content: "↻" / "";
+  margin-right: 7px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* 운영 주기 — 프로세스가 1회성 세팅이 아님을 헤어라인 박스 3칸으로만.
+   gap 값은 칸 사이 연결선 계산에 재사용하므로 토큰화 */
 .pm-cycle {
+  --cyc-gap: 12px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--cyc-gap);
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
@@ -2818,6 +2846,7 @@ body.menu-open .site-header {
 
 /* 독립 박스 3칸 — 라벨(영문) 위·설명 아래 스택(소개서 p22 주기 박스 문법) */
 .pm-cycle li {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -2825,6 +2854,19 @@ body.menu-open .site-header {
   border: 1px solid var(--border-l1);
   border-radius: var(--r-sm);
   background: var(--surface-l0);
+}
+
+/* 칸 사이 연결선 — 세 주기는 순서가 아니라 함께 도는 하나의 운영 밴드다.
+   그래서 .pm-step의 gap 셰브런(방향 있음)이 아니라 방향 없는 헤어라인을 쓴다 */
+.pm-cycle li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(-1 * var(--cyc-gap) - 1px);
+  width: var(--cyc-gap);
+  height: 1px;
+  background: rgba(34, 118, 255, 0.28);
+  transform: translateY(-50%);
 }
 
 
@@ -5112,10 +5154,13 @@ body.menu-open .site-header {
   margin-bottom: -0.09em;
 }
 
+/* 라인 캐스케이드는 블록 페이드(--dur-slow 600ms)보다 늦게 끝나야 읽힌다.
+   80ms 늦게 출발시켜 페이드와 겹치는 구간을 줄이고, 스텝을 110ms로 벌려
+   마지막 줄이 블록 전환이 끝난 뒤 차오르도록 한다 */
 .lines-ready .h-line-inner {
   display: block;
   transform: translateY(112%);
-  transition: transform 760ms var(--ease-emphasized) calc(var(--ln, 0) * 90ms);
+  transition: transform 820ms var(--ease-emphasized) calc(80ms + var(--ln, 0) * 110ms);
 }
 
 [data-reveal].is-visible .h-line-inner {
@@ -5431,7 +5476,9 @@ body.menu-open .site-header {
     border: 0;
   }
 
-  .pm-loop::before {
+  /* 선을 걷으면 화살촉·기점도 붙을 곳이 없어진다 */
+  .pm-loop::before,
+  .pm-loop::after {
     display: none;
   }
 
@@ -5566,6 +5613,11 @@ body.menu-open .site-header {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* 1열 스택에서는 가로 연결선이 갈 곳이 없다 */
+  .pm-cycle li:not(:last-child)::after {
+    display: none;
+  }
+
   /* 비교 — 축 → BEFORE → AFTER → 설명 세로 스택(화살표는 아래 방향으로 회전) */
   .pm-diff-head {
     display: none;
@@ -5634,12 +5686,12 @@ body.menu-open .site-header {
   }
 
   .snapshot-inner article {
-    min-height: 104px;
-    padding: 18px;
+    min-height: 124px;
+    padding: 20px 18px 22px;
   }
 
   .snapshot-inner strong {
-    font-size: clamp(30px, 9vw, 38px);
+    font-size: clamp(38px, 11.5vw, 54px);
   }
 
   .snapshot-inner article > span {
