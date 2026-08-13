@@ -2375,38 +2375,12 @@ body.menu-open .site-header {
   color: var(--blue);
 }
 
-/* 01 영역 → 퍼포먼스 마케팅 상세(#pm-detail) 앵커 — 키워드 줄 위에 배치해 하단 정렬 유지 */
-.svc-more {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  color: var(--blue);
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  transition:
-    gap var(--dur) var(--ease-out),
-    opacity var(--dur) ease;
-}
-
-.svc-more:hover {
-  gap: 10px;
-  opacity: 0.82;
-}
-
-.svc-more:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 3px;
-  border-radius: var(--r-xs);
-}
-
 /* ---- Performance Marketing 상세 (매체 커버리지 · 운영 프로세스 · 차별점) ---- */
 .media-products {
   width: min(100%, var(--max));
   margin: clamp(48px, 6vw, 72px) auto 0;
-  /* FLAGSHIP 카드 앵커(#pm-detail) 착지 여백 — html scroll-padding-top에 더해짐 */
+  /* 사이트 내 링크는 없지만 #pm-detail 직접 공유 시의 착지 여백 —
+     html scroll-padding-top에 더해짐 */
   scroll-margin-top: 24px;
 }
 
