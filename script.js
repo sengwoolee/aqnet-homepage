@@ -904,11 +904,11 @@ if (loop) {
   const panel = document.querySelector(".solution-panel");
   const statusEl = document.querySelector(".console-status");
   const STATUS = [
-    "STEP 01 · Collect — 12개 소스 수집 중",
-    "STEP 02 · Analyze — 채널 기여도 재계산",
-    "STEP 03 · Decide — 예산 재배분 우선순위 산출",
-    "STEP 04 · Execute — 캠페인 액션 반영 중",
-    "STEP 05 · Learn — 다음 가설로 학습 반영",
+    "STEP 01 · Collect: 12개 소스 수집 중",
+    "STEP 02 · Analyze: 채널 기여도 재계산",
+    "STEP 03 · Decide: 예산 재배분 우선순위 산출",
+    "STEP 04 · Execute: 캠페인 액션 반영 중",
+    "STEP 05 · Learn: 다음 가설로 학습 반영",
   ];
   let nodeCenters = [];
   let active = 0;
