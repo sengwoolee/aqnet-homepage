@@ -2130,7 +2130,10 @@ body.menu-open .site-header {
 
 .fw-cycle {
   --fw-cycle-h: 38px;
-  --fw-line: rgba(3, 144, 238, 0.32);
+  --fw-line: rgba(3, 144, 238, 0.4);
+  /* 카드 하단과 브래킷 사이 숨구멍 — 도착 화살촉이 카드 밑변에 박히지 않고
+     소개서 p12처럼 카드 아래에서 올려다보는 형태가 된다 */
+  margin-top: 12px;
   display: flex;
   align-items: flex-end;
   gap: 14px;
@@ -2154,18 +2157,34 @@ body.menu-open .site-header {
   border-bottom-right-radius: 12px;
 }
 
-/* 좌측 화살촉 — 되돌림 방향(E→C)만 암시.
-   top:100%(=하단 라인) 기준 -50% 이동은 .mp-rail::after와 동일한 정렬 기법 */
+/* 도착 화살촉 — 스텁 '위쪽 끝'에서 C(Control) 카드로 다시 올라간다.
+   소개서 p12가 되돌림 경로를 카드로 재진입시키는 방식 그대로이며,
+   위치·기법 모두 06 .pm-loop::before와 같아 두 섹션의 순환 문법이 일치한다.
+   크기는 C→O→R→E 진행 셰브런(--fw-chev: 7px)과 맞춰 같은 흐름의 기호로 읽히게 했다 */
 .fw-cycle-line.is-left::after {
   content: "";
   position: absolute;
-  left: 14px;
-  top: 100%;
+  left: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid rgba(3, 144, 238, 0.62);
+  border-left: 1.5px solid rgba(3, 144, 238, 0.62);
+  transform: rotate(45deg);
+}
+
+/* 출발 기점 — 흐름이 E(Endurance)에서 빠져나가는 지점.
+   화살촉(도착)과 점(출발)이 짝을 이뤄야 브래킷이 '한 번 되돌아감'이 아니라
+   방향을 가진 순환으로 읽힌다(06 .pm-loop::after와 동일 규칙) */
+.fw-cycle-line.is-right::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: -3px;
   width: 6px;
   height: 6px;
-  border-left: 1.5px solid rgba(3, 144, 238, 0.62);
-  border-bottom: 1.5px solid rgba(3, 144, 238, 0.62);
-  transform: translateY(-50%) rotate(45deg);
+  border-radius: 50%;
+  background: rgba(3, 144, 238, 0.62);
 }
 
 /* 라인 사이 캡션 — flex-end 정렬이라 padding-bottom이 라인 위 여백이 된다 */
@@ -2173,22 +2192,41 @@ body.menu-open .site-header {
   flex: 0 0 auto;
   margin: 0;
   padding-bottom: 3px;
-  color: var(--text-d-3);
-  font-size: 13px;
+  color: var(--text-d-2);
+  font-size: 13.5px;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
+/* 순환 기호 — 브래킷이 '반복해서 돈다'로 읽히게.
+   06 .pm-loop-cap::before와 같은 글리프·같은 alt 처리(빈 문자열이라 낭독에 끼어들지 않음)로
+   두 섹션의 루프 캡션 형식을 맞춘다 */
+.fw-cycle-cap::before {
+  content: "↻" / "";
+  margin-right: 7px;
+  color: var(--cyan);
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
 /* --- 마무리 문장 — 되돌림 브래킷 아래 결론 밴드.
-   소개서 p12는 이 결론을 상하 헤어라인으로 감싸 챕터를 닫는다.
-   섹션 이음매와 같은 --grad-line을 써서 사이트 문법과 일치시킨다 --- */
+   소개서 p12는 이 결론을 상하 라인으로 감싸 챕터를 닫는다. 다만 p12는 슬라이드의
+   큰 여백이 무게를 대신하므로 헤어라인만으로 성립하고, 웹에서는 그 여백이 없어
+   같은 구성이 카드 4장에 눌렸다(1차 적용 후 '아직 약하다' 피드백).
+   그래서 위 라인은 카드와 같은 --card-line 2px으로, 밴드에는 면(워시)을,
+   본문에는 한 단계 큰 타이포 위계를 얹어 결론이 스스로 서게 했다 --- */
 .fw-closing {
   position: relative;
-  margin-top: 30px;
-  padding: 22px 0 24px;
+  margin-top: 26px;
+  padding: 34px 0 36px;
   text-align: center;
+  /* 밴드의 면 — 선만으로는 앞의 카드 4장 대비 무게가 서지 않아, 상단 라인에 매달려
+     아래로 꺼지는 액센트 워시를 깐다. 색은 --grad-accent-surface와 같은 액센트(3,144,238)이고
+     좌우로도 페이드하도록 지오메트리만 바꿔 헤어라인의 가로 페이드와 끝이 맞는다.
+     본문 두 줄이 놓이는 아래쪽(66% 지점 이후)에서는 완전히 꺼져 대비를 건드리지 않는다 */
+  background-image: radial-gradient(70% 100% at 50% 0%, rgba(3, 144, 238, 0.24), transparent 66%);
 }
 
 .fw-closing::before,
@@ -2197,38 +2235,51 @@ body.menu-open .site-header {
   position: absolute;
   left: 0;
   right: 0;
-  height: 1px;
-  background: var(--grad-line);
-  opacity: 0.55;
 }
 
+/* 상단 라인 — 카드 4장의 상단 라인(.fw-card::before)과 같은 2px·같은 --card-line 규격.
+   양끝이 카드 그리드 좌우 끝과 맞아떨어져, 결론 밴드가 네 장을 덮어 닫는
+   '다섯 번째 면'으로 읽힌다. 페이드형 --grad-line으로는 이 무게가 서지 않았다 */
 .fw-closing::before {
   top: 0;
+  height: 2px;
+  background: var(--card-line);
+  opacity: 0.7;
 }
 
+/* 하단 라인 — 밴드를 닫되 섹션으로 흩어지도록, 양끝이 사라지는 헤어라인으로 한 단계 약하게 */
 .fw-closing::after {
   bottom: 0;
+  height: 1px;
+  background: var(--grad-line);
+  opacity: 0.5;
 }
 
 .fw-closing-lead {
   margin: 0;
   color: var(--white);
-  font-size: 18px;
-  line-height: 1.4;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
 .fw-closing-sub {
-  margin: 7px 0 0;
-  color: var(--text-d-3);
-  font-size: 15px;
+  margin: 10px 0 0;
+  color: var(--text-d-2);
+  font-size: 16px;
   line-height: 1.6;
   font-weight: 600;
   word-break: keep-all;
 }
 
+/* 액센트 — 색만으로는 약해서 면(글자 아래 저알파 시안 슬랩)과 선(2px 언더라인)을 얹는다.
+   슬랩을 글자 뒤가 아니라 padding 영역에만 깔아, 시안 텍스트는 원래 배경 위에 남아
+   대비(5.7:1)가 그대로 유지된다. 2px는 카드 상단 라인과 같은 강조 규격 */
 .fw-closing-sub strong {
+  padding: 0 3px 6px;
+  background-image: linear-gradient(180deg, transparent calc(100% - 6px), rgba(3, 144, 238, 0.2) calc(100% - 6px));
+  border-bottom: 2px solid rgba(3, 144, 238, 0.62);
   color: var(--cyan);
   font-weight: 800;
 }
@@ -2867,15 +2918,17 @@ body.menu-open .site-header {
    5열 한 줄일 때만 성립하므로 ≤1024px에서는 캡션만 남긴다 */
 .pm-loop {
   position: relative;
-  height: 26px;
-  margin-top: 12px;
+  height: 30px;
+  margin-top: 14px;
   /* 순환 라인 가시성 — 뉴트럴 보더 대신 저알파 블루(디자인 정돈 피드백) */
   border: 1px dashed rgba(34, 118, 255, 0.38);
   border-top: 0;
   border-radius: 0 0 var(--r-md) var(--r-md);
 }
 
-/* 좌측 끝 화살촉 — 05에서 돌아온 흐름이 01로 다시 올라감 */
+/* 좌측 끝 화살촉 — 05에서 돌아온 흐름이 01로 다시 올라감.
+   알파를 0.34(--border-l3)에서 0.62로 올려 반대편 출발점과 같은 세기로 맞췄다 —
+   03 .fw-cycle-line 양끝 기호와도 같은 값이라 두 섹션의 순환 터미널이 한 규격이 된다 */
 .pm-loop::before {
   content: "";
   position: absolute;
@@ -2883,8 +2936,8 @@ body.menu-open .site-header {
   left: -3px;
   width: 6px;
   height: 6px;
-  border-top: 1.5px solid var(--border-l3);
-  border-left: 1.5px solid var(--border-l3);
+  border-top: 1.5px solid rgba(34, 118, 255, 0.62);
+  border-left: 1.5px solid rgba(34, 118, 255, 0.62);
   transform: rotate(45deg);
 }
 
@@ -2898,34 +2951,40 @@ body.menu-open .site-header {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(34, 118, 255, 0.5);
+  background: rgba(34, 118, 255, 0.62);
 }
 
+/* 캡션 — 루프 위에 얹힌 결론 노드.
+   bottom:0 + translateY(50%)라 알약 높이가 바뀌어도 점선 하단에 자동으로 중심이 맞는다 */
 .pm-loop-cap {
   position: absolute;
   left: 50%;
-  bottom: -15px;
-  transform: translateX(-50%);
+  bottom: 0;
+  transform: translate(-50%, 50%);
   margin: 0;
-  padding: 5px 14px;
-  border: 1px solid var(--border-l1);
+  padding: 8px 18px;
+  /* 보더를 뉴트럴에서 액센트 링으로 올려, 알약이 '지나가는 라벨'이 아니라
+     순환이 매듭지어지는 지점으로 읽히게 한다 */
+  border: 1px solid var(--border-l3);
   border-radius: var(--r-pill);
   /* 점선 루프를 가리는 마스크라 섹션 배경(l2)과 반드시 같은 값 */
   background: var(--surface-l2);
-  color: var(--text-l-2);
-  font-size: 13px;
+  box-shadow: var(--e-1);
+  color: var(--text-l-1);
+  font-size: 14.5px;
   line-height: 1.4;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
 /* 순환 기호 — 리턴 패스가 '한 번 되돌아감'이 아니라 '반복해서 돈다'로 읽히게.
-   alt를 빈 문자열로 둬서 낭독에는 끼어들지 않는다(미지원 브라우저는 글리프만 노출) */
+   alt를 빈 문자열로 둬서 낭독에는 끼어들지 않는다(미지원 브라우저는 글리프만 노출).
+   03 .fw-cycle-cap::before와 같은 글리프·같은 처리 */
 .pm-loop-cap::before {
   content: "↻" / "";
-  margin-right: 7px;
+  margin-right: 8px;
   color: var(--blue);
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 800;
 }
 
