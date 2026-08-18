@@ -4546,8 +4546,10 @@ body.menu-open .site-header {
 
 .os-src {
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
+  /* 3열 그리드 — 5개 칩이 폭에 따라 제멋대로 접히던 것을 3 + 2로 고정한다.
+     max-content 열이라 칩 폭은 글자 수를 따르고, 줄바꿈 지점만 고정된다 */
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
   justify-content: center;
   gap: 6px;
   /* 아래로도 패딩만큼 되짚어 카드 바닥까지 밴드를 채운다.
@@ -4735,7 +4737,10 @@ body.menu-open .site-header {
 
 .work-card {
   position: relative;
-  padding: 30px;
+  /* 좌우 26px — 3열에서 침구 사례의 둘째 절이 8px 모자라 3줄로 넘어갔다.
+     클라이언트가 지정한 개행 위치를 지키려면 폭을 벌리는 쪽이 맞고,
+     26px은 .fw-card·.service-card가 이미 쓰는 값이라 카드 문법과도 맞는다 */
+  padding: 30px 26px;
   border: 1px solid var(--border-l2);
   border-radius: var(--r-md);
   background: var(--surface-l0);
@@ -4858,7 +4863,9 @@ body.menu-open .site-header {
 .case-desc {
   margin: 16px 0 0;
   color: var(--text-l-2);
-  font-size: 15.5px;
+  /* 15px — 15.5px에서는 침구 사례의 둘째 절이 가용 폭과 정확히 같아(335/335)
+     반올림에 따라 3줄로 넘어갔다. 클라이언트 지정 개행을 지키려면 여유가 필요하다 */
+  font-size: 15px;
   line-height: 1.6;
   word-break: keep-all;
 }
