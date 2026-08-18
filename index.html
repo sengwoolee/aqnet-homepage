@@ -39,15 +39,34 @@
 
     <link rel="stylesheet" href="styles.css" />
 
+    <!-- Organization JSON-LD — 대표번호는 미확정이라 telephone 속성을 넣지 않는다.
+         확정되면 "telephone": "+82-2-XXXX-XXXX" 한 줄만 추가하면 된다 -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "AQNET",
+        "legalName": "주식회사 에이큐넷",
+        "alternateName": "에이큐넷",
         "url": "https://sengwoolee.github.io/aqnet-homepage/",
         "logo": "https://sengwoolee.github.io/aqnet-homepage/assets/logos/aqnet-horizontal-gradient-transparent-v2.svg",
+        "image": "https://sengwoolee.github.io/aqnet-homepage/assets/logos/aqnet-og.png",
         "description": "데이터·AI 기반 마케팅 기술 컴퍼니",
-        "email": "contact@aqnet.co.kr"
+        "email": "contact@aqnet.co.kr",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "월드컵북로4길 44 (동교동) 201호(JK빌딩)",
+          "addressLocality": "마포구",
+          "addressRegion": "서울시",
+          "addressCountry": "KR"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "email": "contact@aqnet.co.kr",
+          "areaServed": "KR",
+          "availableLanguage": ["ko"]
+        }
       }
     </script>
   </head>
@@ -663,6 +682,9 @@
               AQNET의 성장 운영 프레임입니다.<br />이 운영 루프는 현재 <span class="nowrap">통합 대시보드와</span>
               <span class="nowrap">대화형 레포트로</span> 제품화를 진행하고 있습니다.
             </p>
+            <!-- Service(04) → Solution(05) 연결 문장 — 세 서비스 축의 실행 데이터가
+                 어디로 이어지는지 한 줄로 명시(요청서 P1, 문안 확정본) -->
+            <p class="solution-bridge">Growth Execution, Data &amp; AI, Customer Experience에서 발생하는 실행 데이터를 하나의 운영 기준으로 연결해, AQ Growth OS가 다음 판단과 학습을 이어갑니다.</p>
           </div>
 
           <div class="solution-layout" data-reveal>
@@ -705,18 +727,21 @@
             <!-- 콘솔 목업 = 회사소개서 v2.8 p24(Unified Dashboard) 구성·수치와 1:1.
                  수치를 바꿀 때는 소개서와 동시에 갱신할 것(두 자료를 나란히 보는 클라이언트 기준) -->
             <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 통합 대시보드 테스트 버전 예시 화면">
-              <!-- 존1 — 브라우저 크롬바 -->
-              <div class="panel-chrome" aria-hidden="true">
-                <span class="chrome-dots"><i></i><i></i><i></i></span>
-                <span class="chrome-url">app.aqnet.co.kr/dashboard</span>
-                <span class="preview-badge">테스트 버전</span>
+              <!-- 존1 — 브라우저 크롬바.
+                   URL 자리에는 운영되지 않는 실주소 대신 화면 이름을 넣는다(허위 도메인 인상 방지).
+                   DEMO 배지는 대시보드 우상단 상시 노출 — 하단 'UI CONCEPT · SAMPLE DATA' 고지와 병존 -->
+              <div class="panel-chrome">
+                <span class="chrome-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="chrome-url" aria-hidden="true">AQ Growth OS / Dashboard Concept</span>
+                <span class="preview-badge">DEMO · SAMPLE DATA</span>
               </div>
 
-              <!-- 존2 — 앱 헤더: 화면명 + 조회 필터 칩 -->
+              <!-- 존2 — 앱 헤더: 화면명 + 조회 필터 칩.
+                   조회 기간은 아래 추이 차트의 '최근 9주'(2025.11.24~2026.01.25)와 일치시킨다 -->
               <div class="dash-head">
                 <span class="dash-title">AQ Growth OS · Dashboard</span>
                 <span class="dash-filters" aria-hidden="true">
-                  <span class="dash-chip">2026.01.01–01.31</span>
+                  <span class="dash-chip">2025.11.24–2026.01.25</span>
                   <span class="dash-chip">전체 채널</span>
                 </span>
               </div>
@@ -829,9 +854,23 @@
               AQNET 내부 운영 적용을 목표로 개발 중인 <span class="nowrap">통합 성장 운영 시스템입니다.</span>
             </p>
           </div>
+        </section>
 
-          <!-- 모듈 아키텍처 — 좌2 모듈 · 중앙 시스템 노드 · 우2 모듈.
-               노드↔모듈 커넥터는 카드/노드 의사요소의 border로만 그린다(추가 마크업·JS 없음) -->
+        <!-- ===================== OS ARCHITECTURE =====================
+             모듈 아키텍처 — 좌2 모듈 · 중앙 시스템 노드 · 우2 모듈.
+             노드↔모듈 커넥터는 카드/노드 의사요소의 border로만 그린다(추가 마크업·JS 없음).
+             Solution(운영 루프+콘솔)과 한 섹션에 겹쳐 있던 구성을 독립 섹션으로 분리 —
+             eyebrow 번호는 전 섹션 재부여 확정 전까지 0X 플레이스홀더 -->
+        <section class="section os-arch-section" id="os-arch">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">0X</span>OS ARCHITECTURE</p>
+            <h2>4개 모듈로 나눈<br />Growth OS 구성</h2>
+            <p>
+              앞의 운영 루프를 실제로 돌리는 최소 단위입니다. 데이터 소스를 하나의 기준으로 모으고,
+              <span class="nowrap">대시보드·리포트·자동화·시장 분석</span> 네 모듈이 판단과 실행을 나눠 맡습니다.
+            </p>
+          </div>
+
           <div class="os-arch-block" data-reveal>
             <div class="os-arch" role="group" aria-label="AQ Growth OS 모듈 아키텍처">
               <div class="os-col is-left" data-stagger>
@@ -1218,9 +1257,21 @@
               <input name="consent" type="checkbox" required />
               <span>개인정보 수집·이용(문의 응대 목적)에 동의합니다.</span>
             </label>
+            <!-- 동의 상세 — 라벨 안에 넣으면 details 클릭이 체크박스 토글로 위임되므로 반드시 형제 요소.
+                 푸터 '개인정보처리방침' 링크의 앵커 대상(#privacy-consent) -->
+            <details class="consent-detail" id="privacy-consent">
+              <summary>개인정보 수집·이용 안내 <span class="cd-hint">자세히 보기</span></summary>
+              <dl class="consent-terms">
+                <dt>수집·이용 목적</dt>
+                <dd>상담 및 프로젝트 문의 응대</dd>
+                <dt>수집 항목</dt>
+                <dd>회사명, 담당자명, 연락처, 이메일, 문의내용</dd>
+                <dt>보유·이용 기간</dt>
+                <dd>문의 응대 목적 달성 후 지체 없이 파기하며, 관계 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관합니다</dd>
+              </dl>
+              <p class="consent-right">동의를 거부할 권리가 있으며, 필수 항목 미동의 시 문의 접수가 제한될 수 있습니다</p>
+            </details>
             <button class="button button-primary" type="submit">빠른 상담 요청</button>
-            <!-- 온라인 접수 시스템 오픈 시 이 .form-notice 한 줄만 지우면 원복 (styles.css의 .form-notice 블록도 함께) -->
-            <p class="form-notice">온라인 접수 시스템은 준비 중입니다. 지금은 작성하신 내용이 메일로 접수되며, 1영업일 이내 회신드립니다.</p>
             <p class="form-note" data-form-note role="status" aria-live="polite">contact@aqnet.co.kr</p>
           </form>
         </section>
@@ -1253,11 +1304,16 @@
             <p class="footer-h">Contact</p>
             <ul class="footer-contact">
               <li><span>E</span><a href="mailto:contact@aqnet.co.kr">contact@aqnet.co.kr</a></li>
-              <li><span>T</span><a href="tel:+820200000000">02-0000-0000</a></li>
+              <!-- 대표번호 미확정 — 확정되면 아래 한 줄의 주석을 풀고 XXXX 자리에 실번호를 채울 것.
+                   가짜 번호가 노출되지 않도록 자리표시자 숫자는 일부러 남기지 않았다.
+                   <li><span>T</span><a href="tel:+82-2-XXXX-XXXX">02-XXXX-XXXX</a></li> -->
               <li><span>A</span>서울시 마포구 월드컵북로4길 44 (동교동) 201호(JK빌딩)</li>
             </ul>
           </div>
 
+          <!-- Follow 열 — SNS 실주소 미수급(전부 href="#")이라 열 전체를 숨김.
+               계정 주소가 확정되면 아래 주석을 풀고 각 href만 교체하면 되고,
+               styles.css의 .footer-top 그리드도 3열 → 4열로 되돌릴 것(주석 표시해둠).
           <div class="footer-col">
             <p class="footer-h">Follow</p>
             <ul class="footer-social">
@@ -1278,17 +1334,20 @@
               </li>
             </ul>
           </div>
+          -->
         </div>
 
         <div class="footer-bottom">
           <p class="footer-legal">
-            (주)에이큐넷 &nbsp;·&nbsp; 대표 김관호 &nbsp;·&nbsp; 개인정보책임자 이승우 &nbsp;·&nbsp; 사업자등록번호 000-00-00000 &nbsp;·&nbsp; 서울시 마포구 월드컵북로4길 44 (동교동) 201호(JK빌딩)
+            (주)에이큐넷 &nbsp;·&nbsp; 대표 김관호 &nbsp;·&nbsp; 개인정보책임자 이승우 &nbsp;·&nbsp; 사업자등록번호 451-87-04092 &nbsp;·&nbsp; 서울시 마포구 월드컵북로4길 44 (동교동) 201호(JK빌딩)
           </p>
           <div class="footer-meta">
             <span class="footer-copy">© 2026 AQNET. All rights reserved.</span>
+            <!-- 이용약관 링크 제거 — 회원가입·유료 서비스·이용자 간 거래가 없는 회사 소개 사이트라
+                 약관 게시 대상이 아니다. 개인정보처리방침은 문의 폼에서 개인정보를 수집하므로 유지하고,
+                 별도 페이지가 생기기 전까지는 Contact 폼의 동의 상세(#privacy-consent)로 보낸다 -->
             <span class="footer-policy">
-              <a href="#">개인정보처리방침</a>
-              <a href="#">이용약관</a>
+              <a href="#privacy-consent">개인정보처리방침</a>
             </span>
           </div>
         </div>

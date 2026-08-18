@@ -704,9 +704,11 @@ if (contactForm) {
     );
 
     window.location.href = `mailto:contact@aqnet.co.kr?subject=${subject}&body=${body}`;
+    // 성공 톤 안내 — 다만 실제 전송은 사용자의 메일 앱에서 일어나므로
+    // '서버로 접수 완료'로 오인되지 않도록 마지막 전송 단계를 반드시 명시한다
     if (formNote) {
       formNote.textContent =
-        "메일 앱에서 문의 내용을 확인 후 전송해주세요. 메일 앱이 열리지 않으면 contact@aqnet.co.kr 로 직접 보내주세요.";
+        "문의 내용이 메일로 작성되었습니다. 메일 앱에서 전송하시면 영업일 기준 1일 이내 연락드리겠습니다. 메일 앱이 열리지 않으면 contact@aqnet.co.kr 로 보내주세요.";
     }
   });
 }

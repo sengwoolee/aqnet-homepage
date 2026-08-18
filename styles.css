@@ -3063,6 +3063,20 @@ body.menu-open .site-header {
   color: var(--text-d-2);
 }
 
+/* Service(04) → Solution(05) 연결 문장.
+   헤딩 본문보다 한 단 낮은 톤 + 액센트 룰로 '다리' 역할임을 시각적으로 구분.
+   위의 p:not(.eyebrow) 규칙과 특이도가 같으므로 반드시 그 아래에 온다 */
+.solution-section .section-heading p.solution-bridge {
+  margin: 22px 0 0;
+  padding-left: 14px;
+  max-width: 780px;
+  border-left: 2px solid rgba(3, 144, 238, 0.5);
+  color: var(--text-d-3);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
 .solution-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(420px, 1.12fr);
@@ -3243,9 +3257,11 @@ body.menu-open .site-header {
   border-color: var(--border-3);
 }
 
-/* 존1 — 브라우저 크롬바 */
+/* 존1 — 브라우저 크롬바. DEMO 배지가 항상 우상단에 남아야 하므로
+   줄바꿈 없이(주소칸만 줄어드는 구조로) 유지한다 */
 .panel-chrome {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 10px;
   padding-bottom: 12px;
@@ -3279,19 +3295,31 @@ body.menu-open .site-header {
   color: var(--text-d-3);
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* '테스트 버전' 알약 — 소개서 표기를 승계(구 IN DEVELOPMENT 뱃지 대체) */
+/* 'DEMO · SAMPLE DATA' 알약 — 목업 최상단 우측 고정 고지.
+   하단 'UI CONCEPT · SAMPLE DATA' 각주와 병존하며, 스크롤 위치와 무관하게
+   패널을 보는 순간 먼저 읽히도록 틴트 배경으로 대비를 올린다 */
 .preview-badge {
   flex: 0 0 auto;
+  margin-left: auto;
   padding: 4px 10px;
-  border: 1px solid var(--border-3);
+  border: 1px solid rgba(3, 144, 238, 0.5);
   border-radius: var(--r-pill);
+  background: rgba(3, 144, 238, 0.14);
   color: var(--cyan);
   font-size: 10.5px;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
+}
+
+/* 좁은 폭에서는 장식용 주소칸을 접어 DEMO 배지 자리를 먼저 확보한다(배지는 항상 노출) */
+@media (max-width: 520px) {
+  .chrome-url {
+    display: none;
+  }
 }
 
 /* 존2 — 앱 헤더: 화면명 + 조회 필터 칩 */
@@ -3774,9 +3802,56 @@ body.menu-open .site-header {
    커넥터(브래킷·스텁·접점 도트)는 전부 의사요소 border로 그린다.
    개발 중 제품이므로 글로우 없이 hairline·틴트로만 위계 표현
    --------------------------------------------------------- */
+/* 독립 섹션(#os-arch) — Solution(다크)에서 분리했지만 배경 톤은 그대로 이어받아
+   Solution → OS Architecture → Snapshot 다크 구간이 끊기지 않게 한다.
+   이음매 헤어라인은 공용 SEAM 목록을 건드리지 않고 여기서 같은 방식으로 깐다 */
+.os-arch-section {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  background: var(--surface-0);
+  background-image: var(--mesh-cyan), var(--mesh-blue);
+  color: var(--white);
+}
+
+.os-arch-section::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
+}
+
+/* 헤딩 폭 규격은 다른 풀블리드 섹션(Service/Works/Solution…)과 동일하게 맞춘다
+   — 밴드 1200 / h2 920 / 본문 760. 공용 목록 셀렉터를 건드리지 않고 여기서 재현 */
+.os-arch-section > .section-heading,
+.os-arch-section > .os-arch-block {
+  width: min(100%, var(--max));
+  max-width: var(--max);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.os-arch-section .section-heading h2 {
+  max-width: 920px;
+  color: var(--white);
+}
+
+.os-arch-section .section-heading p:not(.eyebrow) {
+  max-width: 760px;
+  color: var(--text-d-2);
+}
+
 .os-arch-block {
   width: min(100%, var(--max));
   margin: 34px auto 0;
+}
+
+/* 섹션 헤딩이 이미 여백을 잡으므로 블록 자체의 상단 마진은 없앤다 */
+.os-arch-section > .os-arch-block {
+  margin-top: 0;
 }
 
 .os-arch {
@@ -4926,20 +5001,87 @@ body.menu-open .site-header {
   line-height: 1.5;
 }
 
+/* 개인정보 수집·이용 상세 — 동의 체크박스의 '형제' 요소.
+   (라벨 안에 두면 details 토글 클릭이 체크박스 토글로 위임돼 서로 간섭한다)
+   푸터 개인정보처리방침 링크의 앵커 대상이라 :target에서 테두리를 밝혀 위치를 알린다 */
+.consent-detail {
+  margin-top: -6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.03);
+  scroll-margin-top: 110px;
+  transition: border-color var(--dur) ease;
+}
+
+.consent-detail:target,
+.consent-detail[open] {
+  border-color: var(--border-3);
+}
+
+.consent-detail > summary {
+  cursor: pointer;
+  color: var(--text-d-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.consent-detail > summary:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+.consent-detail .cd-hint {
+  margin-left: 6px;
+  color: var(--text-d-4);
+  font-weight: 600;
+}
+
+.consent-terms {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px 12px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.consent-terms dt {
+  color: var(--text-d-2);
+  font-weight: 800;
+}
+
+.consent-terms dd {
+  margin: 2px 0 0;
+  color: var(--text-d-3);
+}
+
+.consent-right {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-1);
+  color: var(--text-d-4);
+  font-size: 12.5px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+@media (min-width: 561px) {
+  .consent-terms {
+    grid-template-columns: 116px minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .consent-terms dd {
+    margin-top: 0;
+  }
+}
+
 .contact-form .button {
   width: 100%;
   margin-top: 4px;
   border: 0;
-}
-
-/* 온라인 접수 오픈 전 임시 안내 — 마크업의 .form-notice와 이 블록만 제거하면 원복 */
-.form-notice {
-  margin: 0;
-  color: var(--text-d-4);
-  font-size: 12.5px;
-  line-height: 1.6;
-  text-align: center;
-  word-break: keep-all;
 }
 
 .form-note {
@@ -4961,9 +5103,11 @@ body.menu-open .site-header {
 
 /* Contact(다크)과의 이음매 헤어라인은 SECTIONS(generic)의 SEAM 규칙이 일괄 담당 */
 
+/* Follow 열을 숨겨둔 동안(마크업 주석 참고) 3열 — SNS 실주소가 확정돼
+   Follow 열을 되살리면 1.5fr 1fr 1.3fr 1fr로 되돌릴 것 */
 .footer-top {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1.3fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1.4fr;
   gap: clamp(28px, 4vw, 56px);
   padding: clamp(48px, 6vw, 76px) max(24px, calc((100% - var(--max)) / 2)) 44px;
 }
