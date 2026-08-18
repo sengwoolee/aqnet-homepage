@@ -2465,6 +2465,11 @@ body.menu-open .site-header {
   max-width: 760px;
 }
 
+/* 12만 예외 — 둘째 문장이 24px 모자라 3줄이 됐다. 09와 같은 폭으로 맞춰 두 줄로 떨어뜨린다 */
+.reference-section > .section-heading p:not(.eyebrow) {
+  max-width: 830px;
+}
+
 .service-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4249,8 +4254,10 @@ body.menu-open .site-header {
   max-width: 920px;
 }
 
+/* 760px에서는 둘째 문장이 33px 모자라 3줄이 됐다. 첫 문장은 <br>로 고정돼 있으므로
+   폭만 벌리면 "정의 / 구성" 두 줄로 떨어진다 */
 .os-arch-section .section-heading p:not(.eyebrow) {
-  max-width: 760px;
+  max-width: 830px;
 }
 
 /* 도식 지반 슬래브 — 02 .about-flow와 같은 문법(l2 면 + 상단 2px 블루 + --r-lg + --e-2 + 패딩).
