@@ -470,9 +470,13 @@ body.menu-open .site-header {
   color: transparent;
 }
 
-/* 파란색 계열 전용 강조(시안 제외) — .grad와 동일 기법, 헤드라인 부분 강조용 */
+/* 파란색 계열 전용 강조(시안 제외) — .grad와 동일 기법, 헤드라인 부분 강조용.
+   구 값(#5b9cff→#2276ff)은 토큰 교체 전 색이라 밝은 끝이 흰 배경 2.75:1로
+   대형 텍스트 3:1조차 못 넘겼다. 그라디언트 텍스트는 color가 transparent라
+   대비 감사에서 걸러지지 않는 사각지대였다. 현행 토큰으로 교체해
+   가장 어두운 라이트 면(l2)에서도 양끝 4.84 / 6.68로 통과시킨다 */
 .accent-blue {
-  background: linear-gradient(90deg, #5b9cff, #2276ff);
+  background: linear-gradient(90deg, var(--blue), var(--blue-deep));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
