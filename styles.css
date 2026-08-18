@@ -3000,16 +3000,51 @@ body.menu-open .site-header {
 
 /* (2) 운영 프로세스 5스텝 — 제목·요약 + 수행 내용 3개.
    같은 페이지의 여정 블록(카드 밖 노드+레일)과 같은 UI로 읽히지 않도록
-   진행 표시는 카드 사이 gap에 놓인 소형 셰브런 하나로만 두고, 레일·노드는 쓰지 않는다 */
+   진행 표시는 카드 사이 gap에 놓인 소형 셰브런 하나로만 두고, 레일·노드는 쓰지 않는다.
+   ※ 05 STAGE 레일(카드 밖 공유 레일)과의 언어 분리는 그대로 유지한다 —
+     06은 '대형 넘버 + 셰브런 + 리턴 루프'이고, 아래에서 더하는 것도 그 셋을 잇는 배선뿐이다 */
 .pm-steps {
   /* 셰브런이 gap 한가운데 놓이도록 gap 값을 토큰화해 계산에 재사용 */
   --pm-gap: 14px;
+  /* 리턴 스텁(::before/::after)의 기준 상자 — 스텁이 그리드 밖(아래 gap)으로 나가야 한다.
+     의사요소를 absolute로 두면 그리드 아이템이 되지 않으므로 5열 배치는 그대로다.
+     isolation은 스텁의 z-index:-1을 이 안에 가둔다 — 없으면 음수 레이어가 루트까지 올라가
+     섹션 배경 뒤로 사라진다. 페이지 나머지 z 순서에는 영향이 없다 */
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--pm-gap);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* 리턴 스텁 — 카드 01 좌변 / 카드 05 우변에서 아래 점선 U까지 내려오는 짧은 수직 구간.
+   높이 30px 중 위 16px은 z-index:-1로 카드 뒤에 깔려 가려진다 — 덕분에 선이 카드 라운드 코너
+   뒤에서 빠져나오는 것처럼 보인다. 그냥 카드 하단선에서 시작하면 반경 14px 때문에
+   카드 잉크의 실제 끝(x=0.5에서 하단선 위 10.3px)과 10px 허공이 생겨 선이 떠 보인다.
+   (::after는 트리 순서상 카드보다 뒤에 그려지므로 음수 z가 없으면 카드 05 위에 얹힌다)
+   실제로 보이는 구간은 gap 14px(= .pm-loop margin-top)이고,
+   x좌표는 .pm-loop의 좌우 보더와 정확히 같은 1px 열에 놓인다(양끝 0px 오차) */
+.pm-steps::before,
+.pm-steps::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: -14px;
+  width: 0;
+  height: 30px;
+  border-left: 1px dashed rgba(15, 99, 234, 0.75);
+  pointer-events: none;
+}
+
+.pm-steps::before {
+  left: 0;
+}
+
+.pm-steps::after {
+  right: 0;
 }
 
 .pm-step {
@@ -3029,18 +3064,40 @@ body.menu-open .site-header {
     box-shadow var(--dur) ease;
 }
 
-/* 진행 셰브런 — gap 중앙, 대형 넘버의 중심 높이에 맞춰 01→02 흐름을 명시한다.
+/* 전진 커넥터(1/2) — gap을 가로지르는 수평 라인.
+   셰브런만 있을 때는 gap 속에 표식이 떠 있을 뿐이라 카드 5장이 '나열'로 읽혔다.
+   라인이 카드 우변에서 다음 카드 좌변까지 닿아야 다섯 장이 한 배선으로 묶인다.
+   x: left 100%는 패딩 박스 우변이므로 +1px(우측 보더)에서 시작해 gap 폭(14px)만큼 달리면
+      끝점이 다음 카드 좌측 보더 바깥면과 정확히 만난다 — 양끝 접점 오차 0px.
+   y: 두께 2px을 셰브런 획과 맞추고 top 37 → 중심 38px로 셰브런 중심과 동일 높이.
+   잉크 0.75는 리턴 루프 선과 같은 값(연속 경로) — 점 표식인 셰브런 0.85보다 한 단계 아래 */
+.pm-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 37px;
+  left: 100%;
+  margin-left: 1px;
+  width: var(--pm-gap);
+  height: 2px;
+  background: rgba(15, 99, 234, 0.75);
+  pointer-events: none;
+}
+
+/* 전진 커넥터(2/2) — 위 라인의 화살촉.
    6px/뉴트럴로는 1440px에서 사실상 보이지 않아 "카드 5장 나열"로 읽혔다 → 10px/블루로 승격.
    높이 계산: 카드 padding-top 22 + .pm-no(32px, line-height 1)의 절반 16 = 38px.
    (absolute 기준은 패딩 박스라 상단 2px 블루 라인은 계산에 들어가지 않는다)
-   가로: right -9px → 셰브런 실보이는 획이 gap [1,15] 안의 [4,11]에 놓여 중앙에 선다.
+   가로: 12px 상자를 45° 돌리면 꼭짓점이 중심에서 6√2 = 8.485px 떨어진다.
+      right: calc(1.5px - var(--pm-gap)) = -12.5px → 꼭짓점이 gap 끝(다음 카드 좌변 바깥면,
+      패딩 박스 우변 기준 15px)에 0.02px 오차로 얹힌다. 즉 라인 + 셰브런이 하나의 화살표가 된다.
+      (중앙에 띄우면 라인이 화살촉을 3.5px 뚫고 나가 '창에 꿴 촉'으로 보인다)
    잉크는 05 .mp-rail::after와 같은 rgba(15,99,234,0.85) — 사이트에 이미 있는 '방향 표식' 값이며
    l2 면에서 3.80:1로 비텍스트 대비 3:1을 통과한다(지시안의 0.62는 2.58:1로 미달) */
 .pm-step:not(:last-child)::after {
   content: "";
   position: absolute;
   top: 38px;
-  right: calc(-1 * var(--pm-gap) / 2 - 2px);
+  right: calc(1.5px - var(--pm-gap));
   width: 10px;
   height: 10px;
   border-top: 2px solid rgba(15, 99, 234, 0.85);
@@ -3141,13 +3198,18 @@ body.menu-open .site-header {
 }
 
 /* 좌측 끝 화살촉 — 05에서 돌아온 흐름이 01로 다시 올라감.
+   스텁이 생기면서 도착점이 U의 좌상단 모서리가 아니라 '카드 01 바로 아래'로 올라간다 —
+   모서리에 두면 화살촉이 경로 한가운데에 박혀 방향이 아니라 장식으로 읽힌다.
+   좌표: 7.5px 상자를 45° 돌리면 꼭짓점이 중심에서 위로 3.75√2 = 5.303px.
+      top -10.5 → 꼭짓점 y = -12.05(카드 하단에서 2px 아래, 스텁 최상단부).
+      left -4 → 꼭짓점 x = 0.75로 스텁·U 좌측 라인(중심 0.5)과 0.25px 차.
    03 .fw-cycle-line 양끝 기호와 '같은 규격'이라는 관계는 유지된다 — 그쪽은 다크 면이라
    --cyan 0.62, 여기는 라이트 면이라 --blue 0.75로, 아이브로우와 같은 면별 액센트 규칙을 따른다 */
 .pm-loop::before {
   content: "";
   position: absolute;
-  top: -3px;
-  left: -3px;
+  top: -10.5px;
+  left: -4px;
   width: 6px;
   height: 6px;
   border-top: 1.5px solid rgba(15, 99, 234, 0.75);
@@ -3156,12 +3218,14 @@ body.menu-open .site-header {
 }
 
 /* 우측 끝 기점 — 흐름이 05에서 빠져나가는 지점.
-   화살촉(도착)과 점(출발)이 짝을 이뤄야 U자가 방향을 가진 리턴 패스로 읽힌다 */
+   화살촉(도착)과 점(출발)이 짝을 이뤄야 U자가 방향을 가진 리턴 패스로 읽힌다.
+   화살촉과 같은 이유로 카드 05 하단(스텁 최상단)까지 끌어올린다 —
+   top -14 → 점 상단이 카드 하단선에 닿고, right -3.5 → 중심이 우측 라인과 같은 x */
 .pm-loop::after {
   content: "";
   position: absolute;
-  top: -3px;
-  right: -3px;
+  top: -14px;
+  right: -3.5px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -3200,6 +3264,22 @@ body.menu-open .site-header {
   color: var(--blue);
   font-size: 14.5px;
   font-weight: 800;
+}
+
+/* 회로 로컬 반응형 — 공용 RESPONSIVE는 ≤1024에서 5열 전제를 버리고(3열) 리턴 루프 선을 걷는다.
+   전진 라인·리턴 스텁도 5열 한 줄에서만 성립하므로 같은 경계에서 함께 끊는다.
+   셰브런은 공용 규칙이 행 끝(3n)만 끊고 남기므로, 라인이 사라진 자리에서 다시 gap 중앙에 서도록
+   right 값을 원래의 중앙 정렬로 되돌린다(다음 카드에 붙어 보이는 것을 막는다) */
+@media (max-width: 1024px) {
+  .pm-step:not(:last-child)::before,
+  .pm-steps::before,
+  .pm-steps::after {
+    display: none;
+  }
+
+  .pm-step:not(:last-child)::after {
+    right: calc(-1 * var(--pm-gap) / 2 - 2px);
+  }
 }
 
 /* (3) 기존 운영과의 차이 — BEFORE→AFTER 4행 비교.
@@ -4173,9 +4253,20 @@ body.menu-open .site-header {
   max-width: 760px;
 }
 
+/* 도식 지반 슬래브 — 02 .about-flow와 같은 문법(l2 면 + 상단 2px 블루 + --r-lg + --e-2 + 패딩).
+   흰 모듈(l0)이 l1 섹션 면 위에 놓였을 때 면 대비가 1.04:1이라 figure/ground가 평탄했고,
+   그 결과 도식이 '동급 상자 다섯 개의 배선도'로 읽혔다. 지반을 l2로 한 단계 내려
+   흰 모듈·허브가 경계가 선언된 판 위에 뜨게 한다(l0 vs l2 = 1.09:1 + 슬래브 보더·그림자).
+   --os-line은 l2 위에서 3.38:1로 비텍스트 3:1을 유지한다 */
 .os-arch-block {
   width: min(100%, var(--max));
   margin: 34px auto 0;
+  padding: clamp(18px, 2.4vw, 30px);
+  border: 1px solid var(--border-l2);
+  border-top: 2px solid var(--blue);
+  border-radius: var(--r-lg);
+  background: var(--surface-l2);
+  box-shadow: var(--e-2);
 }
 
 /* 섹션 헤딩이 이미 여백을 잡으므로 블록 자체의 상단 마진은 없앤다 */
@@ -4210,17 +4301,17 @@ body.menu-open .site-header {
   row-gap: var(--os-row);
 }
 
+/* 잉크 역할 분리 — --os-line은 '도면 잉크' 전속이 된다(커넥터·접점·허브 프레임).
+   직전까지는 모듈 상단 2px·허브 프레임 2px·커넥터 1px이 전부 같은 잉크라
+   네 모듈과 허브가 같은 필압으로 그려졌고, 그래서 허브가 주어로 서지 못했다.
+   모듈은 뉴트럴 1px 4면 보더로 내려 '면'이 되고, 선은 전부 허브 쪽으로 몰린다.
+   블루는 MODULE 배지에만 남는다 — 본문·제목·태그 색은 그대로라 텍스트 대비는 불변 */
 .os-mod {
   position: relative;
   display: flex;
   flex-direction: column;
   padding: 17px 19px 15px;
   border: 1px solid var(--border-l2);
-  /* 소개서 카드 언어 — 상단 2px 블루 라인.
-     커넥터(::before 접점 도트 · ::after 브래킷)가 두 의사요소를 모두 쓰므로
-     이 패밀리만 라인을 border-top으로 그린다(그래서 그라디언트가 아닌 solid).
-     색은 커넥터와 같은 --os-line — 모듈·연결선·허브가 한 도면의 잉크로 보이게 */
-  border-top: 2px solid var(--os-line);
   border-radius: var(--r-md);
   background: var(--surface-l0);
   box-shadow: var(--e-1);
@@ -4230,10 +4321,9 @@ body.menu-open .site-header {
 }
 
 /* 리프트 없음 — 브래킷·접점 도트가 카드에 물려 있어 2px만 올려도
-   중앙 노드 스텁과 커넥터가 어긋난다. 보더·그림자·라인만으로 응답 */
+   중앙 노드 스텁과 커넥터가 어긋난다. 보더·그림자만으로 응답 */
 .os-mod:hover {
   border-color: var(--border-l3);
-  border-top-color: var(--blue);
   box-shadow: var(--e-2);
 }
 
@@ -4249,8 +4339,9 @@ body.menu-open .site-header {
   margin-top: -6px;
   border: 2px solid var(--os-dot);
   border-radius: 50%;
-  /* 링 내부는 섹션 면과 같은 색 — 여기가 남으면 라이트 배경에 다크 점이 찍힌다 */
-  background: var(--surface-l1);
+  /* 링 내부는 지반 슬래브와 같은 색 — 여기가 남으면 라이트 배경에 다크 점이 찍힌다.
+     슬래브가 l1 → l2로 내려갔으므로 이 값도 함께 내린다 */
+  background: var(--surface-l2);
 }
 
 /* 브래킷 — 카드 중앙에서 가로로 나와 열 중앙(노드 높이)까지 꺾여 내려/올라간다.
