@@ -2389,8 +2389,11 @@ body.menu-open .site-header {
   letter-spacing: -0.02em;
 }
 
+/* 순서 교체 — 짧은 선언(sub)이 위, 결론(lead)이 아래로 내려와
+   "한 번의 성과에서 → AQ의 철학은 이어집니다"가 설정에서 결론으로 읽힌다.
+   위아래가 바뀌었으니 간격도 아래쪽으로 옮긴다 */
 .fw-closing-sub {
-  margin: 10px 0 0;
+  margin: 0 0 10px;
   color: var(--text-d-2);
   font-size: 16px;
   line-height: 1.6;
@@ -4538,12 +4541,14 @@ body.menu-open .site-header {
 
 .os-src {
   list-style: none;
-  /* 3열 그리드 — 5개 칩이 폭에 따라 제멋대로 접히던 것을 3 + 2로 고정한다.
-     max-content 열이라 칩 폭은 글자 수를 따르고, 줄바꿈 지점만 고정된다 */
-  display: grid;
-  grid-template-columns: repeat(3, max-content);
+  /* 알약 박스를 걷고 구분점 나열로 — 슬래브 안에 이미 모듈·허브 상자가 겹쳐 있어
+     인풋 목록까지 상자로 두면 층이 하나 더 쌓인다. 한 줄 중앙 정렬이라
+     3열 그리드에서 둘째 행(상품·고객)이 왼쪽에 붙던 문제도 함께 사라진다 */
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 6px;
+  align-items: baseline;
+  gap: 0 10px;
   /* 아래로도 패딩만큼 되짚어 카드 바닥까지 밴드를 채운다.
      안쪽 반경은 프레임 2px을 뺀 값 — overflow:hidden은 좌우 커넥터 스텁을 잘라내므로 쓸 수 없다 */
   margin: 0 calc(var(--os-core-px) * -1) calc(var(--os-core-py) * -1);
@@ -4555,13 +4560,23 @@ body.menu-open .site-header {
 /* 밴드가 l1이 되었으므로 칩 면은 l0으로 반전 — 베이 안에서 개별 소스가 다시 떠오른다
    (텍스트 --text-l-2는 l0에서 9.21:1) */
 .os-src li {
-  padding: 4px 10px;
-  border: 1px solid var(--border-l2);
-  border-radius: var(--r-pill);
-  background: var(--surface-l0);
+  position: relative;
   color: var(--text-l-2);
   font-size: 12.5px;
   font-weight: 700;
+}
+
+/* 구분점 — gap 한가운데에 놓아 항목이 접혀도 줄 끝에 점이 남지 않는다 */
+.os-src li + li::before {
+  content: "";
+  position: absolute;
+  left: -5.5px;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border-l3);
+  transform: translate(-50%, -50%);
 }
 
 /* ≤1024에서는 공용 RESPONSIVE가 허브 패딩을 22/18로 되돌린다 —
