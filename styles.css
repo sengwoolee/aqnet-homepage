@@ -1420,56 +1420,71 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
-/* 변화 로그 — 고스트 인덱스(01·02·03) + 주어 앵커. 전 뷰포트 공통 언어(레일+틱 v1 폐기).
-   데스크탑 미디어 블록이 동일 vw 기울기로 크기만 확장해 1024→1025 경계에서 자연 연속됨 */
+/* 변화의 축 3개 — 세로 목록 v2를 "구획"으로 재편.
+   한 축 = [상단 액센트 룰 → 넘버 인덱스 → 문장]. 소개서 프로세스 박스(.pm-step)의
+   "상단 룰 + 번호 + 제목" 문법을 그대로 다크로 옮긴 것이라 새 언어가 아니다.
+   ≥760px에서 3열로 펴지면 세 축이 병렬로 읽히고, 끊긴 상단 룰 3개가 한 줄의 편집 룰이 된다.
+   마크업은 손대지 않았다 — 비어 있던 <i class="why-tick">를 넘버 슬롯으로 되살려 쓴다 */
 .why-log {
   counter-reset: whyidx;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: clamp(16px, 2.8vw, 26px);
-  font-size: clamp(20px, 3.3vw, 34px);
+  gap: clamp(24px, 3.2vw, 34px);
+  font-size: clamp(21px, 2.6vw, 26px);
 }
 
-/* 한 줄 = [고스트 인덱스 | 문장] 2열. 상단 정렬(문장 줄바꿈 대비) */
 .why-line {
-  display: grid;
-  grid-template-columns: clamp(38px, 4.4vw, 50px) 1fr;
-  column-gap: clamp(14px, 2vw, 20px);
-  align-items: start;
+  position: relative;
+  counter-increment: whyidx;
+  padding-top: clamp(16px, 1.8vw, 22px);
   color: var(--text-d-1);
   font-size: inherit;
-  line-height: 1.32;
+  line-height: 1.34;
   font-weight: 700;
   letter-spacing: -0.01em;
   word-break: keep-all;
 }
 
-/* 고스트 인덱스 — About 타임라인 넘버와 표기 라임(decimal-leading-zero).
-   text-stroke 미지원 폴백: 저알파 fill 선(先)선언 후 stroke+투명 fill이 덮음 */
+/* 축 상단 룰 — 좌측 시안 캡 + 헤어라인. .pm-step의 border-top 2px 라인을 다크 팔레트로 옮겼다 */
 .why-line::before {
-  counter-increment: whyidx;
-  content: counter(whyidx, decimal-leading-zero);
-  margin-top: 0;
-  font-size: clamp(28px, 4.2vw, 43px);
-  font-weight: 900;
-  line-height: 0.82;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  /* azure는 구 하늘색보다 광도가 절반이라 알파를 0.13/0.25에서 상향해 시인성 보정 */
-  color: rgba(3, 144, 238, 0.24);
-  -webkit-text-stroke: 1.5px rgba(3, 144, 238, 0.48);
-  -webkit-text-fill-color: transparent;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--cyan) 0 clamp(44px, 5.5vw, 78px),
+    rgba(255, 255, 255, 0.18) clamp(44px, 5.5vw, 78px)
+  );
 }
 
-/* 틱은 고스트 인덱스로 대체 — 마크업은 유지(스크린리더 무관), 시각만 은닉 */
+/* 축 인덱스 — decimal-leading-zero 표기는 유지하되 고스트 아웃라인을 걷고
+   단색 시안 넘버 배지로 세운다(룰 바로 아래에서 구획의 머리 역할) */
 .why-tick {
-  display: none;
+  display: block;
+  margin-bottom: clamp(10px, 1.2vw, 16px);
+  color: var(--cyan);
+  /* <i>의 기본 이탤릭 해제 — 넘버는 반드시 정체 */
+  font-style: normal;
+  /* 인덱스는 항상 문장보다 한 단계 작게 — 배지가 본문을 이기지 않도록 전 뷰포트에서 고정 */
+  font-size: clamp(19px, 2.35vw, 24px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
-/* 주어 앵커 — 그라디언트 텍스트(술어는 뮤트 유지). 언더라인은 단색 시안으로 눌러
-   정의 블록의 그라디언트 대시(클라이맥스)가 우위를 갖게 함(정적 액센트) */
+.why-tick::before {
+  content: counter(whyidx, decimal-leading-zero);
+}
+
+/* 주어 앵커 — 그라디언트 텍스트(술어는 뮤트 유지). 상단 룰이 액센트를 이미 들고 있어
+   언더라인은 글로우를 걷고 한 단계 눌렀다(정의 플레이트가 클라이맥스를 갖도록) */
 .why-subj {
   position: relative;
   font-weight: 900;
@@ -1485,51 +1500,123 @@ body.menu-open .site-header {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -0.12em;
-  height: 2px;
-  background: rgba(3, 144, 238, 0.75);
-  box-shadow: 0 0 6px rgba(3, 144, 238, 0.3);
+  bottom: -0.1em;
+  height: 1.5px;
+  background: rgba(3, 144, 238, 0.55);
 }
 
-/* 정의 + 약속 — 대형 정의 타입 + 시안 인용바 클로징
-   (블록 자체는 --max 풀폭 유지 — 헤딩·로그와 좌측 정렬. 폭 제한은 내부 텍스트에만) */
+/* 정의 플레이트 — 섹션의 클라이맥스.
+   지금까지 맨 텍스트로 흘렀던 "AQ = Adaptability Quotient" 정의를
+   사이트 카드 문법(상단 2px --card-line + --grad-accent-surface + --e-dark-1)으로 세워
+   위 구획(축 3개)과 층을 분리한다. 블록 자체는 --max 풀폭 유지 */
 .why-define {
-  margin-top: clamp(40px, 6vw, 72px);
+  position: relative;
+  margin-top: clamp(40px, 5.4vw, 72px);
+  padding: clamp(28px, 3.4vw, 46px) clamp(22px, 3vw, 44px);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+  background:
+    var(--grad-accent-surface),
+    var(--surface-1);
+  box-shadow: var(--e-dark-1);
+  overflow: hidden;
+}
+
+.why-define::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-line);
+  opacity: 0.7;
+}
+
+/* 코어 링 — 플레이트 우측 여백을 채우는 장식. 스테이지 궤도 워터마크의 축소판이라
+   같은 모티프가 섹션 안에서 두 번 울린다(정적, 회전 없음) */
+.why-define::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: clamp(-140px, -6vw, -40px);
+  width: clamp(220px, 24vw, 340px);
+  aspect-ratio: 1;
+  translate: 0 -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(3, 144, 238, 0.05), transparent 62%),
+    radial-gradient(
+      circle,
+      transparent 0 39.5%,
+      rgba(3, 144, 238, 0.16) 39.5% 40%,
+      transparent 40% 61.5%,
+      rgba(3, 144, 238, 0.1) 61.5% 62%,
+      transparent 62%
+    );
 }
 
 .why-def {
+  position: relative;
+  z-index: 1;
   margin: 0;
   max-width: 900px;
-  font-size: clamp(24px, 3.6vw, 42px);
-  line-height: 1.28;
+  font-size: clamp(25px, 3.4vw, 44px);
+  line-height: 1.24;
   font-weight: 900;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
   color: var(--white);
   word-break: keep-all;
 }
 
-/* 클로징 약속 — 상단 그라디언트 대시(아이브로우 대시 언어, 좌측 바 대체) */
+/* 리드의 앞 절은 뮤트, 뒤 절은 최고 강조 — 읽는 순서를 만드는 대비.
+   마크업을 건드리지 않고 <br/> 기준 첫 줄("AQNET의 AQ는")만 눌렀다 */
+.why-def::first-line {
+  color: var(--text-d-2);
+}
+
+/* 정의어 밑줄 — 그라디언트 텍스트 위 액센트 언더라인.
+   의사요소가 아니라 text-decoration이라 줄바꿈이 생겨도 따라 끊긴다 */
+.why-def .grad {
+  text-decoration: underline;
+  text-decoration-color: rgba(3, 144, 238, 0.7);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.14em;
+}
+
+/* 클로징 약속 — 플레이트 안에서 정의와 헤어라인 하나로 갈린다 */
 .why-promise {
   position: relative;
-  margin: clamp(20px, 2.6vw, 28px) 0 0;
+  z-index: 1;
+  margin: clamp(22px, 2.8vw, 32px) 0 0;
   max-width: 820px;
-  padding-top: 16px;
+  padding-top: clamp(20px, 2.4vw, 28px);
   color: var(--text-d-2);
-  font-size: clamp(16px, 2vw, 20px);
-  line-height: 1.7;
+  font-size: clamp(17px, 1.9vw, 23px);
+  line-height: 1.65;
   font-weight: 600;
   word-break: keep-all;
 }
 
+/* 정의 ↔ 약속 구분 — 사이트 시그니처 헤어라인(--grad-line, SEAM과 같은 값) */
 .why-promise::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  width: 64px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--blue));
-  box-shadow: 0 0 12px rgba(3, 144, 238, 0.35);
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
+}
+
+/* 축 3개를 병렬로 — 태블릿부터 3열. 세 개의 상단 룰이 한 줄로 끊겨 읽힌다 */
+@media (min-width: 760px) {
+  .why-log {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(20px, 2.6vw, 34px);
+  }
 }
 
 /* =========================================================
@@ -1599,25 +1686,24 @@ body.menu-open .site-header {
     animation: whyOrbitSpin 52s linear infinite;
   }
 
-  /* 변화 로그 — 고스트 인덱스 + 주어 앵커 크기만 확장(구조·색·굵기는 base와 공유).
+  /* 변화의 축 — 3열 구조는 760px 블록이 이미 세웠고 여기서는 크기만 한 단계 키운다.
      같은 vw 기울기를 base에도 써서 1024→1025 경계에서 자연 연속(점프 없음) */
   .why-log {
-    gap: clamp(22px, 2.8vw, 36px);
-    font-size: clamp(24px, 3.3vw, 39px);
+    gap: clamp(24px, 2.6vw, 38px);
+    font-size: clamp(26px, 2.6vw, 31px);
   }
 
   .why-section .why-line {
-    grid-template-columns: clamp(50px, 4.4vw, 74px) 1fr;
-    column-gap: clamp(18px, 2vw, 28px);
+    padding-top: clamp(18px, 1.8vw, 26px);
   }
 
-  .why-line::before {
-    font-size: clamp(40px, 4.2vw, 62px);
+  .why-tick {
+    font-size: clamp(24px, 2.3vw, 29px);
   }
 
-  /* 정의 블록 — 로그 축소분만큼 클라이맥스 진입 여백을 늘려 위계 계단 강화(데스크탑 한정) */
+  /* 정의 플레이트 — 로그 축소분만큼 클라이맥스 진입 여백을 늘려 위계 계단 강화(데스크탑 한정) */
   .why-define {
-    margin-top: clamp(44px, 6vw, 80px);
+    margin-top: clamp(48px, 6vw, 84px);
   }
 }
 
@@ -1742,9 +1828,9 @@ body.menu-open .site-header {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 14px;
-  color: var(--text-d-3);
-  font-size: 11px;
+  margin: 0 0 16px;
+  color: var(--text-d-2);
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1765,37 +1851,71 @@ body.menu-open .site-header {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
+/* 네 역량이 "면 채우는 잔 항목"으로 읽히던 것을 카드 문법(상단 2px 라인 + 리프트 호버)까지
+   갖춘 구획 셀로 올린다 — 아래 운영 도식과 같은 밀도를 갖게 하는 것이 목적 */
 .proof-points li {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 54px;
-  padding: 0 14px;
+  gap: 12px;
+  min-height: 74px;
+  padding: 0 16px;
   border-radius: var(--r-sm);
   border: 1px solid var(--border-2);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-d-2);
-  font-size: 13px;
-  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--white);
+  font-size: 14.5px;
+  line-height: 1.3;
+  font-weight: 800;
+  word-break: keep-all;
+  transition:
+    translate var(--dur) var(--ease-out),
+    border-color var(--dur) ease,
+    box-shadow var(--dur) ease;
+}
+
+/* 상단 액센트 라인 — .fw-card와 같은 카드 언어(상시 노출, hover에서 선명해짐) */
+.proof-points li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-line);
+  opacity: 0.45;
+  transition: opacity var(--dur) ease;
+}
+
+.proof-points li:hover {
+  translate: 0 var(--card-lift);
+  border-color: var(--border-3);
+  box-shadow: var(--e-dark-1);
+}
+
+.proof-points li:hover::before {
+  opacity: 1;
 }
 
 .proof-ic {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--r-xs);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(3, 144, 238, 0.3);
+  background: rgba(3, 144, 238, 0.14);
   color: var(--cyan);
 }
 
 .proof-ic svg {
-  width: 17px;
-  height: 17px;
+  width: 19px;
+  height: 19px;
 }
 
 /* ---------------------------------------------------------
@@ -1808,14 +1928,36 @@ body.menu-open .site-header {
    등장 연출 없이 처음부터 최종 상태로 렌더된다(REVEAL / MOTION 참고)
    --------------------------------------------------------- */
 .about-flow {
+  position: relative;
   display: flex;
   align-items: stretch;
-  gap: clamp(10px, 1.3vw, 16px);
-  padding: clamp(20px, 2.4vw, 28px);
-  border: 1px solid var(--border-l1);
+  gap: clamp(12px, 1.5vw, 20px);
+  padding: clamp(24px, 2.8vw, 34px);
+  border: 1px solid var(--border-l2);
+  /* 도식이 흰 섹션 위에서 "빈 면"으로 흩어지지 않도록 상단 2px 라인으로 블록을 선언한다
+     (.pm-step 라이트 카드 문법). 위 스테이트먼트 패널과 같은 무게로 읽히는 것이 목적 */
+  border-top: 2px solid var(--blue);
   border-radius: var(--r-lg);
-  background: var(--surface-l1);
-  box-shadow: var(--e-1);
+  /* 서피스를 l1 → l2로 한 단계 내려 흰 노드가 바닥에서 떠오르게 한다 */
+  background:
+    radial-gradient(560px 240px at 50% 0%, rgba(15, 99, 234, 0.05), transparent 72%),
+    var(--surface-l2);
+  box-shadow: var(--e-2);
+}
+
+/* 위 패널 → 도식 연결 셰브런 — .about-grid의 gap 한가운데.
+   두 블록이 별개의 슬래브가 아니라 한 흐름이라는 표시 */
+.about-flow::before {
+  content: "";
+  position: absolute;
+  top: -24px;
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid rgba(15, 99, 234, 0.5);
+  border-right: 2px solid rgba(15, 99, 234, 0.5);
+  transform: rotate(135deg);
+  pointer-events: none;
 }
 
 /* 좌: 함께 읽는 네 신호(2×2) */
@@ -1823,97 +1965,126 @@ body.menu-open .site-header {
   flex: 1 1 48%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* 입력 신호 4개 — 상단 액센트는 옅게. 아래 hub(강) · out(시그니처)로 갈수록 세져
+   "신호 → 기준 → 결과"가 강도의 계단으로도 읽힌다 */
 .af-node {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 58px;
-  padding: 0 16px;
+  gap: 12px;
+  /* 위 역량 셀(.proof-points li)과 같은 모듈 높이 — 두 블록이 같은 격자로 읽힌다 */
+  min-height: 74px;
+  padding: 0 18px;
   border: 1px solid var(--border-l2);
+  border-top: 2px solid rgba(15, 99, 234, 0.34);
   border-radius: var(--r-sm);
   background: var(--surface-l0);
   color: var(--text-l-1);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.3;
-  font-weight: 700;
+  font-weight: 800;
   word-break: keep-all;
+  box-shadow: var(--e-1);
   transition:
+    translate var(--dur) var(--ease-out),
     border-color var(--dur) ease,
     box-shadow var(--dur) ease;
 }
 
 .af-node:hover {
+  translate: 0 var(--card-lift);
   border-color: var(--border-l3);
+  border-top-color: var(--blue);
   box-shadow: var(--e-2);
 }
 
+/* 라이트 면 위 액센트는 --blue 계열 — 시안(#0390ee)은 흰 배경에서 3.37:1이라 --blue로 내린다 */
 .af-ic {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--r-xs);
-  background: rgba(3, 144, 238, 0.09);
-  color: var(--cyan);
+  border: 1px solid rgba(15, 99, 234, 0.2);
+  background: rgba(15, 99, 234, 0.08);
+  color: var(--blue);
 }
 
 .af-ic svg {
-  width: 17px;
-  height: 17px;
+  width: 19px;
+  height: 19px;
 }
 
-/* 진행 셰브런 — .fw-flow와 같은 각도·색 */
+/* 진행 셰브런 — .fw-flow와 같은 각도. 도식 안에서 눈에 걸리도록 한 단계 키웠다 */
 .af-chev {
   flex: 0 0 auto;
   align-self: center;
-  width: 10px;
-  height: 10px;
-  border-top: 1.5px solid rgba(3, 144, 238, 0.62);
-  border-right: 1.5px solid rgba(3, 144, 238, 0.62);
+  width: 13px;
+  height: 13px;
+  border-top: 2px solid rgba(15, 99, 234, 0.62);
+  border-right: 2px solid rgba(15, 99, 234, 0.62);
   transform: rotate(45deg);
 }
 
-/* 중: 네 신호가 모이는 단일 기준 — 섹션에서 가장 강한 액센트 면 */
+/* 중: 네 신호가 모이는 단일 기준 — 도식에서 가장 강한 액센트 면.
+   외곽 링 하나로 "모이는 지점"임을 표시한다 */
 .af-hub {
+  position: relative;
   flex: 1 1 26%;
   display: grid;
   place-content: center;
   margin: 0;
   padding: 18px 16px;
-  border: 1px solid rgba(3, 144, 238, 0.45);
+  border: 1.5px solid rgba(15, 99, 234, 0.5);
   border-radius: var(--r-sm);
-  background: rgba(3, 144, 238, 0.07);
+  background: rgba(15, 99, 234, 0.08);
+  box-shadow: 0 0 0 5px rgba(15, 99, 234, 0.05);
   color: var(--text-l-1);
-  font-size: clamp(16px, 1.7vw, 19px);
+  font-size: clamp(17px, 1.8vw, 21px);
   line-height: 1.3;
   font-weight: 900;
   text-align: center;
   word-break: keep-all;
 }
 
-/* 우: 종착점 — 위 스테이트먼트 패널과 같은 잉크 면으로 결과를 못박는다 */
+/* 우: 종착점 — 위 스테이트먼트 패널과 같은 잉크 면으로 결과를 못박는다.
+   상단 2px 카드 라인까지 물려 도식 안에서 유일하게 다크로 끊는다 */
 .af-out {
+  position: relative;
+  overflow: hidden;
   flex: 1 1 26%;
   display: grid;
   place-content: center;
   margin: 0;
   padding: 18px 16px;
   border-radius: var(--r-sm);
-  background: var(--ink-2);
+  background:
+    var(--grad-accent-surface),
+    var(--ink-2);
   color: var(--white);
-  font-size: clamp(16px, 1.7vw, 19px);
+  font-size: clamp(17px, 1.8vw, 21px);
   line-height: 1.3;
   font-weight: 900;
   text-align: center;
   word-break: keep-all;
   box-shadow: var(--e-dark-1);
+}
+
+.af-out::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-line);
+  opacity: 0.8;
 }
 
 /* 4스텝이 빠져 패널이 폭 전체를 쓰게 되었으므로, 데스크탑에서는 한 줄이 지나치게
@@ -1926,11 +2097,12 @@ body.menu-open .site-header {
   }
 
   .statement-body {
-    flex: 1 1 62%;
+    flex: 1 1 58%;
   }
 
+  /* 역량 셀이 커진 만큼 우측 컬럼도 함께 넓힌다(라벨이 두 줄로 접히는 빈도를 줄임) */
   .proof {
-    flex: 1 1 38%;
+    flex: 1 1 42%;
     margin-top: 0;
   }
 }
