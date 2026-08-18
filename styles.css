@@ -4203,7 +4203,10 @@ body.menu-open .site-header {
   --os-line: rgba(15, 99, 234, 0.78);
   --os-dot: rgba(15, 99, 234, 0.9);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(232px, 292px) minmax(0, 1fr);
+  /* 중앙 열이 모듈 열보다 좁아서 주인공이 제일 작은 위계 역전이 있었다 —
+     허브 열을 40px 넓혀 첫 시선이 좌상단 MODULE 01이 아니라 가운데로 떨어지게 한다.
+     커넥터는 브래킷·스텁 모두 고정값 --os-gap에서만 길이를 얻으므로 열 폭이 변해도 정합은 유지된다 */
+  grid-template-columns: minmax(0, 1fr) minmax(272px, 332px) minmax(0, 1fr);
   column-gap: var(--os-gap);
   align-items: stretch;
 }
@@ -4370,21 +4373,35 @@ body.menu-open .site-header {
 /* 중앙 시스템 노드 — 라이트에서는 모듈과 같은 화이트 면을 쓰고
    azure 틴트 + 블루 보더로만 허브 위계를 세운다.
    1px --border-l3(1.57:1)로는 네 모듈과 같은 무게라 허브로 읽히지 않았다 —
-   프레임을 2px로 올리고 커넥터와 같은 --os-line을 써서 "선이 모여 만든 노드"로 보이게 하고,
-   그림자도 한 단계(--e-2) 올려 면 위로 띄운다 */
+   프레임을 2px로 올리고 커넥터와 같은 --os-line을 써서 "선이 모여 만든 노드"로 보이게 한다.
+   선 굵기를 올려도 허브가 서지 않았던 원인은 대비가 아니라 위계였다. 모듈을 감쇠시키지 않고
+   허브만 면적·타이포·그림자 세 축에서 동시에 올리는 '+' 조치로 주종을 만든다 */
 .os-core {
+  /* 하단 인풋 베이가 카드 패딩을 정확히 되짚어 나가야 해서 패딩을 토큰으로 잡는다 */
+  --os-core-py: 30px;
+  --os-core-px: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 24px 20px;
+  padding: var(--os-core-py) var(--os-core-px);
   border: 2px solid var(--os-line);
   border-radius: var(--r-md);
   background-color: var(--surface-l0);
-  /* 같은 azure를 알파만 내려(0.12 → 0.07) 라이트 면에서 허브 톤만 남긴다 */
-  background-image: linear-gradient(180deg, rgba(3, 144, 238, 0.07), rgba(3, 144, 238, 0) 62%);
-  box-shadow: var(--e-2);
+  /* 같은 azure의 알파만 조정(0.07 → 0.12) — 새 색을 만들지 않고 허브 면만 한 단계 진하게.
+     최고 농도(y=0) 지점에서도 그 위에 놓이는 .os-cap이 4.58:1로 AA를 넘긴다 */
+  background-image: linear-gradient(180deg, rgba(3, 144, 238, 0.12), rgba(3, 144, 238, 0) 62%);
+  /* 모듈 평상시 --e-1보다 두 단계, 모듈 호버 --e-2보다도 한 단계 위 —
+     어떤 상태에서도 허브가 가장 높이 떠 있다 */
+  box-shadow: var(--e-3);
   text-align: center;
+}
+
+/* 남는 세로 여유를 이름 그룹 위와 인풋 베이 위로 균등 분배한다.
+   auto 마진이 free space를 전부 흡수하므로 위의 justify-content는 이 시점에 무효 —
+   엔진 그룹은 상단 면 가운데에, 베이는 카드 바닥에 고정된다 */
+.os-core > .os-cap:first-child {
+  margin-top: auto;
 }
 
 /* 노드 좌우 스텁 — gap 절반을 가로질러 모듈 브래킷 수직선과 겹쳐 물린다.
@@ -4408,7 +4425,9 @@ body.menu-open .site-header {
 }
 
 /* 허브 캡션 — 회색이면 모듈 본문과 같은 무게라 노드 안이 평평했다.
-   라이트 액센트로 올려 허브 프레임·커넥터와 같은 계열로 묶는다(틴트 면 4.89:1 / 흰 면 5.26:1) */
+   라이트 액센트로 올려 허브 프레임·커넥터와 같은 계열로 묶는다.
+   틴트를 0.12로 올린 뒤 대비: 그라디언트 최상단(글자가 놓이지 않는 지점) 4.58:1 /
+   캡션이 실제 앉는 위치 4.91:1 / 하단 밴드(l1)의 DATA SOURCE 5.07:1 — 셋 다 AA 통과 */
 .os-cap {
   display: block;
   color: var(--blue);
@@ -4417,20 +4436,30 @@ body.menu-open .site-header {
   letter-spacing: 0.14em;
 }
 
+/* 허브 이름 — 21px는 모듈 h3(18px)와 3px 차이뿐이라 도식의 주어로 읽히지 않았다.
+   최소 24px(모듈 h3의 1.33배)에서 시작해 넓은 화면에서 28px까지 올린다.
+   색은 --text-l-1 그대로 — CI azure는 흰 면에서 3.37:1이라 글자에 못 쓰고,
+   그라디언트 텍스트도 같은 이유로 배제한다 */
 .os-core-name {
   display: block;
-  margin-top: 8px;
+  /* 아래 여백은 인풋 베이 헤어라인과의 최소 간격 —
+     ≤1024에서는 카드가 내용 높이로 줄어 auto 마진이 0이 되므로 이 값이 유일한 완충이 된다 */
+  margin: 10px 0 18px;
   color: var(--text-l-1);
-  font-size: 21px;
-  line-height: 1.2;
+  font-size: clamp(24px, 2vw, 28px);
+  line-height: 1.18;
   font-weight: 800;
   letter-spacing: 0.01em;
 }
 
+/* DATA SOURCE — 이름과 한 상자 안에서 경쟁하던 칩 5개를 카드 하단 전폭 밴드로 내린다.
+   음수 마진으로 좌우·아래 패딩을 되짚어 나가 면 자체를 갈라놓으면
+   허브가 '컨테이너'가 아니라 '엔진 + 그 아래 인풋 베이'라는 종속 구조로 읽힌다 */
 .os-src-cap {
-  margin-top: 20px;
-  padding-top: 18px;
+  margin: auto calc(var(--os-core-px) * -1) 0;
+  padding: 15px var(--os-core-px) 0;
   border-top: 1px solid var(--border-l2);
+  background: var(--surface-l1);
 }
 
 .os-src {
@@ -4439,18 +4468,34 @@ body.menu-open .site-header {
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  margin: 12px 0 0;
-  padding: 0;
+  /* 아래로도 패딩만큼 되짚어 카드 바닥까지 밴드를 채운다.
+     안쪽 반경은 프레임 2px을 뺀 값 — overflow:hidden은 좌우 커넥터 스텁을 잘라내므로 쓸 수 없다 */
+  margin: 0 calc(var(--os-core-px) * -1) calc(var(--os-core-py) * -1);
+  padding: 11px var(--os-core-px) var(--os-core-py);
+  border-radius: 0 0 calc(var(--r-md) - 2px) calc(var(--r-md) - 2px);
+  background: var(--surface-l1);
 }
 
+/* 밴드가 l1이 되었으므로 칩 면은 l0으로 반전 — 베이 안에서 개별 소스가 다시 떠오른다
+   (텍스트 --text-l-2는 l0에서 9.21:1) */
 .os-src li {
   padding: 4px 10px;
   border: 1px solid var(--border-l2);
   border-radius: var(--r-pill);
-  background: var(--surface-l1);
+  background: var(--surface-l0);
   color: var(--text-l-2);
   font-size: 12.5px;
   font-weight: 700;
+}
+
+/* ≤1024에서는 공용 RESPONSIVE가 허브 패딩을 22/18로 되돌린다 —
+   밴드가 되짚는 값이 어긋나지 않도록 같은 수치를 토큰에도 반영한다.
+   (공용 블록은 손대지 않고 이 범위 안에서만 스코프) */
+@media (max-width: 1024px) {
+  .os-core {
+    --os-core-py: 22px;
+    --os-core-px: 18px;
+  }
 }
 
 .os-arch-cap {
