@@ -8,8 +8,11 @@
   --ink-2: #0a1020;
   --navy: #0d1b32;
   --navy-soft: #14243f;
-  --blue: #2276ff;
-  --blue-deep: #0f63ea;
+  /* 라이트 섹션 전용 블루. #2276ff는 흰 배경 4.11:1로 AA(4.5) 미달이라
+     같은 색상각(217°)을 유지한 채 명도만 내렸다 → 텍스트 5.26 / 흰 글자 채움 5.26 모두 통과.
+     다크 섹션의 시그니처는 --cyan(CI azure #0390ee, 다크 위 5.97:1)이라 영향 없음 */
+  --blue: #0f63ea;
+  --blue-deep: #0b4fc0; /* --blue가 내려온 만큼 함께 내려 액티브 칩 그라디언트의 깊이를 유지 */
   /* 시그니처 액센트 — CI v2.0 팔레트의 azure. 구 하늘색(#2ed3ff)에서 전환(2026-08 클라이언트 A안).
      토큰명은 사이트 전역 참조 유지를 위해 그대로 두었으나 값은 하늘색 계열이 아님 */
   --cyan: #0390ee;
@@ -46,7 +49,9 @@
   --text-d-4: rgba(255, 255, 255, 0.45);
   --text-l-1: #0a1020;
   --text-l-2: #3a4861;
-  --text-l-3: #6b7a92;
+  /* 라이트 전환(09·11) 후 실측에서 #6b7a92는 흰 배경 4.35:1로 AA(4.5) 미달이었다.
+     색조는 그대로 두고 명도만 한 단계 내려 l0 5.08 / l1 4.90 / l2 4.68로 전부 통과시킨다 */
+  --text-l-3: #626f85;
 
   /* --- Signature gradients & glows --- */
   --grad-brand: linear-gradient(118deg, #0390ee 0%, #7ab7ff 46%, #2276ff 100%);
@@ -2469,10 +2474,12 @@ body.menu-open .site-header {
 }
 
 /* 두 번째 PM 섹션은 서피스를 한 단계 내려 라이트 구간 안에서도 경계가 보이게 한다 */
+/* 04(l1) → 05(l0) → 06(l2). 04~06이 라이트 3연속이라 l1/l0/l1로는 명도 차가
+   1.5뿐이었다. 가운데를 두 단계 내려 05→06 경계를 3.2로 벌린다(아인스미디어식 명도 계단) */
 #pm-process.pm-section {
-  background-color: var(--surface-l1);
+  background-color: var(--surface-l2);
   background-image:
-    linear-gradient(180deg, rgba(248, 251, 255, 0), var(--surface-l1) 520px),
+    linear-gradient(180deg, rgba(241, 246, 253, 0), var(--surface-l2) 520px),
     var(--dot-light);
 }
 
@@ -2903,7 +2910,8 @@ body.menu-open .site-header {
   padding: 5px 14px;
   border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
-  background: var(--surface-l1);
+  /* 점선 루프를 가리는 마스크라 섹션 배경(l2)과 반드시 같은 값 */
+  background: var(--surface-l2);
   color: var(--text-l-2);
   font-size: 13px;
   line-height: 1.4;
@@ -4387,11 +4395,11 @@ body.menu-open .site-header {
 .case-metric strong {
   display: block;
   margin-top: 10px;
-  /* 라이트 서피스에서는 grad-brand의 #7ab7ff 구간이 대비 미달 — blue→azure의 grad-action */
-  background: var(--grad-action);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  /* 그라디언트 텍스트는 라이트 서피스에서 통과 구간이 없다 —
+     grad-brand의 #7ab7ff는 2.09:1, grad-action의 azure 끝단도 3.37:1.
+     사례 카드의 KPI는 이 페이지에서 가장 중요한 숫자라 단색 --blue(5.26:1)로 확정한다.
+     다크 섹션의 그라디언트 수치 표기(스냅샷 등)는 그대로 둔다 */
+  color: var(--blue);
   /* 화살표형은 23px에서 161px가 필요해 3열(가용 130px)에서 줄바꿈됐다.
      "숫자가 너무 크다"는 클라이언트 피드백과도 맞물려 18px로 낮춘다 */
   font-size: clamp(17px, 1.25vw, 18px);
@@ -4738,14 +4746,16 @@ body.menu-open .site-header {
   color: var(--blue);
 }
 
+/* 태그 글자색은 라이트 배경 AA(4.5:1) 기준으로 명도만 하향 —
+   #0aa6cc는 2.86:1, #3f72c8은 4.14:1로 미달이었다(색조·배경 틴트는 유지) */
 .tag-strategy {
   background: rgba(3, 144, 238, 0.12);
-  color: #0aa6cc;
+  color: #0a6b85;
 }
 
 .tag-ai {
   background: rgba(122, 183, 255, 0.16);
-  color: #3f72c8;
+  color: #345f9e;
 }
 
 /* 제목 — 리스트 항목 위계로 축소(헤딩이 아닌 목록의 톤) */
