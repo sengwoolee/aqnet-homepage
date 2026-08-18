@@ -590,12 +590,12 @@ if (filterButtons.length) {
 }
 
 /* 로고월 더 보기 — 접힘 기준은 CSS(.is-collapsed)가 뷰포트별로 가른다.
-   데스크탑 40장 / 모바일(≤720px) priority 18장 → 펼치면 전수.
+   데스크탑 28장 / 모바일(≤720px) priority 18장 → 펼치면 전수.
    버튼과 접힘 클래스를 JS가 부여하므로 JS 미실행 환경은 70장 전량 노출 */
 const logoWall = document.querySelector(".logo-wall");
 if (logoWall) {
   const logoTiles = logoWall.querySelectorAll(".logo-tile");
-  const DESKTOP_VISIBLE = 40; // styles.css의 :nth-child(n + 41)과 짝 — 함께 바꿀 것
+  const DESKTOP_VISIBLE = 28; // styles.css의 :nth-child(n + 29)와 짝 — 함께 바꿀 것
   const priorityTiles = logoWall.querySelectorAll(".logo-tile.priority").length;
 
   if (logoTiles.length > DESKTOP_VISIBLE || logoTiles.length > priorityTiles) {
