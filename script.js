@@ -57,7 +57,8 @@ function rampHeroEmblemIn() {
   // 기준 시각은 예약 시점이 아니라 첫 프레임에서 잡는다 — 백그라운드 탭에서 로드되면
   // rAF가 멈춰 있다가 복귀하는데, 예약 시각 기준이면 경과분이 이미 지나 즉시 1로 튀어버린다
   let start = 0;
-  const DUR = 620;
+  // 즉시 승격으로 첫 프레임이 훨씬 빨리 도착하므로, 램프도 짧게 잡아 본문과 함께 뜨는 체감을 만든다
+  const DUR = 380;
   const step = (now) => {
     if (!start) start = now;
     const t = clamp((now - start) / DUR, 0, 1);
@@ -84,7 +85,7 @@ function loadHeroVideos() {
   promoteHeroVideo(heroEmblemEl);
 }
 
-// 로드 트리거 — load 후 idle+600ms 타이머와 첫 스크롤 중 먼저 오는 쪽(중복 호출은 no-op)
+// 로드 트리거 — 파싱 직후 즉시 호출이 주 경로, 스크롤은 실패 시 재시도용(중복 호출은 no-op)
 function triggerHeroVideoLoad() {
   window.clearTimeout(heroVideoLoadTimer);
   heroVideoLoadTimer = null;
@@ -101,15 +102,8 @@ function pauseHeroVideos() {
 
 if (heroEmblemEl) {
   window.addEventListener("scroll", triggerHeroVideoLoad, { passive: true });
-  window.addEventListener("load", () => {
-    if (heroVideosLoaded) return;
-    // LCP 경합 방지 — lazy 이미지 탓에 load가 매우 이르게 발화하므로 idle까지 한 번 더 양보
-    const start = () => {
-      heroVideoLoadTimer = window.setTimeout(triggerHeroVideoLoad, 600);
-    };
-    if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
-    else start();
-  });
+  /* 즉시 승격은 pinEnabled 선언(아래) 이후에 호출한다 — 여기서 부르면 TDZ로 스크립트가 멈춘다.
+     스크롤 리스너는 승격 실패 시의 재시도 경로로 남긴다(중복 호출은 no-op) */
   // 탭 복귀 — 변경 가드를 무효화해 현재 스크롤 위치의 프레임으로 재동기화
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
@@ -208,6 +202,13 @@ function stripBoost() {
 }
 
 let pinEnabled = window.innerWidth > 1024 && !prefersReducedMotion(); // 히어로 핀 스크럽(데스크탑 전용, 동작 줄이기 시 해제)
+
+/* 히어로 심볼 즉시 승격 — 기존에는 window.load → requestIdleCallback(최대 1200ms) → 600ms
+   타이머를 거쳐서야 fetch가 시작돼 심볼이 본문보다 수 초 늦게 배어나왔다.
+   이 스크립트는 body 끝에서 실행되므로 여기서 바로 부르면 파싱 직후 fetch가 시작된다.
+   heroVideosEnabled()가 pinEnabled를 읽으므로 반드시 위 선언 뒤에 있어야 한다(TDZ).
+   모바일·reduced-motion은 그 게이트에서 걸러져 여전히 0바이트 */
+if (heroEmblemEl) triggerHeroVideoLoad();
 
 function shouldSmoothHeroProgress() {
   return smoothHeroScroll && pinEnabled;
@@ -502,7 +503,16 @@ if (navLinks.length && "IntersectionObserver" in window) {
   });
 
   // 내비에 없는 섹션은 인접 메뉴로 매핑(스파이 사각지대 제거)
-  const proxyMap = { "about-detail": "about", framework: "about", reference: "works" };
+  const proxyMap = {
+    "about-detail": "about",
+    framework: "about",
+    // SERVICE에서 분리된 3개 섹션과 SOLUTION에서 분리된 OS 아키텍처는 내비에 없으므로 모(母) 메뉴로 매핑
+    "pm-detail": "service",
+    "pm-process": "service",
+    "pm-shift": "service",
+    "os-arch": "solution",
+    reference: "works",
+  };
   Object.entries(proxyMap).forEach(([sectionId, navId]) => {
     const section = document.getElementById(sectionId);
     const link = Array.from(navLinks).find((l) => l.getAttribute("href") === `#${navId}`);

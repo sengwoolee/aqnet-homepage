@@ -83,8 +83,8 @@
      콘텐츠 카드 공통 규칙: 상단 2px 블루 라인(상시 노출) + hover에서
      리프트 2px · 보더 한 단계 · 그림자 한 단계.
      리프트를 transform이 아니라 translate로 두는 이유 —
-     등장 리빌(cardIn)과 스크럽 패럴랙스가 transform을 점유하므로
-     축을 분리해야 두 시스템이 서로의 값을 덮어쓰지 않는다 */
+     기존 등장 리빌·스크럽 패럴랙스가 transform을 점유했던 잔재이며,
+     축을 분리해 두어야 다른 transform과 서로의 값을 덮어쓰지 않는다 */
   --card-line: var(--grad-action);
   --card-lift: -2px;
 
@@ -2176,10 +2176,33 @@ body.menu-open .site-header {
   white-space: nowrap;
 }
 
-/* --- 마무리 문장 — 순환 라인 아래 중앙 2줄 --- */
+/* --- 마무리 문장 — 되돌림 브래킷 아래 결론 밴드.
+   소개서 p12는 이 결론을 상하 헤어라인으로 감싸 챕터를 닫는다.
+   섹션 이음매와 같은 --grad-line을 써서 사이트 문법과 일치시킨다 --- */
 .fw-closing {
-  margin-top: 22px;
+  position: relative;
+  margin-top: 30px;
+  padding: 22px 0 24px;
   text-align: center;
+}
+
+.fw-closing::before,
+.fw-closing::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-line);
+  opacity: 0.55;
+}
+
+.fw-closing::before {
+  top: 0;
+}
+
+.fw-closing::after {
+  bottom: 0;
 }
 
 .fw-closing-lead {
@@ -4235,10 +4258,11 @@ body.menu-open .site-header {
   }
 }
 
-/* 예시안 2×2 — 데스크탑 2열 */
+/* 사례가 4개에서 9개로 늘어 2열이면 5행(2618px)이 된다.
+   필터가 하나의 그리드를 공유해야 해서 섹션 분할은 불가하므로 열 수로 높이를 잡는다 */
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -4303,7 +4327,9 @@ body.menu-open .site-header {
 }
 
 .case-metric {
-  padding: 18px 16px;
+  /* 3열 그리드에서 화살표형 수치("365% → 472%")가 한 줄에 들어가도록
+     좌우 패딩을 14px로 좁힌다(가용 126px → 130px) */
+  padding: 18px 14px;
   border: 1px solid var(--border-2);
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.02);
@@ -4328,7 +4354,9 @@ body.menu-open .site-header {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(18px, 2vw, 23px);
+  /* 화살표형은 23px에서 161px가 필요해 3열(가용 130px)에서 줄바꿈됐다.
+     "숫자가 너무 크다"는 클라이언트 피드백과도 맞물려 18px로 낮춘다 */
+  font-size: clamp(17px, 1.25vw, 18px);
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -4368,9 +4396,15 @@ body.menu-open .site-header {
   opacity: 1;
 }
 
-/* 태블릿 이하 1열 — 공용 반응형 블록보다 뒤/높은 특이도가 아니라
+/* 태블릿 2열 · 모바일 1열 — 공용 반응형 블록보다 뒤/높은 특이도가 아니라
    해당 목록에서 .work-grid를 빼고 여기서 섹션 로컬로 관리 */
 @media (max-width: 1024px) {
+  .work-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
   .work-grid {
     grid-template-columns: 1fr;
   }

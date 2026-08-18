@@ -115,7 +115,7 @@
           <!-- CI 모션 비디오 — 데스크탑 핀 전용. src는 JS가 data-src에서 승격(모바일 대역폭 0)
                AQ 엠블럼 드로잉을 스크롤 진행도에 프레임 단위 스크럽 — 브리지 직전 심볼 완성 -->
           <div class="hero-videos" aria-hidden="true">
-            <video class="hero-video hero-video-emblem" data-hero-video="emblem" data-src="assets/video/hero-emblem.mp4" muted playsinline preload="metadata"></video>
+            <video class="hero-video hero-video-emblem" data-hero-video="emblem" data-src="assets/video/hero-emblem.mp4" muted playsinline preload="auto"></video>
           </div>
           <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
           <div class="hero-noise" aria-hidden="true"></div>
@@ -366,9 +366,13 @@
               <p class="fw-cycle-cap">학습을 다시 기준으로</p>
               <span class="fw-cycle-line is-right" aria-hidden="true"></span>
             </div>
-            <!-- 되돌림 캡션("학습을 다시 기준으로")과 같은 말을 반복하던 보조 문장은 삭제 -->
+            <!-- 결론 밴드 — 소개서 p12가 되돌림 브래킷 아래에 상하 헤어라인으로
+                 감싸 챕터를 닫는 문법을 그대로 옮겼다. 두 줄 모두 소개서 verbatim -->
             <div class="fw-closing" data-reveal>
               <p class="fw-closing-lead">AQ의 철학은 이어집니다</p>
+              <p class="fw-closing-sub">
+                한 번의 성과에서 멈추지 않고 <strong class="nowrap">반복되는 운영</strong>으로
+              </p>
             </div>
           </div>
         </section>
@@ -444,7 +448,7 @@
              #pm-detail 앵커는 외부 공유 URL 대비로 이 섹션에 유지한다 -->
         <section class="section pm-section" id="pm-detail">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow"><span class="eyebrow-no">0X</span>PERFORMANCE MARKETING</p>
+            <p class="eyebrow"><span class="eyebrow-no">05</span>PERFORMANCE MARKETING</p>
             <h2>고객 여정별 채널 운영</h2>
             <p class="mp-lead">
               매체마다 다른 상품 구조와 입찰 방식을 나눠 <span class="nowrap">운영합니다.</span><br /><span
@@ -551,7 +555,7 @@
         <!-- ===================== PERFORMANCE MARKETING · 운영 프로세스 ===================== -->
         <section class="section pm-section" id="pm-process">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow"><span class="eyebrow-no">0X</span>OPERATING PROCESS</p>
+            <p class="eyebrow"><span class="eyebrow-no">06</span>OPERATING PROCESS</p>
             <h2>운영 프로세스</h2>
           </div>
 
@@ -622,7 +626,7 @@
              바로 뒤 SOLUTION(다크)으로 자연스럽게 넘긴다 -->
         <section class="section pm-shift-section" id="pm-shift">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">0X</span>OPERATING SHIFT</p>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">07</span>OPERATING SHIFT</p>
             <h2>AQNET이 만드는 운영의 변화</h2>
             <p class="pm-lead">성과 보장이 아닌, 더 일관된 판단·실행·학습을 위한 운영 방식의 변화입니다.</p>
           </div>
@@ -675,7 +679,7 @@
         <!-- ===================== SOLUTION (AQ GROWTH OS) ===================== -->
         <section class="section solution-section" id="solution">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">05</span>SOLUTION</p>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">08</span>SOLUTION</p>
             <h2>AQ Growth OS</h2>
             <p>
               광고, CRM, 커머스, 콘텐츠 데이터를 연결해 다음 액션을 결정하고<br />실행 결과를 다시 학습하는
@@ -726,7 +730,7 @@
 
             <!-- 콘솔 목업 = 회사소개서 v2.8 p24(Unified Dashboard) 구성·수치와 1:1.
                  수치를 바꿀 때는 소개서와 동시에 갱신할 것(두 자료를 나란히 보는 클라이언트 기준) -->
-            <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 통합 대시보드 테스트 버전 예시 화면">
+            <div class="solution-panel bg-grid" role="group" aria-label="AQ Growth OS 대시보드 콘셉트 예시 화면 (샘플 데이터)">
               <!-- 존1 — 브라우저 크롬바.
                    URL 자리에는 운영되지 않는 실주소 대신 화면 이름을 넣는다(허위 도메인 인상 방지).
                    DEMO 배지는 대시보드 우상단 상시 노출 — 하단 'UI CONCEPT · SAMPLE DATA' 고지와 병존 -->
@@ -863,7 +867,7 @@
              eyebrow 번호는 전 섹션 재부여 확정 전까지 0X 플레이스홀더 -->
         <section class="section os-arch-section" id="os-arch">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">0X</span>OS ARCHITECTURE</p>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">09</span>OS ARCHITECTURE</p>
             <h2>4개 모듈로 나눈<br />Growth OS 구성</h2>
             <p>
               앞의 운영 루프를 실제로 돌리는 최소 단위입니다. 데이터 소스를 하나의 기준으로 모으고,
@@ -949,7 +953,7 @@
              (6 서비스 영역=Service, 4 실행 원칙=C.O.R.E, 15+ 사례=Works, 70+=Client Network) -->
         <section class="reference-snapshot" aria-label="성장 운영 요약 지표" data-scrub>
           <div class="snapshot-head" data-reveal>
-            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">06</span>BY THE NUMBERS</p>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">10</span>BY THE NUMBERS</p>
             <p class="snapshot-lead">AQNET의 성장 운영을 숫자로 요약합니다.</p>
           </div>
           <div class="snapshot-inner">
@@ -980,7 +984,7 @@
         <!-- ===================== WORKS ===================== -->
         <section class="section works-section" id="works" data-scrub>
           <div class="section-heading compact" data-reveal>
-            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">07</span>WORKS</p>
+            <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">11</span>WORKS</p>
             <h2>데이터와 실행으로 만든<br />성장 사례</h2>
             <p>
               핵심 인력의 실제 수행 경험을 바탕으로, 전략부터 실행·성과까지 성장의 과정을 소개합니다.
@@ -1108,7 +1112,7 @@
         <!-- ===================== CLIENT NETWORK ===================== -->
         <section class="section reference-section" id="reference">
           <div class="section-heading compact" data-reveal>
-            <p class="eyebrow"><span class="eyebrow-no">08</span>BRAND EXPERIENCE</p>
+            <p class="eyebrow"><span class="eyebrow-no">12</span>BRAND EXPERIENCE</p>
             <h2>다양한 브랜드의 가능성을<br />성장으로 연결하는 파트너 네트워크</h2>
             <p>
               브랜드마다 시장과 고객, 성장의 방식은 다릅니다.<br />AQNET은 고객 여정과 채널 데이터를 분석해<br class="br-desktop" />
@@ -1193,7 +1197,7 @@
         <!-- ===================== INSIGHT ===================== -->
         <section class="section insight-section" id="insight" data-reveal data-scrub>
           <div class="section-heading">
-            <p class="eyebrow"><span class="eyebrow-no">09</span>INSIGHT</p>
+            <p class="eyebrow"><span class="eyebrow-no">13</span>INSIGHT</p>
             <h2>운영 결과가 다음 전략이 되는<br />데이터 인사이트</h2>
             <p>
               AQNET의 인사이트는 캠페인 리포트가 아니라 다음 의사결정을 위한 운영 가설로 정리됩니다.
@@ -1226,7 +1230,7 @@
           <div class="section-heading contact-copy" data-reveal>
             <!-- 진단 회신 SLA를 헤딩 위로 — contact-meta 중복을 피해 이쪽 한 곳에서만 노출 -->
             <div class="contact-eyebrow">
-              <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">10</span>CONTACT</p>
+              <p class="eyebrow eyebrow-signal"><span class="eyebrow-no">14</span>CONTACT</p>
               <span class="sla-badge"><span class="nowrap">1영업일 이내</span> 1차 진단 회신</span>
             </div>
             <h2>성장 구조를 함께 설계할<br />준비가 되었습니다.</h2>
