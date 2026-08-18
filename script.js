@@ -599,7 +599,6 @@ if (logoWall) {
   const priorityTiles = logoWall.querySelectorAll(".logo-tile.priority").length;
 
   if (logoTiles.length > DESKTOP_VISIBLE || logoTiles.length > priorityTiles) {
-    const referenceSection = logoWall.closest("section");
     const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "logo-more";
@@ -612,16 +611,22 @@ if (logoWall) {
 
     toggle.addEventListener("click", () => {
       const expand = toggle.getAttribute("aria-expanded") !== "true";
+      // 접을 때 버튼을 화면상 제자리에 붙들기 위해 변경 전 위치를 먼저 잡는다
+      const btnTopBefore = toggle.getBoundingClientRect().top;
+
       toggle.setAttribute("aria-expanded", expand ? "true" : "false");
       toggle.textContent = expand ? "접기" : "더 보기";
       logoWall.classList.toggle("is-collapsed", !expand);
 
-      // 접을 때만 보정 — 로고월이 접히면 버튼이 1800px 넘게 위로 올라가므로
-      // 뷰포트가 그대로면 뒤 섹션에 떨어진다. html{scroll-behavior:smooth}를
-      // 상속하면 그 거리를 훑고 지나가므로 instant로 끊고, 헤더 가림은
-      // scroll-padding-top을 읽는 scrollIntoView가 알아서 피한다
-      if (!expand && referenceSection && referenceSection.getBoundingClientRect().top < 0) {
-        referenceSection.scrollIntoView({ block: "start", behavior: "instant" });
+      /* 접기 보정 — 로고월이 접히면 버튼이 1,800px 넘게 위로 딸려 올라가 뒤 섹션이 튀어나온다.
+         이전에는 섹션 최상단으로 scrollIntoView 했는데, 버튼을 보고 있던 시선이 갑자기
+         섹션 머리로 날아가 "스크롤이 제멋대로 움직인다"고 읽혔다.
+         대신 버튼의 뷰포트 좌표를 그대로 유지한다 — 로고월만 위로 접히고 버튼은 제자리라
+         화면이 이동하지 않은 것처럼 보인다. 펼칠 때는 새 로고가 그 자리에 드러나는 편이
+         자연스러워 보정하지 않는다. behavior는 html{scroll-behavior:smooth} 상속을 끊는다 */
+      if (!expand) {
+        const drift = toggle.getBoundingClientRect().top - btnTopBefore;
+        if (drift) window.scrollBy({ top: drift, left: 0, behavior: "instant" });
       }
 
       measureSections(); // 로고월 높이가 바뀌므로 스크럽 오프셋 재측정
