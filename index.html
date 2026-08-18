@@ -1323,7 +1323,10 @@
             <!-- 동의 상세 — 라벨 안에 넣으면 details 클릭이 체크박스 토글로 위임되므로 반드시 형제 요소.
                  푸터 '개인정보처리방침' 링크의 앵커 대상(#privacy-consent) -->
             <details class="consent-detail" id="privacy-consent">
-              <summary>개인정보 수집·이용 안내 <span class="cd-hint">자세히 보기</span></summary>
+              <!-- 네이티브 펼침 삼각형과 "자세히 보기"가 같은 역할로 중복이라, 마커를 감추고
+                   상태에 따라 문구가 바뀌는 단일 어포던스로 통일. details가 펼침 상태를
+                   스스로 낭독하므로 이 힌트는 aria-hidden 처리한다 -->
+              <summary>개인정보 수집·이용 안내<span class="cd-hint" aria-hidden="true"></span></summary>
               <dl class="consent-terms">
                 <dt>수집·이용 목적</dt>
                 <dd>상담 및 프로젝트 문의 응대</dd>

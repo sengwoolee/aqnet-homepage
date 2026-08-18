@@ -5216,9 +5216,17 @@ body.menu-open .site-header {
 
 .consent-detail > summary {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--text-d-2);
   font-size: 13px;
   font-weight: 700;
+  list-style: none; /* 네이티브 삼각형 제거 — 아래 .cd-hint가 유일한 어포던스 */
+}
+
+.consent-detail > summary::-webkit-details-marker {
+  display: none;
 }
 
 .consent-detail > summary:focus-visible {
@@ -5227,10 +5235,37 @@ body.menu-open .site-header {
   border-radius: var(--r-xs);
 }
 
+/* 단일 어포던스 — 접힘 "자세히 보기 ▾" / 펼침 "접기 ▴".
+   문구가 상태를 말하므로 삼각형과 중복되지 않는다 */
 .consent-detail .cd-hint {
-  margin-left: 6px;
-  color: var(--text-d-4);
-  font-weight: 600;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.consent-detail .cd-hint::before {
+  content: "자세히 보기";
+}
+
+.consent-detail[open] .cd-hint::before {
+  content: "접기";
+}
+
+.consent-detail .cd-hint::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.consent-detail[open] .cd-hint::after {
+  transform: translateY(1px) rotate(-135deg);
 }
 
 .consent-terms {
