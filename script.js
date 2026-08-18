@@ -524,12 +524,23 @@ if (navLinks.length && "IntersectionObserver" in window) {
   byId.forEach((_, section) => spy.observe(section));
 }
 
-/* Works 필터 — 예시안 복원(All/Commerce/Health/Service). 표시 토글 후 스크럽 오프셋 재측정 */
+/* Works 필터 — 업종 9종(Commerce는 업종이 아니라 비즈니스 형태라 제외).
+   데이터 계약(data-filter / .hidden / stagger-done / measureSections)은 그대로. */
 const filterButtons = document.querySelectorAll("[data-work-tabs] [data-filter]");
 if (filterButtons.length) {
   const workGrid = document.querySelector(".work-grid");
   const workStatus = document.querySelector("[data-work-status]");
-  const filterLabels = { all: "전체", commerce: "Commerce", health: "Health", service: "Service" };
+  const filterLabels = {
+    all: "전체",
+    health: "Health",
+    food: "Food",
+    home: "Home",
+    pet: "Pet",
+    digital: "Digital",
+    bedding: "Bedding",
+    sports: "Sports",
+    service: "Service",
+  };
 
   const applyWorkFilter = (filter) => {
     filterButtons.forEach((btn) => {
@@ -566,6 +577,46 @@ if (filterButtons.length) {
   filterButtons.forEach((btn) => {
     btn.addEventListener("click", () => applyWorkFilter(btn.dataset.filter || "all"));
   });
+}
+
+/* 로고월 더 보기 — 접힘 기준은 CSS(.is-collapsed)가 뷰포트별로 가른다.
+   데스크탑 40장 / 모바일(≤720px) priority 18장 → 펼치면 전수.
+   버튼과 접힘 클래스를 JS가 부여하므로 JS 미실행 환경은 70장 전량 노출 */
+const logoWall = document.querySelector(".logo-wall");
+if (logoWall) {
+  const logoTiles = logoWall.querySelectorAll(".logo-tile");
+  const DESKTOP_VISIBLE = 40; // styles.css의 :nth-child(n + 41)과 짝 — 함께 바꿀 것
+  const priorityTiles = logoWall.querySelectorAll(".logo-tile.priority").length;
+
+  if (logoTiles.length > DESKTOP_VISIBLE || logoTiles.length > priorityTiles) {
+    const referenceSection = logoWall.closest("section");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "logo-more";
+    toggle.textContent = "더 보기";
+    toggle.setAttribute("aria-expanded", "false");
+    if (logoWall.id) toggle.setAttribute("aria-controls", logoWall.id);
+
+    logoWall.classList.add("is-collapsed");
+    logoWall.after(toggle);
+
+    toggle.addEventListener("click", () => {
+      const expand = toggle.getAttribute("aria-expanded") !== "true";
+      toggle.setAttribute("aria-expanded", expand ? "true" : "false");
+      toggle.textContent = expand ? "접기" : "더 보기";
+      logoWall.classList.toggle("is-collapsed", !expand);
+
+      // 접을 때만 보정 — 로고월이 접히면 버튼이 1800px 넘게 위로 올라가므로
+      // 뷰포트가 그대로면 뒤 섹션에 떨어진다. html{scroll-behavior:smooth}를
+      // 상속하면 그 거리를 훑고 지나가므로 instant로 끊고, 헤더 가림은
+      // scroll-padding-top을 읽는 scrollIntoView가 알아서 피한다
+      if (!expand && referenceSection && referenceSection.getBoundingClientRect().top < 0) {
+        referenceSection.scrollIntoView({ block: "start", behavior: "instant" });
+      }
+
+      measureSections(); // 로고월 높이가 바뀌므로 스크럽 오프셋 재측정
+    });
+  }
 }
 
 /* 폼 칩 선택 하이라이트 — :has() 미지원 브라우저 폴백(.checked 미러링) */
@@ -723,12 +774,15 @@ if (counters.length) {
       const cell = el.closest("article");
       if (cell) cell.classList.add("counted");
     };
-    // 동작 줄이기 — 카운트업 없이 즉시 최종값
+    // 동작 줄이기 — 카운트업 없이 즉시 최종값(DOM 기본값과 동일)
     if (prefersReducedMotion()) {
       el.textContent = `${target}${suffix}`;
       done();
       return;
     }
+    // DOM에는 최종 숫자가 박혀 있다(JS 미실행·옵저버 미발화 대비).
+    // 0은 애니메이션을 실제로 시작하는 순간에만 세운다
+    el.textContent = `0${suffix}`;
     const duration = 1100;
     const start = performance.now();
     const step = (now) => {

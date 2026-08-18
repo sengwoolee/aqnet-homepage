@@ -4209,6 +4209,32 @@ body.menu-open .site-header {
   color: var(--white);
 }
 
+/* 칩 9종 — 데스크탑은 wrap(1200px 기준 1줄, 좁은 데스크탑에서도 최대 2줄),
+   모바일은 줄바꿈 대신 한 줄 가로 스크롤.
+   공용 RESPONSIVE 블록이 아니라 섹션 로컬 @media로 둔다(WORKS 블록 관례) */
+@media (max-width: 720px) {
+  .work-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    /* 스크롤바는 숨기고 스와이프만 남긴다 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .work-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+}
+
 /* 예시안 2×2 — 데스크탑 2열 */
 .work-grid {
   display: grid;
@@ -4291,7 +4317,10 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
-/* 값은 "21만원 절감"처럼 서술형이라 카운트업 없이 정적 텍스트 */
+/* 값은 "21만원 절감"처럼 서술형이라 카운트업 없이 정적 텍스트.
+   표기가 화살표형("2.1% → 2.8%")과 증감형("+38%")으로 이원화되면서
+   최대 글자수가 늘어 수치 크기를 한 단계 낮춘다(28 → 23px).
+   두 형식이 같은 박스 높이 안에서 한 줄로 마무리되게 하는 상한값 */
 .case-metric strong {
   display: block;
   margin-top: 10px;
@@ -4299,10 +4328,20 @@ body.menu-open .site-header {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: clamp(18px, 2vw, 23px);
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+/* 기간·비교 기준 한 줄 — 수치가 어느 구간의 값인지 바로 받아준다 */
+.case-basis {
+  margin: 12px 0 0;
+  color: var(--text-d-4);
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   word-break: keep-all;
 }
 
@@ -4485,6 +4524,75 @@ body.menu-open .site-header {
 .logo-tile:hover img {
   filter: grayscale(0);
   opacity: 1;
+}
+
+/* 접힘 상태 — JS가 .is-collapsed를 부여한다(JS 없으면 70장 전부 노출).
+   데스크탑은 40장까지, 모바일은 priority 타일만 — 기준이 뷰포트별로
+   다르므로 JS 재계산 없이 CSS가 직접 가른다(리사이즈 안전) */
+.logo-wall.is-collapsed > .logo-tile:nth-child(n + 41) {
+  display: none;
+}
+
+/* 더 보기 / 접기 토글 — 로고월 바로 아래 중앙 */
+.logo-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: min(100%, 260px);
+  min-height: 48px;
+  margin: 18px auto 0;
+  padding: 0 24px;
+  border: 1px solid var(--border-l2);
+  border-radius: var(--r-pill);
+  background: var(--surface-l0);
+  color: var(--text-l-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    border-color var(--dur) ease,
+    color var(--dur) ease,
+    box-shadow var(--dur) ease;
+}
+
+.logo-more:hover {
+  border-color: var(--border-l3);
+  color: var(--blue);
+  box-shadow: var(--e-1);
+}
+
+.logo-more:focus-visible {
+  outline: none;
+  box-shadow: var(--e-focus);
+}
+
+/* 셰브런 — 펼침 상태에서 뒤집는다 */
+.logo-more::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  translate: 0 -2px;
+  rotate: 45deg;
+  transition:
+    rotate var(--dur) ease,
+    translate var(--dur) ease;
+}
+
+.logo-more[aria-expanded="true"]::after {
+  translate: 0 2px;
+  rotate: -135deg;
+}
+
+/* 모바일 접힘 — priority 18장만 남겨 스크롤 길이를 줄인다 */
+@media (max-width: 720px) {
+  .logo-wall.is-collapsed > .logo-tile:not(.priority) {
+    display: none;
+  }
 }
 
 /* =========================================================
