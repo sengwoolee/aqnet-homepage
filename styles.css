@@ -3448,7 +3448,9 @@ body.menu-open .site-header {
 /* 진행 커서 도트 — active 노드 아이콘 중심을 따라 이동 */
 .loop-cursor {
   position: absolute;
-  left: var(--cx, 40px);
+  /* X를 left(전환 없음), Y를 transform(전환 있음)으로 나눠 두면 가로는 순간이동하고
+     세로만 미끄러진다. 두 축을 transform 하나로 합쳐 함께 움직이게 한다 */
+  left: 0;
   top: 0;
   width: 12px;
   height: 12px;
@@ -3456,7 +3458,7 @@ body.menu-open .site-header {
   background: var(--cyan);
   box-shadow: var(--glow-cyan);
   z-index: 2;
-  transform: translate(-50%, calc(var(--cy, 40px) - 50%));
+  transform: translate(calc(var(--cx, 40px) - 50%), calc(var(--cy, 40px) - 50%));
   transition: transform var(--dur-slow) var(--ease-emphasized);
   pointer-events: none;
 }

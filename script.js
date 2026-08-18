@@ -914,14 +914,20 @@ if (loop) {
   let active = 0;
   let timer;
 
+  /* 커서 좌표는 노드 아이콘 중심에서 뽑되, 노드에 걸린 translateX를 되돌려 '레이아웃' 중심을 쓴다.
+     활성 노드는 --loop-active-shift만큼 밀리고 그 이동이 전환 중이라, rect를 그대로 쓰면
+     클래스 토글 직후엔 이동 전 좌표가, 전환 중엔 중간 좌표가 잡혀 커서가 따라붙지 못한다.
+     rect와 transform은 같은 시점 값이라 빼면 서로 상쇄돼 전환 어느 지점에서 재도 결과가 같다.
+     (offsetLeft는 정수로 반올림돼 1px 오차가 남으므로 쓰지 않는다) */
   const measureNodes = () => {
-    const cursorX = parseFloat(getComputedStyle(loop).getPropertyValue("--loop-cursor-x")) || 40;
     const loopRect = loop.getBoundingClientRect();
     nodeCenters = nodes.map((node) => {
-      const nodeRect = node.getBoundingClientRect();
+      const icon = node.querySelector(".loop-ic") || node;
+      const iconRect = icon.getBoundingClientRect();
+      const m = new DOMMatrix(getComputedStyle(node).transform);
       return {
-        x: cursorX,
-        y: nodeRect.top - loopRect.top + nodeRect.height / 2,
+        x: iconRect.left - loopRect.left + iconRect.width / 2 - m.m41,
+        y: iconRect.top - loopRect.top + iconRect.height / 2 - m.m42,
       };
     });
   };
@@ -940,7 +946,8 @@ if (loop) {
     if (panel) panel.classList.toggle("learning", index === nodes.length - 1);
     measureNodes();
     if (nodeCenters.length) {
-      loop.style.setProperty("--cx", `${nodeCenters[index].x}px`);
+      const shift = parseFloat(getComputedStyle(loop).getPropertyValue("--loop-active-shift")) || 0;
+      loop.style.setProperty("--cx", `${nodeCenters[index].x + shift}px`);
       loop.style.setProperty("--cy", `${nodeCenters[index].y}px`);
     }
     if (statusEl) {
