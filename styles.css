@@ -1728,23 +1728,50 @@ body.menu-open .site-header {
 /* 운영 요약 리드 — 무엇을 연결하는지(카드 상단 본문) */
 .statement-sub {
   margin: 0;
-  font-size: clamp(16px, 1.9vw, 19px);
+  font-size: clamp(16px, 1.62vw, 17px);
   line-height: 1.7;
   font-weight: 600;
   color: var(--text-d-2);
   word-break: keep-all;
 }
 
-/* 클로징 선언 — 운영 원칙 재해석 (리드와 성격 분리) */
+/* 클로징 선언 — 패널의 착지점(포지셔닝 선언).
+   16px + 좌측 2px 바 조합이던 이전 처리는 리드(19px)보다 작아 섹션에서 가장 중요한
+   문장이 '각주 인용'으로 읽혔다. 리드를 한 단계 양보시키고 이 문장을 패널에서 가장
+   크고 굵은 흰 텍스트로 올려 위계를 제자리로 돌린다 */
 .statement-close {
-  margin: 20px 0 0;
-  padding-left: 14px;
-  border-left: 2px solid var(--cyan);
+  position: relative;
+  margin: clamp(22px, 2.2vw, 30px) 0 0;
+  padding-top: clamp(20px, 2vw, 26px);
+  border-top: 1px solid var(--border-2);
   color: var(--white);
-  font-size: 16px;
-  line-height: 1.6;
-  font-weight: 700;
+  font-size: clamp(19px, 1.4vw, 20px);
+  line-height: 1.5;
+  font-weight: 800;
   word-break: keep-all;
+}
+
+/* 결론 표식 — 구분선 위에 .why-label::after와 같은 시안 그라디언트 마크를 얹어
+   이 줄이 리드의 연장이 아니라 패널의 결론임을 표시한다(좌측 인용 바의 대체) */
+.statement-close::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 46px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+
+/* 공용 RESPONSIVE(720 이하)가 이 문단을 15px/좌패딩 12px로 되돌리므로, 좁은 뷰에서도
+   클로징이 리드보다 크게 남는 하한만 패널 스코프로 고정한다. 좌측 바를 걷어낸 지금
+   좌패딩은 리드와의 좌측 정렬을 깨뜨리기만 하므로 함께 0으로 */
+@media (max-width: 720px) {
+  .about-statement .statement-close {
+    padding-left: 0;
+    font-size: 17.5px;
+  }
 }
 
 /* 주장(메인+서브) ↔ 근거(역량 태그) 위계 — 가로줄 대체 */
@@ -2020,9 +2047,11 @@ body.menu-open .site-header {
 /* 4스텝이 빠져 패널이 폭 전체를 쓰게 되었으므로, 데스크탑에서는 한 줄이 지나치게
    길어지지 않도록 주장(좌) · 근거(우) 2열로 나눈다. 태블릿 이하는 기존 세로 스택 유지 */
 @media (min-width: 1025px) {
+  /* flex-start였을 때 주장 열이 위로 붙어 좌측 하단에 역량 2x2와의 높이차(약 51px)가
+     통째로 공백으로 남았다. center로 두면 그 차이가 위아래로 반씩 나뉜다 */
   .about-statement {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: clamp(32px, 4vw, 64px);
   }
 
