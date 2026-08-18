@@ -2062,6 +2062,9 @@ body.menu-open .site-header {
    AQ FRAMEWORK (C·O·R·E)
    ========================================================= */
 .framework-section {
+  /* 카드 그리드의 gap을 섹션 토큰으로 둔다 — 셰브런 오버레이와 결론 플레이트가
+     같은 간격 문법을 공유해야 결론부가 그리드의 '다음 행'으로 읽힌다 */
+  --fw-gap: 16px;
   width: 100%;
   max-width: none;
   background: var(--surface-0);
@@ -2092,8 +2095,7 @@ body.menu-open .site-header {
 }
 
 .framework-grid {
-  /* 셰브런 오버레이가 카드와 동일한 트랙·gap을 재사용하므로 gap을 토큰화 */
-  --fw-gap: 16px;
+  /* 셰브런 오버레이가 카드와 동일한 트랙·gap(--fw-gap, 섹션 토큰)을 재사용한다 */
   --fw-chev: 7px;
   position: relative;
   display: grid;
@@ -2313,48 +2315,41 @@ body.menu-open .site-header {
   font-weight: 800;
 }
 
-/* --- 마무리 문장 — 되돌림 브래킷 아래 결론 밴드.
-   소개서 p12는 이 결론을 상하 라인으로 감싸 챕터를 닫는다. 다만 p12는 슬라이드의
-   큰 여백이 무게를 대신하므로 헤어라인만으로 성립하고, 웹에서는 그 여백이 없어
-   같은 구성이 카드 4장에 눌렸다(1차 적용 후 '아직 약하다' 피드백).
-   그래서 위 라인은 카드와 같은 --card-line 2px으로, 밴드에는 면(워시)을,
-   본문에는 한 단계 큰 타이포 위계를 얹어 결론이 스스로 서게 했다 --- */
+/* --- 마무리 문장 — 되돌림 브래킷 아래 결론 플레이트.
+   앞선 두 번은 이 자리를 '밴드'로 보고 선과 워시를 더 세게 가져갔지만, 어긋난 것은
+   강도가 아니라 재질이었다. 카드는 그림자를 가진 불투명한 물체인데 결론부만
+   빛나는 투명한 면이라, 카드 그룹이 아니라 섹션 프레임(SEAM) 계열로 읽혔다.
+   그래서 더하지 않고 뺀다 — 면·보더·라디우스·그림자를 .fw-card와 똑같이 주고
+   radial 워시와 하단 헤어라인은 걷어낸다. 위 간격까지 --fw-gap으로 맞추면
+   결론부가 별도 층이 아니라 그리드의 '다섯 번째 플레이트'로 읽힌다 --- */
 .fw-closing {
   position: relative;
-  margin-top: 26px;
-  padding: 34px 0 36px;
+  /* 간격 문법까지 그리드와 동일 — 카드 사이 gap과 같은 값이라 C·O·R·E 네 장 다음 행으로 앉는다 */
+  margin-top: var(--fw-gap);
+  /* 아래 다섯 줄은 .fw-card의 재질을 그대로 옮긴 것 — 수평 패딩도 카드와 같은 26px */
+  padding: 34px 26px 36px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: var(--e-dark-1);
+  /* 상단 2px 라인이 라디우스를 따라 잘리도록 — .fw-card와 같은 클리핑 방식 */
+  overflow: hidden;
   text-align: center;
-  /* 밴드의 면 — 선만으로는 앞의 카드 4장 대비 무게가 서지 않아, 상단 라인에 매달려
-     아래로 꺼지는 액센트 워시를 깐다. 색은 --grad-accent-surface와 같은 액센트(3,144,238)이고
-     좌우로도 페이드하도록 지오메트리만 바꿔 헤어라인의 가로 페이드와 끝이 맞는다.
-     본문 두 줄이 놓이는 아래쪽(66% 지점 이후)에서는 완전히 꺼져 대비를 건드리지 않는다 */
-  background-image: radial-gradient(70% 100% at 50% 0%, rgba(3, 144, 238, 0.24), transparent 66%);
 }
 
-.fw-closing::before,
-.fw-closing::after {
+/* 상단 라인 — 카드 4장의 상단 라인(.fw-card::before)과 같은 2px·같은 --card-line 규격에
+   불투명도까지 카드 휴지 상태(0.55)로 통일했다. 결론부를 더 세게 만드는 장치가 아니라
+   '이것도 카드다'라고 말하는 문법의 일부다. 밴드를 닫던 하단 1px 헤어라인은
+   플레이트 보더가 대신하므로 삭제 */
+.fw-closing::before {
   content: "";
   position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-}
-
-/* 상단 라인 — 카드 4장의 상단 라인(.fw-card::before)과 같은 2px·같은 --card-line 규격.
-   양끝이 카드 그리드 좌우 끝과 맞아떨어져, 결론 밴드가 네 장을 덮어 닫는
-   '다섯 번째 면'으로 읽힌다. 페이드형 --grad-line으로는 이 무게가 서지 않았다 */
-.fw-closing::before {
-  top: 0;
   height: 2px;
   background: var(--card-line);
-  opacity: 0.7;
-}
-
-/* 하단 라인 — 밴드를 닫되 섹션으로 흩어지도록, 양끝이 사라지는 헤어라인으로 한 단계 약하게 */
-.fw-closing::after {
-  bottom: 0;
-  height: 1px;
-  background: var(--grad-line);
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 .fw-closing-lead {
@@ -2375,12 +2370,11 @@ body.menu-open .site-header {
   word-break: keep-all;
 }
 
-/* 액센트 — 색만으로는 약해서 면(글자 아래 저알파 시안 슬랩)과 선(2px 언더라인)을 얹는다.
-   슬랩을 글자 뒤가 아니라 padding 영역에만 깔아, 시안 텍스트는 원래 배경 위에 남아
-   대비(5.7:1)가 그대로 유지된다. 2px는 카드 상단 라인과 같은 강조 규격 */
+/* 액센트 — 슬랩(면) + 언더라인(선) + 시안(색)의 3중 강조는 플레이트 안에서 과밀했다.
+   면을 걷어내고 선 하나로 감량한다. 2px는 카드 상단 라인과 같은 강조 규격이고,
+   시안 텍스트는 --surface-2 위에서 5.3:1로 AA를 통과한다 */
 .fw-closing-sub strong {
-  padding: 0 3px 6px;
-  background-image: linear-gradient(180deg, transparent calc(100% - 6px), rgba(3, 144, 238, 0.2) calc(100% - 6px));
+  padding-bottom: 5px;
   border-bottom: 2px solid rgba(3, 144, 238, 0.62);
   color: var(--cyan);
   font-weight: 800;
