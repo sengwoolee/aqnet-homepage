@@ -2446,10 +2446,13 @@ body.menu-open .site-header {
 /* =========================================================
    PERFORMANCE MARKETING — SERVICE에서 분리한 3개 섹션
    "SERVICE가 유독 길다"는 피드백에 따라 채널 운영 / 운영 프로세스 / 운영의 변화를
-   각각 독립 섹션으로 세분화했다. 경계가 눈에 읽히도록 서피스를 번갈아 두고,
+   각각 독립 섹션으로 세분화했다. 라이트 3연속(04~06)은 배경 명도 차가 5% 남짓이라
+   그것만으로는 한 덩어리로 읽힌다 — 새 색을 만드는 대신 섹션 배경과 패널의 관계를
+   한 섹션씩 뒤집어(면 반전) 경계를 만들고,
    전환 경계마다 다른 섹션과 같은 --grad-line 이음매를 깐다.
-     · #pm-detail  채널 운영    → l0 (SERVICE l1 다음이라 한 단계 밝음)
-     · #pm-process 운영 프로세스 → l1 (다시 한 단계 어두워짐)
+     · 04 SERVICE  영역 카드    → 배경 l1 + 카드 l0 (틴트 배경 위 화이트 카드)
+     · #pm-detail  채널 운영    → 배경 l0 + 패널 l1 (화이트 배경 위 틴트 패널 — 반전)
+     · #pm-process 운영 프로세스 → 배경 l1 + 카드 l0 (다시 틴트 배경 위 화이트 카드)
      · #pm-shift   운영의 변화   → 다크(결론 블록 + 뒤 SOLUTION 다크로 연결)
    ========================================================= */
 .pm-section {
@@ -2501,6 +2504,16 @@ body.menu-open .site-header {
 
 .pm-section > .section-heading h2 {
   max-width: 920px;
+}
+
+/* 리드 없는 섹션의 헤더 블록 보정 —
+   섹션 헤더는 "eyebrow → 헤딩 → 리드 → 콘텐츠"를 같은 높이로 반복해야 페이지 넘김이 생긴다.
+   05(#pm-detail)에는 .mp-lead가 있고 06(#pm-process)에는 없어 콘텐츠 시작선이 81px 어긋났다.
+   카피를 새로 만들지 않고, 리드가 차지하던 높이만큼을 헤딩 하단 여백으로 대신 확보한다.
+   = .section-heading 기본 여백 48px + 리드 상단 여백 18px + 리드 2줄(18px × 1.75)
+   h2 폰트가 clamp로 줄어드는 구간에서도 '차이값'은 그대로라 1440/1024/720 모두 정확히 맞는다 */
+#pm-process > .section-heading {
+  margin-bottom: calc(48px + 18px + 2 * 18px * 1.75);
 }
 
 /* --- 운영의 변화(결론 블록) — 다크 반전 --- */
@@ -2611,7 +2624,9 @@ body.menu-open .site-header {
   transform: translateY(-50%) rotate(45deg);
 }
 
-/* 본문 패널 — 섹션 배경(--surface-l1) 위 화이트 플랫 패널.
+/* 본문 패널 — 화이트 섹션 배경(--surface-l0) 위 틴트 플랫 패널(--surface-l1).
+   앞뒤 라이트 섹션(04·06)이 "틴트 배경 + 화이트 카드"이므로 여기서만 면 관계를 뒤집어,
+   배경값을 바꾸지 않고 04→05→06 경계를 만든다.
    .pm-step과 달리 그림자·리프트 없음, 반경도 한 단계 작게 */
 .mp-body {
   display: flex;
@@ -2620,7 +2635,7 @@ body.menu-open .site-header {
   padding: var(--mp-pad);
   border: 1px solid var(--border-l1);
   border-radius: var(--r-sm);
-  background: var(--surface-l0);
+  background: var(--surface-l1);
   transition: border-color var(--dur) ease;
 }
 
@@ -2659,6 +2674,7 @@ body.menu-open .site-header {
   list-style: none;
 }
 
+/* 패널이 l1으로 뒤집혔으므로 태그는 l0 — 패널과 동색으로 겹쳐 사라지지 않게 반대로 든다 */
 .mp-tags li {
   display: inline-flex;
   align-items: center;
@@ -2666,7 +2682,7 @@ body.menu-open .site-header {
   padding: 4px 10px;
   border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
-  background: var(--surface-l1);
+  background: var(--surface-l0);
   color: var(--text-l-2);
   font-size: 12.5px;
   line-height: 1.4;
