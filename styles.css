@@ -2578,8 +2578,10 @@ body.menu-open .site-header {
   width: 46px;
   height: 46px;
   border-radius: var(--r-sm);
-  background: var(--surface-l2);
-  color: var(--blue);
+  /* 세 장 동일 — 1번만 솔리드였을 때 "선택된 카드"로 읽혔다.
+     흰 글리프 / 블루 면 5.26:1 */
+  background: var(--blue);
+  color: var(--white);
   transition: background var(--dur) ease;
 }
 
@@ -2589,12 +2591,12 @@ body.menu-open .site-header {
 }
 
 .service-card:hover .svc-icon {
-  background: rgba(34, 118, 255, 0.1);
+  background: var(--blue-deep);
 }
 
 /* 인덱스 — 13px 회색 각주였던 것을 아이콘 높이에 맞춘 넘버 플레이트로 키운다.
    아이콘(좌) ↔ 인덱스(우)가 한 밴드에서 마주보며 헤더행을 만들고, 그 아래 구분선이
-   제목으로 시선을 넘긴다. 색은 --text-l-3 유지(흰 면 5.08:1) — 크기만으로 위계를 든다 */
+   제목으로 시선을 넘긴다. 아이콘과 짝이 되도록 세 장 모두 블루(흰 면 5.26:1) */
 .svc-index {
   position: absolute;
   top: 28px;
@@ -2602,7 +2604,7 @@ body.menu-open .site-header {
   display: grid;
   place-items: center;
   height: 46px;
-  color: var(--text-l-3);
+  color: var(--blue);
   font-size: 24px;
   line-height: 1;
   font-weight: 800;
@@ -2679,40 +2681,6 @@ body.menu-open .site-header {
   line-height: 1.6;
   font-weight: 700;
   letter-spacing: 0.01em;
-}
-
-/* 선두 영역(01) — 배지 없이 액센트 보더·미세 틴트·한 단계 높은 그림자로만 위계 표기.
-   기본 상태가 이미 한 단계 위이므로 hover도 한 단계 위(--e-3)로 받는다.
-   틴트만으로는 세 장을 나란히 놓았을 때 차이가 거의 읽히지 않아(직전 피드백),
-   "상단 라인 3px + 솔리드 블루 아이콘 칩 + 블루 인덱스"로 즉시 보이는 표식을 얹는다 */
-.service-card.is-lead {
-  border-color: var(--border-l3);
-  background:
-    linear-gradient(180deg, rgba(34, 118, 255, 0.08), rgba(34, 118, 255, 0) 46%),
-    var(--surface-l0);
-  box-shadow: var(--e-2);
-}
-
-.service-card.is-lead::before {
-  height: 3px;
-}
-
-.service-card.is-lead:hover {
-  box-shadow: var(--e-3);
-}
-
-/* 02·03은 틴트 칩(블루 글리프), 01만 솔리드 칩(화이트 글리프) — 흰 스트로크/블루 면 5.26:1 */
-.service-card.is-lead .svc-icon {
-  background: var(--blue);
-  color: var(--white);
-}
-
-.service-card.is-lead:hover .svc-icon {
-  background: var(--blue-deep);
-}
-
-.service-card.is-lead .svc-index {
-  color: var(--blue);
 }
 
 /* =========================================================
