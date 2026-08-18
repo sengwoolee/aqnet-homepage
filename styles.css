@@ -3841,16 +3841,22 @@ body.menu-open .site-header {
    커넥터(브래킷·스텁·접점 도트)는 전부 의사요소 border로 그린다.
    개발 중 제품이므로 글로우 없이 hairline·틴트로만 위계 표현
    --------------------------------------------------------- */
-/* 독립 섹션(#os-arch) — Solution(다크)에서 분리했지만 배경 톤은 그대로 이어받아
-   Solution → OS Architecture → Snapshot 다크 구간이 끊기지 않게 한다.
+/* 독립 섹션(#os-arch) — 08 대시보드 데모(다크)와 10 증거 밴드(다크) 사이에 놓이는 라이트 정보층.
+   4모듈 구성 설명은 읽히는 도식이라 라이트 면이 맞고, 다크가 다섯 섹션 연속으로 한 덩어리가 되는 것을 끊어
+   08 대시보드가 시그니처로 서게 한다.
    이음매 헤어라인은 공용 SEAM 목록을 건드리지 않고 여기서 같은 방식으로 깐다 */
 .os-arch-section {
   position: relative;
   width: 100%;
   max-width: none;
-  background: var(--surface-0);
-  background-image: var(--mesh-cyan), var(--mesh-blue);
-  color: var(--white);
+  /* 라이트 섹션 공통 텍스처 — .reference-section과 동일 구성(면 → 페이드 → dot) */
+  background-color: var(--surface-l1);
+  background-image:
+    linear-gradient(180deg, rgba(248, 251, 255, 0), var(--surface-l1) 520px),
+    var(--dot-light);
+  background-size:
+    auto,
+    var(--dot-light-size);
 }
 
 .os-arch-section::before {
@@ -3875,12 +3881,10 @@ body.menu-open .site-header {
 
 .os-arch-section .section-heading h2 {
   max-width: 920px;
-  color: var(--white);
 }
 
 .os-arch-section .section-heading p:not(.eyebrow) {
   max-width: 760px;
-  color: var(--text-d-2);
 }
 
 .os-arch-block {
@@ -3918,14 +3922,14 @@ body.menu-open .site-header {
   display: flex;
   flex-direction: column;
   padding: 17px 19px 15px;
-  border: 1px solid var(--border-2);
+  border: 1px solid var(--border-l2);
   /* 소개서 카드 언어 — 상단 2px 블루 라인.
      커넥터(::before 접점 도트 · ::after 브래킷)가 두 의사요소를 모두 쓰므로
      이 패밀리만 라인을 border-top으로 그린다(그래서 그라디언트가 아닌 solid) */
   border-top: 2px solid rgba(34, 118, 255, 0.55);
   border-radius: var(--r-md);
-  background: var(--surface-2);
-  box-shadow: var(--e-dark-1);
+  background: var(--surface-l0);
+  box-shadow: var(--e-1);
   transition:
     border-color var(--dur) ease,
     box-shadow var(--dur) ease;
@@ -3934,9 +3938,9 @@ body.menu-open .site-header {
 /* 리프트 없음 — 브래킷·접점 도트가 카드에 물려 있어 2px만 올려도
    중앙 노드 스텁과 커넥터가 어긋난다. 보더·그림자·라인만으로 응답 */
 .os-mod:hover {
-  border-color: var(--border-3);
+  border-color: var(--border-l3);
   border-top-color: var(--blue);
-  box-shadow: var(--e-dark-2);
+  box-shadow: var(--e-2);
 }
 
 /* 접점 도트 — 커넥터가 카드에서 출발하는 지점(.mp-stage::before와 동일한 링 표현) */
@@ -3949,7 +3953,8 @@ body.menu-open .site-header {
   margin-top: -5px;
   border: 1.5px solid var(--os-dot);
   border-radius: 50%;
-  background: var(--surface-0);
+  /* 링 내부는 섹션 면과 같은 색 — 여기가 남으면 라이트 배경에 다크 점이 찍힌다 */
+  background: var(--surface-l1);
 }
 
 /* 브래킷 — 카드 중앙에서 가로로 나와 열 중앙(노드 높이)까지 꺾여 내려/올라간다.
@@ -4009,7 +4014,7 @@ body.menu-open .site-header {
 }
 
 .os-mod-no {
-  color: var(--text-d-4);
+  color: var(--text-l-3);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -4018,7 +4023,7 @@ body.menu-open .site-header {
 
 .os-mod h3 {
   margin: 5px 0 0;
-  color: var(--white);
+  color: var(--text-l-1);
   font-size: 18px;
   line-height: 1.25;
   font-weight: 800;
@@ -4027,7 +4032,7 @@ body.menu-open .site-header {
 
 .os-mod p {
   margin: 7px 0 0;
-  color: var(--text-d-3);
+  color: var(--text-l-2);
   font-size: 14.5px;
   line-height: 1.55;
   word-break: keep-all;
@@ -4044,26 +4049,28 @@ body.menu-open .site-header {
 
 .os-mod-tags li {
   padding: 4px 10px;
-  border: 1px solid var(--border-1);
+  border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-d-3);
+  background: var(--surface-l1);
+  color: var(--text-l-2);
   font-size: 12.5px;
   font-weight: 700;
 }
 
-/* 중앙 시스템 노드 — 모듈보다 한 단계 밝은 서피스 + 블루 보더로만 허브 위계 */
+/* 중앙 시스템 노드 — 라이트에서는 모듈과 같은 화이트 면을 쓰고
+   azure 틴트 + 블루 보더로만 허브 위계를 세운다 */
 .os-core {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 24px 20px;
-  border: 1px solid var(--border-3);
+  border: 1px solid var(--border-l3);
   border-radius: var(--r-md);
-  background-color: var(--surface-1);
-  background-image: linear-gradient(180deg, rgba(3, 144, 238, 0.12), rgba(3, 144, 238, 0) 62%);
-  box-shadow: var(--e-dark-1);
+  background-color: var(--surface-l0);
+  /* 같은 azure를 알파만 내려(0.12 → 0.07) 라이트 면에서 허브 톤만 남긴다 */
+  background-image: linear-gradient(180deg, rgba(3, 144, 238, 0.07), rgba(3, 144, 238, 0) 62%);
+  box-shadow: var(--e-1);
   text-align: center;
 }
 
@@ -4087,7 +4094,7 @@ body.menu-open .site-header {
 
 .os-cap {
   display: block;
-  color: var(--text-d-3);
+  color: var(--text-l-3);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -4096,7 +4103,7 @@ body.menu-open .site-header {
 .os-core-name {
   display: block;
   margin-top: 8px;
-  color: var(--white);
+  color: var(--text-l-1);
   font-size: 21px;
   line-height: 1.2;
   font-weight: 800;
@@ -4106,7 +4113,7 @@ body.menu-open .site-header {
 .os-src-cap {
   margin-top: 20px;
   padding-top: 18px;
-  border-top: 1px solid var(--border-2);
+  border-top: 1px solid var(--border-l2);
 }
 
 .os-src {
@@ -4121,10 +4128,10 @@ body.menu-open .site-header {
 
 .os-src li {
   padding: 4px 10px;
-  border: 1px solid var(--border-1);
+  border: 1px solid var(--border-l1);
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-d-2);
+  background: var(--surface-l1);
+  color: var(--text-l-2);
   font-size: 12.5px;
   font-weight: 700;
 }
@@ -4132,15 +4139,16 @@ body.menu-open .site-header {
 .os-arch-cap {
   margin: 24px 0 0;
   text-align: center;
-  color: var(--text-d-2);
+  color: var(--text-l-2);
   font-size: 15px;
   line-height: 1.6;
   font-weight: 600;
   word-break: keep-all;
 }
 
+/* 액센트 색은 아이브로우와 같은 관례 — 라이트 섹션 var(--blue) / 다크 섹션 var(--cyan) */
 .os-arch-cap strong {
-  color: var(--cyan);
+  color: var(--blue);
   font-weight: 800;
 }
 
@@ -4151,7 +4159,7 @@ body.menu-open .site-header {
 }
 
 .os-arch-cta a {
-  color: var(--cyan);
+  color: var(--blue);
   font-size: 15px;
   font-weight: 800;
 }
@@ -4162,11 +4170,13 @@ body.menu-open .site-header {
   text-underline-offset: 3px;
 }
 
-/* 각주 — 콘솔 면책과 동일 톤(개발 단계 명시) */
+/* 각주 — 콘솔 면책과 동일 톤(개발 단계 명시).
+   라이트 각주 관례(.pm-diff-note/.mp-note)와 같은 --text-l-2 —
+   대응 토큰인 --text-l-3은 이 면에서 4.20:1로 AA 미달이라 한 단계 올렸다(8.88:1) */
 .os-arch-note {
   margin: 9px 0 0;
   text-align: center;
-  color: var(--text-d-4);
+  color: var(--text-l-2);
   font-size: 12px;
   line-height: 1.6;
   word-break: keep-all;
